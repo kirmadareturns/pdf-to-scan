@@ -1,14 +1,21 @@
-let currentFiles = []; // Stores all uploaded files
+// --- 1. AUTO-FIX HTML ---
+// This line forces your file picker to accept multiple files
+const fileInputRef = document.getElementById('fileInput');
+if (fileInputRef) {
+    fileInputRef.setAttribute('multiple', 'multiple');
+}
+
+// --- 2. VARIABLES ---
+let currentFiles = []; 
 let convertedPdfBytes = null;
 let librariesLoaded = false;
 let loadingPromise = null;
 
 const uploadSection = document.getElementById('uploadSection');
-const fileInput = document.getElementById('fileInput');
 const convertBtn = document.getElementById('convertBtn');
 const settingsSection = document.getElementById('settingsSection');
 
-// --- 1. LIBRARY LOADER (Unchanged) ---
+// --- 3. LIBRARY LOADER ---
 function loadScript(src) {
     return new Promise((resolve, reject) => {
         if (document.querySelector(`script[src="${src}"]`)) return resolve();
@@ -24,7 +31,7 @@ async function loadLibraries() {
     if (librariesLoaded) return;
     if (loadingPromise) return loadingPromise;
 
-    console.log("Starting PDF Engine download...");
+    console.log("Loading PDF Engine...");
     loadingPromise = Promise.all([
         loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js'),
         loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js')
@@ -37,19 +44,21 @@ async function loadLibraries() {
         if (typeof window.pdfjsLib === 'undefined') throw new Error("PDF Engine failed.");
         window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
         librariesLoaded = true;
-        console.log("PDF Engine Fully Ready.");
+        console.log("Engine Ready.");
     }).catch(err => {
         console.error(err);
         loadingPromise = null;
-        alert("Connection error: Could not load PDF tools.");
+        alert("Internet connection required for PDF tools.");
     });
     return loadingPromise;
 }
 
-// --- 2. TRIGGERS & EVENTS ---
+// --- 4. EVENT LISTENERS ---
 if (uploadSection) {
     uploadSection.addEventListener('mouseenter', loadLibraries);
     uploadSection.addEventListener('touchstart', loadLibraries, { passive: true });
+    
+    // Drag & Drop Support
     uploadSection.addEventListener('dragover', e => {
         e.preventDefault();
         uploadSection.classList.add('dragover');
@@ -62,72 +71,63 @@ if (uploadSection) {
     });
 }
 
-if (fileInput) fileInput.addEventListener('change', handleFileSelect);
+if (fileInputRef) fileInputRef.addEventListener('change', handleFileSelect);
 if (convertBtn) convertBtn.addEventListener('click', convertPDF);
 
-// --- 3. UPDATED FILE HANDLING (APPEND MODE) ---
+// --- 5. FILE HANDLING (THE IMPORTANT PART) ---
 async function handleFileSelect(event) {
+    // Get files from input
     const newFiles = Array.from(event.target.files);
+    
     if (newFiles.length === 0) return;
 
-    // Filter PDFs
+    // Filter only PDFs
     const validFiles = newFiles.filter(f => f.type === 'application/pdf');
-    if (validFiles.length === 0) return alert('Only PDF files are allowed.');
+    if (validFiles.length === 0) return alert('Please upload PDF files only.');
 
     loadLibraries();
 
-    // APPEND new files to existing list (Don't overwrite)
-    // Check for duplicates based on name to be safe
+    // Add new files to our list (APPENDING, not replacing)
+    // We check for duplicates by name so we don't add the same file twice
     const existingNames = new Set(currentFiles.map(f => f.name));
-    const uniqueNewFiles = validFiles.filter(f => !existingNames.has(f.name));
+    const uniqueToAdd = validFiles.filter(f => !existingNames.has(f.name));
     
-    if (uniqueNewFiles.length === 0 && currentFiles.length > 0) {
-        // If user adds same file again, just ignore or alert
-        console.log("File already added.");
-    } else {
-        currentFiles = [...currentFiles, ...uniqueNewFiles];
-    }
+    currentFiles = [...currentFiles, ...uniqueToAdd];
 
-    // Reset input so user can select more if they want
-    if (fileInput) fileInput.value = ''; 
-
+    // Update the UI
     showFileInfo();
     settingsSection.classList.add('active');
     settingsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-    if (typeof gtag !== 'undefined') gtag('event', 'file_upload', { 'event_category': 'conversion', 'event_label': 'pdf_uploaded' });
+    
+    // Clear the input so you can select the same file again if you really want to
+    if (fileInputRef) fileInputRef.value = ''; 
 }
 
 function showFileInfo() {
     const totalSize = (currentFiles.reduce((acc, file) => acc + file.size, 0) / 1024 / 1024).toFixed(2);
-    const count = currentFiles.length;
     
-    // List first few names
-    let nameDisplay = currentFiles.map(f => f.name).join(', ');
-    if (nameDisplay.length > 50) nameDisplay = nameDisplay.substring(0, 50) + '...';
-
     document.getElementById('fileInfo').innerHTML = `
-        <div class="file-info-row"><span class="file-info-label">Queue:</span><span class="file-info-value"><strong>${count}</strong> File(s) Ready</span></div>
-        <div class="file-info-row"><span class="file-info-label">Total Size:</span><span class="file-info-value">${totalSize} MB</span></div>
-        <div class="file-info-row"><span class="file-info-label">Files:</span><span class="file-info-value" style="font-size:0.8em;">${nameDisplay}</span></div>
-        ${count > 1 ? '<div style="margin-top:5px; font-size:0.8em; color:#666;">(Files will be merged into one PDF)</div>' : ''}
+        <div class="file-info-row">
+            <span class="file-info-label">Files Loaded:</span>
+            <span class="file-info-value"><strong>${currentFiles.length}</strong></span>
+        </div>
+        <div class="file-info-row">
+            <span class="file-info-label">Total Size:</span>
+            <span class="file-info-value">${totalSize} MB</span>
+        </div>
+        <div style="margin-top:8px; font-size:0.8em; color:#666;">
+            ${currentFiles.map(f => f.name).join('<br>')}
+        </div>
     `;
 }
 
-// --- 4. BATCH CONVERSION LOGIC ---
+// --- 6. CONVERSION PROCESS ---
 async function convertPDF() {
-    if (currentFiles.length === 0) return alert("No files selected!");
+    if (currentFiles.length === 0) return alert("No files loaded.");
 
     if (!librariesLoaded) {
-        document.body.style.cursor = 'wait';
-        convertBtn.disabled = true;
         convertBtn.textContent = "Loading Engine...";
-        try { await loadLibraries(); } catch (e) { 
-            convertBtn.disabled = false; 
-            document.body.style.cursor = 'default'; 
-            return; 
-        }
-        document.body.style.cursor = 'default';
+        try { await loadLibraries(); } catch (e) { return; }
         convertBtn.textContent = "Convert to Scanned PDF";
     }
 
@@ -144,30 +144,20 @@ async function convertPDF() {
     }
 
     try {
-        const dpi = parseInt(document.getElementById('dpiSelect').value) || 150; // Default to 150 if null
+        const dpi = parseInt(document.getElementById('dpiSelect').value) || 150;
         const pdfDoc = await PDFLib.PDFDocument.create();
-        
-        updateProgress(5, 'Starting Batch...');
 
-        // --- MAIN LOOP: Process each file ---
+        // Loop through FILES
         for (let fIndex = 0; fIndex < currentFiles.length; fIndex++) {
             const file = currentFiles[fIndex];
-            console.log(`Processing file ${fIndex + 1}: ${file.name}`);
-            
             const arrayBuffer = await file.arrayBuffer();
             const pdf = await window.pdfjsLib.getDocument({ data: arrayBuffer }).promise;
 
-            // --- PAGE LOOP: Process each page ---
+            // Loop through PAGES
             for (let i = 1; i <= pdf.numPages; i++) {
-                // Math for smooth progress bar
-                const totalFiles = currentFiles.length;
-                const fileProgressChunk = 90 / totalFiles; // Each file gets a chunk of the bar
-                const currentBase = 5 + (fIndex * fileProgressChunk);
-                const pageProgress = (i / pdf.numPages) * fileProgressChunk;
-                
                 updateProgress(
-                    currentBase + pageProgress, 
-                    `File ${fIndex + 1}/${totalFiles} - Page ${i}/${pdf.numPages}`
+                    ((fIndex / currentFiles.length) * 100) + ((i/pdf.numPages) * (100/currentFiles.length)), 
+                    `Processing File ${fIndex + 1}/${currentFiles.length} - Page ${i}`
                 );
 
                 const page = await pdf.getPage(i);
@@ -178,9 +168,15 @@ async function convertPDF() {
                 canvas.height = viewport.height;
 
                 await page.render({ canvasContext: ctx, viewport }).promise;
-                applyScannedEffect(ctx, canvas.width, canvas.height);
+                
+                // Scan Effect
+                ctx.globalCompositeOperation = 'destination-over';
+                ctx.fillStyle = '#fcfcf5';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.globalCompositeOperation = 'source-over';
 
-                const imgData = canvas.toDataURL('image/jpeg', 0.85); // 0.85 quality is faster/smaller
+                // Add to PDF
+                const imgData = canvas.toDataURL('image/jpeg', 0.8);
                 const imgBytes = await fetch(imgData).then(r => r.arrayBuffer());
                 const image = await pdfDoc.embedJpg(imgBytes);
                 const pdfPage = pdfDoc.addPage([viewport.width, viewport.height]);
@@ -188,9 +184,8 @@ async function convertPDF() {
             }
         }
 
-        updateProgress(95, 'Merging files...');
+        updateProgress(100, 'Finished!');
         convertedPdfBytes = await pdfDoc.save();
-        updateProgress(100, 'Done!');
         
         setTimeout(() => {
             progressSection.classList.remove('active');
@@ -199,40 +194,10 @@ async function convertPDF() {
         }, 500);
 
     } catch (err) {
-        console.error(err);
-        alert('Error during conversion: ' + err.message);
+        alert('Error: ' + err.message);
         convertBtn.disabled = false;
         progressSection.classList.remove('active');
     }
-}
-
-function applyScannedEffect(ctx, w, h) {
-    // White bg
-    ctx.fillStyle = '#fcfcf5';
-    ctx.globalCompositeOperation = 'destination-over';
-    ctx.fillRect(0, 0, w, h);
-
-    // Noise
-    const noiseCanvas = document.createElement('canvas');
-    noiseCanvas.width = 50;
-    noiseCanvas.height = 50;
-    const nCtx = noiseCanvas.getContext('2d');
-    const imgData = nCtx.createImageData(50, 50);
-    for (let i = 0; i < imgData.data.length; i += 4) {
-        const v = 235 + Math.random() * 20;
-        imgData.data[i] = v;
-        imgData.data[i + 1] = v;
-        imgData.data[i + 2] = v;
-        imgData.data[i + 3] = 30; 
-    }
-    nCtx.putImageData(imgData, 0, 0);
-
-    ctx.globalAlpha = 0.12;
-    ctx.fillStyle = ctx.createPattern(noiseCanvas, 'repeat');
-    ctx.fillRect(0, 0, w, h);
-
-    ctx.globalAlpha = 1.0;
-    ctx.globalCompositeOperation = 'source-over';
 }
 
 function setupDownload() {
@@ -245,13 +210,7 @@ function setupDownload() {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        
-        // Naming
-        let fName = 'scanned_document.pdf';
-        if (currentFiles.length === 1) fName = currentFiles[0].name.replace('.pdf', '_scanned.pdf');
-        else fName = `scanned_batch_${currentFiles.length}_files.pdf`;
-
-        a.download = fName;
+        a.download = currentFiles.length > 1 ? 'scanned_batch_merged.pdf' : currentFiles[0].name.replace('.pdf', '_scanned.pdf');
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -262,10 +221,9 @@ function setupDownload() {
 function resetApp() {
     currentFiles = [];
     convertedPdfBytes = null;
-    fileInput.value = '';
+    if (fileInputRef) fileInputRef.value = '';
     settingsSection.classList.remove('active');
     document.getElementById('progressSection').classList.remove('active');
     document.getElementById('resultSection').classList.remove('active');
     convertBtn.disabled = false;
-    document.getElementById('fileInfo').innerHTML = '';
 }

@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universal Client-Side Formatter</title>
+    <style>
+        :root {
+            --bg: #1e1e1e;
+            --panel: #252526;
+            --text: #d4d4d4;
+            --accent: #007acc;
+            --border: #3e3e42;
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            height: 100vh;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        h1 { margin: 0; font-size: 20px; }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        select, button {
+            padding: 8px 12px;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button.primary {
+            background-color: var(--accent);
+            border-color: var(--accent);
+            font-weight: bold;
+        }
+
+        button.primary:hover { opacity: 0.9; }
+        button:disabled { opacity: 0.5; cursor: wait; }
+
+        .status-text {
+            font-size: 12px;
+            color: #888;
+            margin-right: 10px;
+            font-style: italic;
+        }
+
+        .editor-container {
+            display: flex;
+            gap: 20px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 5px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        textarea {
+            flex: 1;
+            background-color: var(--panel);
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 15px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+            resize: none;
+            outline: none;
+            white-space: pre;
+            overflow: auto;
+        }
+
+        textarea:focus { border-color: var(--accent); }
+
+        .error-msg {
+            color: #ff6b6b;
+            font-size: 13px;
+            margin-top: 10px;
+            display: none;
+            padding: 10px;
+            background: rgba(255, 107, 107, 0.1);
+            border-left: 3px solid #ff6b6b;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Universal Safe Formatter</h1>
+        <div class="controls">
+            <span id="statusText" class="status-text"></span>
+            <select id="languageSelect" onchange="prefetchParser()">
+                <option value="html">HTML</option>
+                <option value="css">CSS / SCSS</option>
+                <option value="babel">JavaScript</option>
+                <option value="typescript">TypeScript</option>
+                <option value="json">JSON</option>
+                <option value="markdown">Markdown</option>
+                <option value="yaml">YAML</option>
+                <option value="xml">XML / SVG</option>
+            </select>
+            <button class="primary" id="formatBtn" onclick="formatCode()">Format Code</button>
+            <button onclick="copyOutput()">Copy Output</button>
+        </div>
+    </header>
+
+    <div class="editor-container">
+        <div class="panel">
+            <label>Input</label>
+            <textarea id="inputCode" placeholder="Paste code here..." spellcheck="false"></textarea>
+        </div>
+        <div class="panel">
+            <label>Formatted Output</label>
+            <textarea id="outputCode" placeholder="Clean code will appear here..." readonly spellcheck="false"></textarea>
+        </div>
+    </div>
+    
+    <div id="errorDisplay" class="error-msg"></div>
+
+    <script>
+        // --- CONFIGURATION ---
+        const BASE_URL = "https://unpkg.com/prettier@2.8.8";
+        const CORE_URL = `${BASE_URL}/standalone.js`;
+        
+        // Map languages to their specific script URLs
+        // We map the dropdown values to the required plugin scripts
+        const parsersMap = {
+            html:       { parser: "html",       url: `${BASE_URL}/parser-html.js` },
+            css:        { parser: "css",        url: `${BASE_URL}/parser-postcss.js` },
+            babel:      { parser: "babel",      url: `${BASE_URL}/parser-babel.js` },
+            typescript: { parser: "typescript", url: `${BASE_URL}/parser-typescript.js` },
+            json:       { parser: "json",       url: `${BASE_URL}/parser-babel.js` }, // JSON uses babel parser in Prettier 2.x
+            markdown:   { parser: "markdown",   url: `${BASE_URL}/parser-markdown.js` },
+            yaml:       { parser: "yaml",       url: `${BASE_URL}/parser-yaml.js` },
+            xml:        { parser: "xml",        url: "https://unpkg.com/@prettier/plugin-xml@2.2.0/standalone.js" }
+        };
+
+        // Track loaded scripts to avoid re-downloading
+        const loadedScripts = new Set();
+
+        // --- DYNAMIC LOADER ---
+        function loadScript(src) {
+            return new Promise((resolve, reject) => {
+                if (loadedScripts.has(src)) return resolve(); // Already loaded
+
+                document.getElementById('statusText').textContent = "Loading engine...";
+                const script = document.createElement('script');
+                script.src = src;
+                script.onload = () => {
+                    loadedScripts.add(src);
+                    document.getElementById('statusText').textContent = "";
+                    resolve();
+                };
+                script.onerror = () => {
+                    document.getElementById('statusText').textContent = "Error loading engine.";
+                    reject(new Error(`Failed to load ${src}`));
+                };
+                document.head.appendChild(script);
+            });
+        }
+
+        // --- PRE-FETCH LOGIC ---
+        // 1. Load the CORE engine immediately after page load (background)
+        window.addEventListener('DOMContentLoaded', () => {
+            loadScript(CORE_URL).then(() => {
+                // Once core is ready, pre-fetch the default parser (HTML)
+                prefetchParser();
+            });
+        });
+
+        // 2. Load specific parser when dropdown changes (before user clicks format)
+        async function prefetchParser() {
+            const lang = document.getElementById('languageSelect').value;
+            const config = parsersMap[lang];
+            if(config && config.url) {
+                await loadScript(config.url);
+            }
+        }
+
+        // --- MAIN FORMAT FUNCTION ---
+        async function formatCode() {
+            const input = document.getElementById('inputCode').value;
+            const lang = document.getElementById('languageSelect').value;
+            const errorBox = document.getElementById('errorDisplay');
+            const outputBox = document.getElementById('outputCode');
+            const btn = document.getElementById('formatBtn');
+
+            if (!input.trim()) return;
+
+            // UI Loading State
+            btn.disabled = true;
+            btn.textContent = "Processing...";
+            errorBox.style.display = 'none';
+
+            try {
+                // 1. Ensure Core is loaded
+                await loadScript(CORE_URL);
+                
+                // 2. Ensure specific language parser is loaded
+                const config = parsersMap[lang];
+                await loadScript(config.url);
+
+                // 3. Formatting Logic
+                const formatted = prettier.format(input, {
+                    parser: config.parser,
+                    plugins: window.prettierPlugins,
+                    printWidth: 80,
+                    tabWidth: 2,
+                    useTabs: false,
+                    semi: true,
+                    singleQuote: false,
+                });
+
+                outputBox.value = formatted;
+
+            } catch (err) {
+                console.error(err);
+                errorBox.style.display = 'block';
+                errorBox.textContent = "Error: " + err.message;
+            } finally {
+                btn.disabled = false;
+                btn.textContent = "Format Code";
+            }
+        }
+
+        function copyOutput() {
+            const output = document.getElementById('outputCode');
+            if (!output.value) return;
+            output.select();
+            document.execCommand('copy');
+            alert('Copied to clipboard!');
+        }
+    </script>
+</body>
+</html>

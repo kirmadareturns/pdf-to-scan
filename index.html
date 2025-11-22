@@ -6,17 +6,21 @@
     <title>PDF to scanned document converter free online tool</title>
     <meta name="title" content="PDF to scanned PDF converter free online tool. PDF to scanned document converter free online tool.">
     <meta name="description" content="Convert PDF to scanned PDF online free. Make your digital PDF look like a scanned document with adjustable DPI quality. Fast, secure, and easy to use. No registration required. Make any PDF look scanned in 30 s. Free online tool—no signup, no watermark, 300 DPI quality. Instant download.">
+    <meta name="keywords" content="pdf to scanned pdf, convert pdf to scanned, pdf scanner online, make pdf look scanned, digital pdf to scanned, pdf to image pdf, scanned pdf converter, online pdf scanner, free pdf converter, pdf to scanned document">
+    <meta name="robots" content="index, follow">
+    <link rel="icon" type="image/png" href="/favicon.png">
     <link rel="stylesheet" href="style.css">
-    
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6196194515460390" crossorigin="anonymous"></script>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-CJJHK6V33P"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-CJJHK6V33P');
-    </script>
 </head>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-CJJHK6V33P"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-CJJHK6V33P');
+</script>
+
 <body>   
     <nav class="navbar">
         <div class="nav-container">
@@ -29,7 +33,13 @@
                     <a href="#" class="dropbtn">Tools ▼</a>
                     <div class="dropdown-content">
                         <a href="/merge-pdf.html">Merge PDF</a>
+                        <a href="/pdf-eraser.html">Erase PDF</a>
+                        <a href="/unlock-pdf.html">Unlock PDF</a>
+                        <a href="/rearrange-pdf.html">Rearrange PDF</a>
+                        <a href="/split-pdf.html">Split PDF</a>
+                        <a href="/rotate-pdf.html">Rotate PDF</a>
                         <a href="/pdf-to-scan.html">PDF to scan</a>
+                        <a href="/compress-pdf.html">Compress PDF</a>
                     </div>
                 </li>
             </ul>
@@ -43,95 +53,109 @@
             <p style="font-size:14px;color:#666;">Completely free to use. No signup or login required</p>
         </div>
 
-        <div class="main-content">
-            <div class="scan-overlay" id="scanOverlay">
-                <div class="scan-beam"></div>
-            </div>
-
-            <div class="upload-zone" id="uploadSection">
-                <div class="upload-icon"></div>
-                <h2>Select PDF File</h2>
-                <p>Click to browse or drag and drop your PDF file here</p>
-                <input type="file" id="fileInput" accept="application/pdf" multiple style="display:none;">
-                <button class="btn">Choose PDF File</button>
-            </div>
-
-            <div class="settings-section" id="settingsSection">
-                <div class="file-info" id="fileInfo"></div>
-                <div style="margin-bottom: 20px;">
-                    <label>DPI (Resolution Quality)</label>
-                    <select id="dpiSelect" style="width:100%; padding:10px; margin-top:5px;">
-                        <option value="150">150</option>
-                        <option value="200">200</option>
-                        <option value="300" selected>300 (Recommended)</option>
-                    </select>
+        <div class="content-grid">
+            <div class="main-content">
+                
+                <div class="scan-overlay" id="scanOverlay">
+                    <div class="scan-beam"></div>
                 </div>
-                <button class="btn" id="convertBtn" style="width:100%">Convert to Scanned PDF</button>
-            </div>
 
-            <div class="progress-section" id="progressSection">
-                <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-                <div class="progress-text" id="progressText">Processing...</div>
-            </div>
+                <div class="upload-zone" id="uploadSection">
+                    <div class="upload-icon"></div>
+                    <h2>Select PDF File</h2>
+                    <p>Click to browse or drag and drop your PDF file here</p>
+                    <input type="file" id="fileInput" accept="application/pdf" multiple style="display:none;">
+                    <button class="btn" onclick="document.getElementById('fileInput').click()">Choose PDF File</button>
+                </div>
 
-            <div class="result-section" id="resultSection">
-                <h3>Success</h3>
-                <p>Your scanned PDF is ready to download</p>
-                <div class="button-group">
-                    <button class="btn btn-success" id="downloadBtn">Download Scanned PDF</button>
-                    <button class="btn btn-secondary" onclick="resetApp()">Convert Another File</button>
+                <div class="settings-section" id="settingsSection">
+                    <div class="file-info" id="fileInfo"></div>
+                    <div class="form-group">
+                        <label for="dpiSelect" style="display:block;margin-bottom:10px;font-weight:bold;">DPI (Resolution Quality)</label>
+                        <select id="dpiSelect" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:5px;">
+                            <option value="100">100</option>
+                            <option value="150">150</option>
+                            <option value="200">200</option>
+                            <option value="300" selected>300 (Recommended)</option>
+                            <option value="400">400</option>
+                        </select>
+                    </div>
+                    <div class="convert-section" style="margin-top:20px;text-align:center;">
+                        <button class="btn" id="convertBtn">Convert to Scanned PDF</button>
+                    </div>
+                </div>
+
+                <div class="progress-section" id="progressSection">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="progress-text" id="progressText">Processing...</div>
+                </div>
+
+                <div class="result-section" id="resultSection">
+                    <h3>Success</h3>
+                    <p>Your scanned PDF is ready to download</p>
+                    <div class="button-group">
+                        <button class="btn btn-success" id="downloadBtn">Download Scanned PDF</button>
+                        <button class="btn btn-secondary" onclick="resetApp()">Convert Another File</button>
+                    </div>
                 </div>
             </div>
         </div> 
     </main>
 
-    <div class="content-section-wrapper" id="how">
-        <div class="collapsible-header" onclick="toggleSection(this)">
-            <h2>How to Convert PDF to Scanned Document</h2>
-            <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
-        </div>
-        <div class="collapsible-content">
-            <div class="seo-content">
-                <h3>Step 1: Upload Your PDF File</h3>
-                <p>Click the upload zone or drag and drop your PDF file. You can upload PDF files of any size.</p>
-                <h3>Step 2: Select DPI Quality</h3>
-                <p>Choose your preferred DPI. 300 DPI is recommended.</p>
-                <h3>Step 3: Click Convert</h3>
-                <p>Click "Convert to Scanned PDF" button and wait for processing to complete. The process is almost instant.</p>
-                <h3>Step 4: Download Your Scanned PDF</h3>
-                <p>Click "Download Scanned PDF" to save your file.</p>
-                <h3>Why Make PDFs Look Scanned?</h3>
-                <ul><li>Scanned documents look more authentic and trustworthy</li></ul>
+    <div class="container" id="how">
+        <div class="collapsible-wrapper">
+            <div class="collapsible-header" onclick="toggleSection(this)">
+                <h2>How to Convert PDF to Scanned Document</h2>
+                <svg class="chevron" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+            </div>
+            <div class="collapsible-content">
+                <div class="seo-content">
+                    <h3>Step 1: Upload Your PDF File</h3>
+                    <p>Click the upload zone or drag and drop your PDF file. You can upload PDF files of any size.</p>
+                    <h3>Step 2: Select DPI Quality</h3>
+                    <p>Choose your preferred DPI. 300 DPI is recommended.</p>
+                    <h3>Step 3: Click Convert</h3>
+                    <p>Click "Convert to Scanned PDF" button and wait. The process is almost instant.</p>
+                    <h3>Step 4: Download Your Scanned PDF</h3>
+                    <p>Click "Download Scanned PDF" to save your file.</p>
+                    <h3>Why Make PDFs Look Scanned?</h3>
+                    <ul>
+                        <li>Scanned documents look more authentic and trustworthy.</li>
+                        <li>Useful for submitting forms that require a "scanned" look.</li>
+                    </ul>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="content-section-wrapper" id="faq">
-        <div class="collapsible-header" onclick="toggleSection(this)">
-            <h2>Common questions you might have</h2>
-            <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
-        </div>
-        <div class="collapsible-content">
-            <div class="faq-section">
-                <div class="faq-item">
-                    <div class="faq-question">Do I need to sign up or log in to use the tool?</div>
-                    <div class="faq-answer">No, you don’t need to sign up or log in to use the tool.</div>
-                </div>
-                <div class="faq-item">
-                    <div class="faq-question">Do I need to pay anything to use the tool?</div>
-                    <div class="faq-answer">No, the tool is 100% free to use. You don’t have to pay a single dime.</div>
-                </div>
-                <div class="faq-item">
-                    <div class="faq-question">Can I risk uploading my private and confidential documents?</div>
-                    <div class="faq-answer">You don’t have to worry since your documents never leave your device. All files are processed 100% in your browser and nothing is ever sent to our servers.</div>
-                </div>
-                <div class="faq-item">
-                    <div class="faq-question">How long does it take to convert a file?</div>
-                    <div class="faq-answer">Conversion happens almost instantly. Large files with multiple pages might take a few seconds.</div>
-                </div>
-                <div class="faq-item">
-                    <div class="faq-question">Can we convert multiple PDFs at once?</div>
-                    <div class="faq-answer">Yes. Batch upload the files you want to convert and the processor will convert each of them one by one.</div>
+        <div class="collapsible-wrapper" id="faq">
+            <div class="collapsible-header" onclick="toggleSection(this)">
+                <h2>Common questions you might have</h2>
+                <svg class="chevron" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+            </div>
+            <div class="collapsible-content">
+                <div class="faq-section">
+                    <div class="faq-item" style="padding:15px 0;border-bottom:1px solid #eee;">
+                        <div class="faq-question" style="font-weight:bold;margin-bottom:5px;">Do I need to sign up or log in to use the tool?</div>
+                        <div class="faq-answer">No, you don’t need to sign up or log in to use the tool.</div>
+                    </div>
+                    <div class="faq-item" style="padding:15px 0;border-bottom:1px solid #eee;">
+                        <div class="faq-question" style="font-weight:bold;margin-bottom:5px;">Do I need to pay anything to use the tool?</div>
+                        <div class="faq-answer">No, the tool is 100% free to use. You don’t have to pay a single dime.</div>
+                    </div>
+                    <div class="faq-item" style="padding:15px 0;border-bottom:1px solid #eee;">
+                        <div class="faq-question" style="font-weight:bold;margin-bottom:5px;">Can I risk uploading my private and confidential documents?</div>
+                        <div class="faq-answer">You don’t have to worry since your documents never leave your device. All files are processed 100% in your browser and nothing is ever sent to our servers.</div>
+                    </div>
+                    <div class="faq-item" style="padding:15px 0;border-bottom:1px solid #eee;">
+                        <div class="faq-question" style="font-weight:bold;margin-bottom:5px;">How long does it take to convert a file?</div>
+                        <div class="faq-answer">Conversion happens almost instantly. Large files with multiple pages might take a few seconds.</div>
+                    </div>
+                    <div class="faq-item" style="padding:15px 0;">
+                        <div class="faq-question" style="font-weight:bold;margin-bottom:5px;">Can we convert multiple PDFs at once?</div>
+                        <div class="faq-answer">Yes. Batch upload the files you want to convert and the processor will convert each of them one by one.</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -139,21 +163,19 @@
 
     <footer class="footer">
         <div class="footer-container">
-            <div class="footer-section">
-                <h4>Company</h4>
-                <ul class="footer-links">
-                    <li><a href="/about.html">About the website</a></li>
-                    <li><a href="/privacy.html">Privacy Policy</a></li>
-                    <li><a href="/terms.html">Terms & Conditions</a></li>
-                    <li><a href="/contact.html">Contact the developer</a></li>
-                </ul>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>All processing happens in your browser. No files are uploaded to our servers.</p>
+            <h4>Company</h4>
+            <ul class="footer-links" style="list-style:none;margin-top:10px;">
+                <li><a href="/about.html">About the website</a></li>
+                <li><a href="/privacy.html">Privacy Policy</a></li>
+                <li><a href="/terms.html">Terms & Conditions</a></li>
+                <li><a href="/contact.html">Contact the developer</a></li>
+            </ul>
+            <p style="margin-top:20px;color:#666;">All processing happens in your browser. No files are uploaded to our servers.</p>
         </div>
     </footer>
 
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
     <script defer src="script.js"></script>
 </body>
 </html>

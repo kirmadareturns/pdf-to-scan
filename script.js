@@ -10,22 +10,31 @@ const settingsSection = document.getElementById('settingsSection');
 
 // --- 1. PREFETCHING LOGIC (SPEED BOOST) ---
 // Start downloading as soon as mouse enters the upload zone
-uploadSection.addEventListener('mouseenter', loadLibraries);
-uploadSection.addEventListener('touchstart', loadLibraries, {passive: true});
-fileInput.addEventListener('click', loadLibraries);
+if(uploadSection) {
+    uploadSection.addEventListener('mouseenter', loadLibraries);
+    uploadSection.addEventListener('touchstart', loadLibraries, {passive: true});
+}
+if(fileInput) {
+    fileInput.addEventListener('click', loadLibraries);
+}
 
 function loadLibraries() {
     if (librariesLoaded || loadingPromise) return;
     
     console.log("Prefetching PDF engines...");
+    
     loadingPromise = Promise.all([
         loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js'),
         loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js')
     ]).then(() => {
-        // Set up the worker immediately after loading
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-        librariesLoaded = true;
-        console.log("PDF Engines Ready.");
+        // Wait a tiny bit to ensure window.pdfjsLib is available
+        if (window.pdfjsLib) {
+            window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+            librariesLoaded = true;
+            console.log("PDF Engines Ready.");
+        } else {
+            console.error("PDF.js loaded but object not found");
+        }
     }).catch(err => {
         console.error("Failed to load libraries", err);
         loadingPromise = null; // Allow retry
@@ -34,7 +43,9 @@ function loadLibraries() {
 
 function loadScript(src) {
     return new Promise((resolve, reject) => {
+        // Check if script already exists
         if(document.querySelector(`script[src="${src}"]`)) return resolve();
+        
         const script = document.createElement('script');
         script.src = src;
         script.onload = resolve;
@@ -44,18 +55,27 @@ function loadScript(src) {
 }
 
 // --- 2. STANDARD EVENT LISTENERS ---
-uploadSection.addEventListener('dragover', e => { e.preventDefault(); uploadSection.classList.add('dragover'); });
-uploadSection.addEventListener('dragleave', () => uploadSection.classList.remove('dragover');
-uploadSection.addEventListener('drop', e => {
-    e.preventDefault(); 
-    uploadSection.classList.remove('dragover');
-    loadLibraries(); // Ensure triggered on drop
-    const files = e.dataTransfer.files;
-    if (files.length && files[0].type === 'application/pdf') handleFileSelect({ target: { files } });
-});
+if(uploadSection) {
+    uploadSection.addEventListener('dragover', e => { 
+        e.preventDefault(); 
+        uploadSection.classList.add('dragover'); 
+    });
+    
+    uploadSection.addEventListener('dragleave', () => {
+        uploadSection.classList.remove('dragover');
+    });
 
-fileInput.addEventListener('change', handleFileSelect);
-convertBtn.addEventListener('click', convertPDF);
+    uploadSection.addEventListener('drop', e => {
+        e.preventDefault(); 
+        uploadSection.classList.remove('dragover');
+        loadLibraries(); // Ensure triggered on drop
+        const files = e.dataTransfer.files;
+        if (files.length && files[0].type === 'application/pdf') handleFileSelect({ target: { files } });
+    });
+}
+
+if(fileInput) fileInput.addEventListener('change', handleFileSelect);
+if(convertBtn) convertBtn.addEventListener('click', convertPDF);
 
 async function handleFileSelect(event) {
     const file = event.target.files[0];
@@ -64,11 +84,21 @@ async function handleFileSelect(event) {
     // Show loading cursor if libs aren't ready
     if (!librariesLoaded) {
         document.body.style.cursor = 'wait';
-        uploadSection.style.opacity = '0.7';
+        if(uploadSection) uploadSection.style.opacity = '0.7';
+        
         if (!loadingPromise) loadLibraries();
-        await loadingPromise; // Wait for the download to finish
+        
+        try {
+            await loadingPromise; // Wait for the download to finish
+        } catch(e) {
+            alert("Could not load PDF tools. Please check your internet connection.");
+            document.body.style.cursor = 'default';
+            if(uploadSection) uploadSection.style.opacity = '1';
+            return;
+        }
+        
         document.body.style.cursor = 'default';
-        uploadSection.style.opacity = '1';
+        if(uploadSection) uploadSection.style.opacity = '1';
     }
 
     currentFile = file;
@@ -89,20 +119,31 @@ function showFileInfo(file) {
 
 async function convertPDF() {
     if (!currentFile) return;
+    
+    // Safety check for the library
+    if (typeof window.pdfjsLib === 'undefined') {
+        alert("PDF Engine not ready. Please wait a moment and try again.");
+        loadLibraries();
+        return;
+    }
+
     const progressSection = document.getElementById('progressSection');
     const progressFill = document.getElementById('progressFill');
     const progressText = document.getElementById('progressText');
     convertBtn.disabled = true;
     progressSection.classList.add('active');
 
-    function updateProgress(percent, text){ progressFill.style.width = percent+'%'; progressText.textContent=text; }
+    function updateProgress(percent, text){ 
+        progressFill.style.width = percent+'%'; 
+        progressText.textContent=text; 
+    }
 
     try {
         const dpi = parseInt(document.getElementById('dpiSelect').value);
         const arrayBuffer = await currentFile.arrayBuffer();
         updateProgress(10,'Loading PDF...');
         
-        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        const pdf = await window.pdfjsLib.getDocument({ data: arrayBuffer }).promise;
         const pdfDoc = await PDFLib.PDFDocument.create();
         
         for (let i=1;i<=pdf.numPages;i++){
@@ -167,7 +208,6 @@ function applyScannedEffect(ctx, w, h) {
 
 function setupDownload(){
     const btn=document.getElementById('downloadBtn');
-    // Clone to remove old events
     const newBtn = btn.cloneNode(true);
     btn.parentNode.replaceChild(newBtn, btn);
     newBtn.onclick=()=>{

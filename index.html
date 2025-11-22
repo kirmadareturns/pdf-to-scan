@@ -84,6 +84,10 @@
 
         <div class="content-grid">
             <div class="main-content">
+                <div class="scan-overlay" id="scanOverlay">
+                    <div class="scan-beam"></div>
+                </div>
+
                 <div class="upload-zone" id="uploadSection">
                     <div class="upload-icon"></div>
                     <h2>Select PDF File</h2>
@@ -133,65 +137,77 @@
         </div> 
     </main>
 
-
-    <div class="seo-content" id="how">
-        <h2>How to Convert PDF to Scanned Document</h2>
-        
-        <h3>Step 1: Upload Your PDF File</h3>
-        <p>Click the upload zone or drag and drop your PDF file. You can upload PDF files of any size.</p>
-        
-        <h3>Step 2: Select DPI Quality</h3>
-        <p>Choose your preferred DPI. 300 DPI is recommended.</p>
-        
-        <h3>Step 3: Click Convert</h3>
-        <p>Click "Convert to Scanned PDF" button and wait for processing to complete. The process is almost instant.</p>
-        
-        <h3>Step 4: Download Your Scanned PDF</h3>
-        <p>Click "Download Scanned PDF" to save your file.</p>
-
-        <h3>Why Make PDFs Look Scanned?</h3>
-        <ul>
-            <li>Scanned documents look more authentic and trustworthy</li>
-
-
-    <div class="faq-section" id="faq">
-        <h2>Common questions you might have</h2>
-
-        <div class="faq-item">
-            <div class="faq-question">Do I need to sign up or log in to use the tool?</div>
-            <div class="faq-answer">No, you don’t need to sign up or log in to use the tool.</div>
+    <div class="content-section-wrapper" id="how">
+        <div class="collapsible-header" onclick="toggleSection(this)">
+            <h2>How to Convert PDF to Scanned Document</h2>
+            <svg class="chevron" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
         </div>
+        <div class="collapsible-content">
+            <div class="seo-content">
+                <h3>Step 1: Upload Your PDF File</h3>
+                <p>Click the upload zone or drag and drop your PDF file. You can upload PDF files of any size.</p>
+                
+                <h3>Step 2: Select DPI Quality</h3>
+                <p>Choose your preferred DPI. 300 DPI is recommended.</p>
+                
+                <h3>Step 3: Click Convert</h3>
+                <p>Click "Convert to Scanned PDF" button and wait for processing to complete. The process is almost instant.</p>
+                
+                <h3>Step 4: Download Your Scanned PDF</h3>
+                <p>Click "Download Scanned PDF" to save your file.</p>
 
-        <div class="faq-item">
-            <div class="faq-question">Do I need to pay anything to use the tool?</div>
-            <div class="faq-answer">No, the tool is 100% free to use. You don’t have to pay a single dime.</div>
+                <h3>Why Make PDFs Look Scanned?</h3>
+                <ul>
+                    <li>Scanned documents look more authentic and trustworthy</li>
+                </ul>
+            </div>
         </div>
-        
-        <div class="faq-item">
-            <div class="faq-question">Can I risk uploading my private and confidential documents?</div>
-            <div class="faq-answer">You don’t have to worry since your documents never leave your device. All files are processed 100% in your browser and nothing is ever sent to our servers.</div>
-        </div>
-        
-        <div class="faq-item">
-            <div class="faq-question">How long does it take to convert a file?</div>
-            <div class="faq-answer">Conversion happens almost instantly. Large files with multiple pages might take a few seconds.</div>
-        </div>
-        
-        <div class="faq-item">
-            <div class="faq-question">Can we convert multiple PDFs at once?</div>
-            <div class="faq-answer">Yes. Batch upload the files you want to convert and the processor will convert each of them one by one.</div>
-        </div>
-        
-        <div class="faq-item">
-            <div class="faq-question">Will the converted files have any watermark or logo?</div>
-            <div class="faq-answer">No. The converted files will not have any watermark or logo.</div>
-        </div>
-        
-<div class="faq-item">
-            <div class="faq-question">Are there usage limits under the free plan or any limit on the number of PDFs I can convert?</div>
-            <div class="faq-answer">No. There are absolutely no limits. You can convert as many files as you want whenever you like.</div>
-        </div>
+    </div>
 
+    <div class="content-section-wrapper" id="faq">
+        <div class="collapsible-header" onclick="toggleSection(this)">
+            <h2>Common questions you might have</h2>
+            <svg class="chevron" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+        </div>
+        <div class="collapsible-content">
+            <div class="faq-section">
+                <div class="faq-item">
+                    <div class="faq-question">Do I need to sign up or log in to use the tool?</div>
+                    <div class="faq-answer">No, you don’t need to sign up or log in to use the tool.</div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">Do I need to pay anything to use the tool?</div>
+                    <div class="faq-answer">No, the tool is 100% free to use. You don’t have to pay a single dime.</div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">Can I risk uploading my private and confidential documents?</div>
+                    <div class="faq-answer">You don’t have to worry since your documents never leave your device. All files are processed 100% in your browser and nothing is ever sent to our servers.</div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">How long does it take to convert a file?</div>
+                    <div class="faq-answer">Conversion happens almost instantly. Large files with multiple pages might take a few seconds.</div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">Can we convert multiple PDFs at once?</div>
+                    <div class="faq-answer">Yes. Batch upload the files you want to convert and the processor will convert each of them one by one.</div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">Will the converted files have any watermark or logo?</div>
+                    <div class="faq-answer">No. The converted files will not have any watermark or logo.</div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">Are there usage limits under the free plan or any limit on the number of PDFs I can convert?</div>
+                    <div class="faq-answer">No. There are absolutely no limits. You can convert as many files as you want whenever you like.</div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <footer class="footer">
         <div class="footer-container">

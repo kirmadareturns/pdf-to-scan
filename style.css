@@ -1,268 +1,140 @@
 /* --- Global & Reset --- */
 :root {
-    --primary-red: #E3362B; /* iLovePDF style bright red */
+    --primary-red: #E3362B; /* iLovePDF Bright Red */
     --primary-hover: #C6261D;
     --text-dark: #2c3338;
     --text-gray: #606970;
-    --bg-light: #f3f4f6; /* Softer gray background */
+    --bg-light: #f3f4f6;
     --white: #ffffff;
-    --radius-md: 12px;
-    --radius-lg: 20px;
-    --shadow-soft: 0 5px 15px rgba(0, 0, 0, 0.05);
-    --shadow-hover: 0 8px 25px rgba(227, 54, 43, 0.15);
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --shadow-card: 0 2px 10px rgba(0,0,0,0.08);
 }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-    font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; /* Clean system fonts */
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
     background: var(--bg-light);
     color: var(--text-dark);
     line-height: 1.6;
-    -webkit-font-smoothing: antialiased;
 }
 
-/* --- Navigation --- */
+/* --- Navbar --- */
 .navbar {
     background: var(--white);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, .04);
-    padding: 0;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.05);
+    position: sticky; top: 0; z-index: 1000;
 }
-
 .nav-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 12px 24px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    max-width: 1200px; margin: 0 auto; padding: 15px 20px;
+    display: flex; justify-content: space-between; align-items: center;
 }
-
 .logo {
-    font-size: 26px;
-    font-weight: 800;
-    color: var(--text-dark);
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    font-size: 24px; font-weight: 800; color: var(--text-dark); text-decoration: none;
 }
+.logo span { color: var(--primary-red); } /* Highlights "pdf" in red */
 
-.logo span { color: var(--primary-red); }
-
-.nav-links {
-    display: flex;
-    gap: 32px;
-    list-style: none;
-}
-
+.nav-links { display: flex; gap: 25px; list-style: none; }
 .nav-links a {
-    color: var(--text-dark);
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 15px;
-    transition: color .2s;
+    color: var(--text-dark); text-decoration: none; font-weight: 600; font-size: 15px;
 }
+.nav-links a:hover { color: var(--primary-red); }
 
-.nav-links a:hover {
-    color: var(--primary-red);
-}
+/* --- Layout --- */
+.container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+.hero { text-align: center; margin-bottom: 40px; }
+.hero h1 { font-size: 42px; color: var(--text-dark); margin-bottom: 10px; font-weight: 800; }
 
-/* --- Layout Containers --- */
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 60px 20px;
-}
-
-.hero {
-    text-align: center;
-    margin-bottom: 50px;
-}
-
-.hero h1 {
-    font-size: 48px;
-    font-weight: 800;
-    color: var(--text-dark);
-    margin-bottom: 16px;
-    line-height: 1.2;
-    letter-spacing: -0.5px;
-}
-
-.hero p {
-    font-size: 20px;
-    color: var(--text-gray);
-    font-weight: 400;
-    max-width: 600px;
-    margin: 0 auto;
-}
-
+/* --- Main Card --- */
 .main-content {
     background: var(--white);
     border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-soft);
-    padding: 50px;
-    width: 100%;
+    box-shadow: var(--shadow-card);
+    padding: 40px;
     max-width: 900px;
     margin: 0 auto;
-    position: relative; /* Essential for Scan Light */
-    overflow: hidden;   /* Essential for Scan Light */
+    position: relative; /* Vital for Scan Light */
+    overflow: hidden;   /* Vital for Scan Light */
+    min-height: 400px;
 }
 
 /* --- Upload Zone --- */
 .upload-zone {
-    border: 2px dashed #e0e0e0;
-    border-radius: var(--radius-md);
-    padding: 80px 40px;
-    text-align: center;
-    background: #FAFAFA;
-    cursor: pointer;
-    transition: all .3s ease;
-    margin-bottom: 30px;
-    max-width: 700px;
-    margin-left: auto;
-    margin-right: auto;
+    border: 2px dashed #ddd; border-radius: var(--radius-md);
+    padding: 60px 20px; text-align: center; background: #fdfdfd;
+    cursor: pointer; transition: 0.3s;
+    max-width: 600px; margin: 0 auto;
+}
+.upload-zone:hover { border-color: var(--primary-red); background: #fff5f5; }
+.upload-icon {
+    width: 60px; height: 60px; margin: 0 auto 15px;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23E3362B" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>') center/contain no-repeat;
 }
 
-.upload-zone:hover {
-    border-color: var(--primary-red);
-    background: #fffbfb;
-    transform: scale(1.01);
-}
-
+/* --- Buttons --- */
 .btn {
-    background: var(--primary-red);
-    color: var(--white);
-    border: none;
-    padding: 16px 48px;
-    border-radius: 8px; /* Soft rounded corners */
-    font-size: 18px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all .2s ease;
-    display: inline-block;
-    box-shadow: 0 4px 6px rgba(227, 54, 43, 0.2);
+    background: var(--primary-red); color: var(--white); border: none;
+    padding: 14px 30px; border-radius: 6px; font-size: 18px; font-weight: 700;
+    cursor: pointer; transition: 0.2s; margin-top: 15px;
 }
+.btn:hover { background: var(--primary-hover); transform: translateY(-2px); }
+.btn-secondary { background: #666; }
+.btn-success { background: #28a745; }
+.button-group { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
 
-.btn:hover {
-    background: var(--primary-hover);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 15px rgba(227, 54, 43, 0.3);
-}
+/* --- Settings & Progress --- */
+.settings-section, .progress-section, .result-section { display: none; }
+.settings-section.active, .progress-section.active, .result-section.active { display: block; }
+
+.file-info { background: #f8f9fa; padding: 15px; border-left: 4px solid var(--primary-red); margin-bottom: 20px; }
+.progress-bar { height: 8px; background: #eee; border-radius: 4px; overflow: hidden; margin: 20px 0; }
+.progress-fill { height: 100%; width: 0%; background: var(--primary-red); transition: width 0.3s; }
+.progress-text { text-align: center; color: #666; }
 
 /* --- COLLAPSIBLE SECTIONS (SEO & FAQ) --- */
+/* This styling creates the "Accordion" look */
 .content-section-wrapper {
-    max-width: 900px;
-    margin: 40px auto;
-    background: var(--white);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-soft);
-    overflow: hidden;
+    max-width: 900px; margin: 30px auto;
+    background: var(--white); border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card); overflow: hidden;
 }
-
 .collapsible-header {
-    padding: 25px 30px;
-    background: var(--white);
-    cursor: pointer;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid transparent;
-    transition: background 0.3s;
+    padding: 20px 30px; cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+    background: var(--white); transition: background 0.2s;
 }
-
-.collapsible-header:hover {
-    background: #f9f9f9;
-}
-
-.collapsible-header h2 {
-    font-size: 22px;
-    font-weight: 700;
-    margin: 0;
-    color: var(--text-dark);
-}
-
-.chevron {
-    width: 24px;
-    height: 24px;
-    transition: transform 0.3s ease;
-    opacity: 0.6;
-}
-
-/* Active State for Collapsible */
-.content-section-wrapper.active .collapsible-header {
-    border-bottom: 1px solid #eee;
-}
-
-.content-section-wrapper.active .chevron {
-    transform: rotate(180deg);
-    opacity: 1;
-    color: var(--primary-red);
-}
+.collapsible-header:hover { background: #f9f9f9; }
+.collapsible-header h2 { font-size: 20px; margin: 0; }
 
 .collapsible-content {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.4s cubic-bezier(0, 1, 0, 1); /* Smooth slide */
-    padding: 0 30px;
-    opacity: 0;
-    transition: max-height 0.4s ease-out, opacity 0.4s ease, padding 0.4s;
+    max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out, padding 0.4s;
+    padding: 0 30px; opacity: 0;
 }
-
+/* When JS adds 'active' class, it opens */
 .content-section-wrapper.active .collapsible-content {
-    max-height: 2000px; /* Arbitrary high number */
-    opacity: 1;
-    padding: 30px;
+    max-height: 2000px; padding-bottom: 30px; opacity: 1;
 }
+.content-section-wrapper.active .chevron { transform: rotate(180deg); }
+.chevron { transition: transform 0.3s; width: 20px; opacity: 0.5; }
 
-/* --- SCANNING LIGHT ANIMATION --- */
-/* The container overlay */
+/* Inner Content Styles */
+.seo-content p, .seo-content ul { color: var(--text-gray); font-size: 15px; margin-bottom: 15px; }
+.faq-item { border-bottom: 1px solid #eee; padding: 15px 0; }
+.faq-question { font-weight: 600; color: var(--text-dark); margin-bottom: 5px; }
+.faq-answer { color: var(--text-gray); font-size: 14px; }
+
+/* --- SCAN LIGHT ANIMATION --- */
 .scan-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none; /* Click through it */
-    z-index: 50;
-    display: none;
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 50; display: none;
 }
-
-.scan-overlay.scanning {
-    display: block;
-}
-
-/* The moving beam */
+.scan-overlay.scanning { display: block; }
 .scan-beam {
-    width: 100%;
-    height: 4px;
-    background: var(--primary-red);
-    position: absolute;
-    top: 0;
-    left: 0;
-    box-shadow: 0 0 15px 2px rgba(227, 54, 43, 0.6), 0 0 30px rgba(227, 54, 43, 0.4);
-    animation: scanMove 1.5s cubic-bezier(0.4, 0.0, 0.2, 1) infinite;
-    opacity: 0.8;
+    width: 100%; height: 4px; background: var(--primary-red);
+    position: absolute; top: 0;
+    box-shadow: 0 0 20px rgba(227, 54, 43, 0.8);
+    animation: scanMove 1.5s linear infinite;
 }
-
-/* The glass-like reflection following the beam */
-.scan-beam::after {
-    content: '';
-    position: absolute;
-    top: -40px;
-    left: 0;
-    width: 100%;
-    height: 40px;
-    background: linear-gradient(to top, rgba(227, 54, 43, 0.2), transparent);
-}
-
 @keyframes scanMove {
     0% { top: 0%; opacity: 0; }
     10% { opacity: 1; }
@@ -270,24 +142,12 @@ body {
     100% { top: 100%; opacity: 0; }
 }
 
-/* --- Settings & Helpers (Preserved) --- */
-.settings-section { display: none; margin-bottom: 30px; }
-.settings-section.active { display: block; }
-.file-info { background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid var(--primary-red); }
-.progress-section { margin-top: 30px; display: none; }
-.progress-section.active { display: block; }
-.result-section { display: none; text-align: center; }
-.result-section.active { display: block; }
+/* --- Footer --- */
+.footer { margin-top: 50px; border-top: 1px solid #eee; padding: 40px; background: var(--white); }
+.footer-container { max-width: 1200px; margin: 0 auto; }
+.footer-links { list-style: none; }
+.footer-links a { color: #666; text-decoration: none; }
 
-/* FAQ Styling inside collapsible */
-.faq-item { border-bottom: 1px solid #eee; padding: 15px 0; }
-.faq-item:last-child { border-bottom: none; }
-.faq-question { font-weight: 600; color: var(--text-dark); margin-bottom: 8px; }
-.faq-answer { color: var(--text-gray); font-size: 15px; }
-
-/* Mobile */
-@media(max-width: 768px) {
-    .hero h1 { font-size: 32px; }
-    .main-content { padding: 30px 20px; }
-    .btn { width: 100%; }
-}
+/* Dropdown (Hidden logic) */
+.dropdown-content { display: none; position: absolute; background: white; box-shadow: 0 8px 16px rgba(0,0,0,0.1); }
+.dropdown:hover .dropdown-content { display: block; }

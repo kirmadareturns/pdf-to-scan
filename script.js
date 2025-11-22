@@ -74,7 +74,7 @@ if (uploadSection) {
 if (fileInputRef) fileInputRef.addEventListener('change', handleFileSelect);
 if (convertBtn) convertBtn.addEventListener('click', convertPDF);
 
-// --- 5. FILE HANDLING (THE IMPORTANT PART) ---
+// --- 5. FILE HANDLING ---
 async function handleFileSelect(event) {
     // Get files from input
     const newFiles = Array.from(event.target.files);
@@ -88,7 +88,6 @@ async function handleFileSelect(event) {
     loadLibraries();
 
     // Add new files to our list (APPENDING, not replacing)
-    // We check for duplicates by name so we don't add the same file twice
     const existingNames = new Set(currentFiles.map(f => f.name));
     const uniqueToAdd = validFiles.filter(f => !existingNames.has(f.name));
     
@@ -99,7 +98,7 @@ async function handleFileSelect(event) {
     settingsSection.classList.add('active');
     settingsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
     
-    // Clear the input so you can select the same file again if you really want to
+    // Clear the input
     if (fileInputRef) fileInputRef.value = ''; 
 }
 
@@ -125,9 +124,12 @@ function showFileInfo() {
 async function convertPDF() {
     if (currentFiles.length === 0) return alert("No files loaded.");
 
+    // >>> NEW: INSTANT SCAN LIGHT TRIGGER <<<
+    triggerScanEffect();
+
     if (!librariesLoaded) {
         convertBtn.textContent = "Loading Engine...";
-        try { await loadLibraries(); } catch (e) { return; }
+        try { await loadLibraries(); } catch (e) { stopScanEffect(); return; }
         convertBtn.textContent = "Convert to Scanned PDF";
     }
 
@@ -188,6 +190,8 @@ async function convertPDF() {
         convertedPdfBytes = await pdfDoc.save();
         
         setTimeout(() => {
+            // >>> NEW: STOP SCAN LIGHT <<<
+            stopScanEffect();
             progressSection.classList.remove('active');
             document.getElementById('resultSection').classList.add('active');
             setupDownload();
@@ -195,6 +199,8 @@ async function convertPDF() {
 
     } catch (err) {
         alert('Error: ' + err.message);
+        // >>> NEW: STOP SCAN LIGHT ON ERROR <<<
+        stopScanEffect();
         convertBtn.disabled = false;
         progressSection.classList.remove('active');
     }
@@ -226,4 +232,27 @@ function resetApp() {
     document.getElementById('progressSection').classList.remove('active');
     document.getElementById('resultSection').classList.remove('active');
     convertBtn.disabled = false;
+    stopScanEffect(); // Ensure light is off
+}
+
+// --- 7. NEW UI HELPERS (COLLAPSIBLE & ANIMATION) ---
+
+// Called by onclick in HTML for SEO/FAQ sections
+function toggleSection(headerElement) {
+    const wrapper = headerElement.parentElement;
+    wrapper.classList.toggle('active');
+}
+
+function triggerScanEffect() {
+    const overlay = document.getElementById('scanOverlay');
+    if (overlay) {
+        overlay.classList.add('scanning');
+    }
+}
+
+function stopScanEffect() {
+    const overlay = document.getElementById('scanOverlay');
+    if (overlay) {
+        overlay.classList.remove('scanning');
+    }
 }

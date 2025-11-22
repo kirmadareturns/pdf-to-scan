@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free PDF Eraser Tool - Zoom Fixed</title>
+    <meta name="description" content="Erase text and images from PDF online. Features Zoom, Undo, and Auto-fit.">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pdf-lib/dist/pdf-lib.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        :root { --primary: #d32f2f; --bg: #f4f4f9; --panel: #ffffff; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding-bottom: 50px; }
+        
+        /* Header */
+        header { background: var(--panel); padding: 15px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        h1 { margin: 0; color: var(--primary); font-size: 1.5rem; }
+
+        /* Layout */
+        .main-container { max-width: 1200px; margin: 20px auto; padding: 0 20px; }
+        
+        /* Upload Box */
+        .upload-area { 
+            border: 2px dashed #ccc; padding: 50px; text-align: center; background: white; 
+            border-radius: 8px; cursor: pointer; transition: 0.3s; 
+        }
+        .upload-area:hover { border-color: var(--primary); background: #fffdfd; }
+
+        /* Toolbar */
+        .editor-wrapper { display: none; background: white; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); overflow: hidden; }
+        .editor-wrapper.active { display: block; }
+        
+        .toolbar { 
+            background: #2c3e50; color: white; padding: 10px; display: flex; 
+            flex-wrap: wrap; gap: 15px; align-items: center; justify-content: center;
+            position: sticky; top: 0; z-index: 100;
+        }
+        
+        .tool-group { display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.1); padding: 5px 10px; border-radius: 4px; }
+
+        .btn { background: #555; border: none; color: white; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 14px; }
+        .btn:hover { background: #666; }
+        .btn-primary { background: var(--primary); }
+        .btn-primary:hover { background: #b71c1c; }
+        
+        /* Inputs */
+        input[type="color"] { border: none; width: 25px; height: 25px; cursor: pointer; background: none; padding: 0; }
+        input[type="number"] { width: 40px; padding: 4px; border-radius: 3px; border: none; text-align: center; }
+
+        /* Canvas */
+        .canvas-container { 
+            background: #525659; overflow: auto; padding: 20px; text-align: center; 
+            min-height: 60vh; display: flex; justify-content: center; align-items: flex-start;
+        }
+        #container { position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.5); background: white; }
+        canvas { display: block; }
+
+        /* Loading */
+        #loading { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(255,255,255,0.9); z-index: 1000; display: none; justify-content: center; align-items: center; flex-direction: column; }
+        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6196194515460390"
+     crossorigin="anonymous"></script>
+</head>
+<body>
+
+<header>
+    <h1>PDF Eraser Tool</h1>
+</header>
+
+<div class="main-container">
+    
+    <div id="uploadSection" class="upload-area" onclick="document.getElementById('fileInput').click()">
+        <i class="fas fa-cloud-upload-alt" style="font-size: 30px; color: #d32f2f; margin-bottom: 10px;"></i>
+        <h3>Click to Upload PDF</h3>
+        <input type="file" id="fileInput" accept="application/pdf" style="display:none">
+    </div>
+
+    <div id="editor" class="editor-wrapper">
+        <div class="toolbar">
+            <div class="tool-group">
+                <button class="btn" id="prevPage"><i class="fas fa-chevron-left"></i></button>
+                <span style="font-size:13px">Page <span id="pageNum">1</span> / <span id="pageCount">0</span></span>
+                <button class="btn" id="nextPage"><i class="fas fa-chevron-right"></i></button>
+            </div>
+
+            <div class="tool-group">
+                <button class="btn" onclick="changeZoom(-0.2)"><i class="fas fa-search-minus"></i></button>
+                <span id="zoomLevel" style="font-size:13px; min-width: 40px; text-align:center;">100%</span>
+                <button class="btn" onclick="changeZoom(0.2)"><i class="fas fa-search-plus"></i></button>
+                <button class="btn" onclick="fitToWidth()" title="Fit to Width"><i class="fas fa-arrows-alt-h"></i></button>
+            </div>
+
+            <div class="tool-group">
+                <label><i class="fas fa-eraser"></i></label>
+                <input type="number" id="eraserSize" value="15" min="1" max="100" title="Size">
+                <input type="color" id="colorPicker" value="#ffffff" title="Color">
+            </div>
+
+            <div class="tool-group">
+                <button class="btn" id="undoBtn"><i class="fas fa-undo"></i></button>
+                <button class="btn btn-primary" id="downloadBtn">Download PDF</button>
+            </div>
+        </div>
+
+        <div class="canvas-container">
+            <div id="container">
+                <canvas id="pdfCanvas"></canvas>
+                <canvas id="eraserCanvas" style="position:absolute; top:0; left:0;"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="loading">
+    <div class="spinner"></div>
+    <p style="margin-top:10px; font-weight:bold; color:#333;">Processing...</p>
+</div>
+
+<script>
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+
+    const pdfCanvas = document.getElementById('pdfCanvas');
+    const eraserCanvas = document.getElementById('eraserCanvas');
+    const ctx = eraserCanvas.getContext('2d');
+    
+    let pdfDoc = null;
+    let currentPage = 1;
+    let currentScale = 1.0; // Dynamic Scale
+    
+    let eraserData = {}; // Stores drawings { pageNum: DataURL }
+    let undoStack = {};  // Stores history { pageNum: [DataURL] }
+    
+    // --- File Handling ---
+    document.getElementById('fileInput').addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        document.getElementById('loading').style.display = 'flex';
+        document.getElementById('uploadSection').style.display = 'none';
+        
+        try {
+            const buffer = await file.arrayBuffer();
+            pdfDoc = await pdfjsLib.getDocument({ data: buffer }).promise;
+            document.getElementById('pageCount').innerText = pdfDoc.numPages;
+            
+            document.getElementById('editor').classList.add('active');
+            
+            // Auto-fit to screen width on load
+            await fitToWidth();
+            
+        } catch (err) {
+            alert("Error loading PDF: " + err.message);
+            location.reload();
+        }
+        document.getElementById('loading').style.display = 'none';
+    });
+
+    // --- Zoom Logic (NEW) ---
+    async function fitToWidth() {
+        const page = await pdfDoc.getPage(currentPage);
+        const viewport = page.getViewport({ scale: 1.0 });
+        const containerWidth = document.querySelector('.canvas-container').clientWidth - 60; // -60 for padding
+        
+        // Calculate scale to fit width
+        currentScale = containerWidth / viewport.width;
+        if(currentScale > 1.5) currentScale = 1.5; // Limit max auto zoom
+        
+        renderPage(currentPage);
+    }
+
+    function changeZoom(delta) {
+        const newScale = currentScale + delta;
+        if (newScale > 0.2 && newScale < 5.0) {
+            // Save drawing before zooming so we don't lose progress
+            saveCurrentState();
+            currentScale = newScale;
+            renderPage(currentPage);
+        }
+    }
+
+    function updateZoomDisplay() {
+        document.getElementById('zoomLevel').innerText = Math.round(currentScale * 100) + "%";
+    }
+
+    // --- Rendering ---
+    async function renderPage(num) {
+        updateZoomDisplay();
+        
+        const page = await pdfDoc.getPage(num);
+        const viewport = page.getViewport({ scale: currentScale });
+
+        pdfCanvas.width = viewport.width;
+        pdfCanvas.height = viewport.height;
+        eraserCanvas.width = viewport.width;
+        eraserCanvas.height = viewport.height;
+
+        // Render PDF
+        await page.render({
+            canvasContext: pdfCanvas.getContext('2d'),
+            viewport: viewport
+        }).promise;
+
+        // Render Eraser Layer (Scaling existing drawings)
+        ctx.clearRect(0, 0, eraserCanvas.width, eraserCanvas.height);
+        
+        if (eraserData[num]) {
+            const img = new Image();
+            img.src = eraserData[num];
+            img.onload = () => {
+                // Draw the saved image stretched to the new zoom level
+                ctx.drawImage(img, 0, 0, eraserCanvas.width, eraserCanvas.height);
+            };
+        }
+        
+        document.getElementById('pageNum').innerText = num;
+    }
+
+    // --- Drawing ---
+    let isDrawing = false;
+    let lastX = 0, lastY = 0;
+
+    function getPos(e) {
+        const rect = eraserCanvas.getBoundingClientRect();
+        const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+        const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+        return { x, y };
+    }
+
+    eraserCanvas.addEventListener('mousedown', startDraw);
+    eraserCanvas.addEventListener('touchstart', startDraw, {passive: false});
+    
+    eraserCanvas.addEventListener('mousemove', draw);
+    eraserCanvas.addEventListener('touchmove', draw, {passive: false});
+    
+    eraserCanvas.addEventListener('mouseup', endDraw);
+    eraserCanvas.addEventListener('touchend', endDraw);
+
+    function startDraw(e) {
+        if(e.cancelable) e.preventDefault();
+        isDrawing = true;
+        const pos = getPos(e);
+        lastX = pos.x; 
+        lastY = pos.y;
+        
+        // Push state to undo stack before new stroke
+        if(!undoStack[currentPage]) undoStack[currentPage] = [];
+        undoStack[currentPage].push(eraserCanvas.toDataURL());
+        
+        draw(e); // Draw dot
+    }
+
+    function draw(e) {
+        if (!isDrawing) return;
+        if(e.cancelable) e.preventDefault();
+        
+        const pos = getPos(e);
+        const size = parseInt(document.getElementById('eraserSize').value);
+        const color = document.getElementById('colorPicker').value;
+
+        ctx.lineWidth = size * currentScale; // Scale eraser size with zoom
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = color;
+
+        ctx.beginPath();
+        ctx.moveTo(lastX, lastY);
+        ctx.lineTo(pos.x, pos.y);
+        ctx.stroke();
+
+        lastX = pos.x;
+        lastY = pos.y;
+    }
+
+    function endDraw() {
+        isDrawing = false;
+    }
+
+    // --- State Management ---
+    function saveCurrentState() {
+        eraserData[currentPage] = eraserCanvas.toDataURL();
+    }
+
+    document.getElementById('prevPage').onclick = () => {
+        if (currentPage <= 1) return;
+        saveCurrentState();
+        currentPage--;
+        renderPage(currentPage);
+    };
+
+    document.getElementById('nextPage').onclick = () => {
+        if (currentPage >= pdfDoc.numPages) return;
+        saveCurrentState();
+        currentPage++;
+        renderPage(currentPage);
+    };
+
+    document.getElementById('undoBtn').onclick = () => {
+        if (undoStack[currentPage] && undoStack[currentPage].length > 0) {
+            const prevImg = new Image();
+            prevImg.src = undoStack[currentPage].pop();
+            prevImg.onload = () => {
+                ctx.clearRect(0, 0, eraserCanvas.width, eraserCanvas.height);
+                ctx.drawImage(prevImg, 0, 0);
+                saveCurrentState(); // Update current state to match undo
+            };
+        } else {
+            // If undo stack is empty, clear canvas
+            ctx.clearRect(0, 0, eraserCanvas.width, eraserCanvas.height);
+            delete eraserData[currentPage];
+        }
+    };
+
+    // --- Download ---
+    document.getElementById('downloadBtn').onclick = async () => {
+        saveCurrentState(); // Ensure last stroke is saved
+        document.getElementById('loading').style.display = 'flex';
+        
+        try {
+            const bytes = await document.getElementById('fileInput').files[0].arrayBuffer();
+            const pdfLibDoc = await PDFLib.PDFDocument.load(bytes);
+            const pages = pdfLibDoc.getPages();
+
+            for (let i = 1; i <= pdfDoc.numPages; i++) {
+                if (eraserData[i]) {
+                    const page = pages[i - 1];
+                    const imgBytes = await fetch(eraserData[i]).then(res => res.arrayBuffer());
+                    const pngImage = await pdfLibDoc.embedPng(imgBytes);
+                    
+                    // The image stretches to fit the PDF page dimensions
+                    page.drawImage(pngImage, {
+                        x: 0, y: 0,
+                        width: page.getWidth(),
+                        height: page.getHeight()
+                    });
+                }
+            }
+
+            const modifiedPdf = await pdfLibDoc.save();
+            const blob = new Blob([modifiedPdf], { type: 'application/pdf' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = "erased_document.pdf";
+            link.click();
+        } catch (e) {
+            alert("Error generating PDF");
+        }
+        document.getElementById('loading').style.display = 'none';
+    };
+</script>
+
+</body>
+</html>

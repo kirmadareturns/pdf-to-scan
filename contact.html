@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact - PDF to Scanned Converter</title>
+    <meta name="description" content="Contact PDF to Scanned. We'd love to hear from you.">
+    <link rel="canonical" href="https://pdftoscan.online/contact.html">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #ffffff; color: #333; line-height: 1.6; }
+        .header { padding: 50px 20px; text-align: center; border-bottom: 1px solid #f0f0f0; }
+        .logo { font-size: 32px; font-weight: 700; color: #000; margin-bottom: 10px; letter-spacing: -0.5px; text-decoration: none; }
+        .tagline { font-size: 16px; color: #666; }
+        .container { max-width: 600px; margin: 0 auto; padding: 60px 20px; }
+        h1 { font-size: 32px; color: #000; margin-bottom: 10px; }
+        .subtitle { color: #666; font-size: 16px; margin-bottom: 40px; }
+        .form-group { margin-bottom: 25px; }
+        label { display: block; font-weight: 600; color: #000; margin-bottom: 10px; font-size: 14px; }
+        input[type="text"],
+        input[type="email"],
+        textarea { width: 100%; padding: 12px; border: 1px solid #e0e0e0; border-radius: 4px; font-family: inherit; font-size: 15px; color: #333; }
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        textarea:focus { outline: none; border-color: #dc143c; }
+        textarea { resize: vertical; min-height: 150px; }
+        .btn { background: #dc143c; color: #fff; border: none; padding: 14px 32px; border-radius: 4px; font-size: 15px; font-weight: 600; cursor: pointer; width: 100%; transition: all 0.3s ease; }
+        .btn:hover { background: #b91030; }
+        .btn:disabled { background: #ccc; cursor: not-allowed; }
+        .success-message { display: none; background: #f0f8f0; border-left: 3px solid #28a745; padding: 20px; border-radius: 4px; color: #155724; margin-bottom: 30px; }
+        .success-message.show { display: block; }
+        .contact-info { margin-top: 50px; padding-top: 30px; border-top: 1px solid #f0f0f0; }
+        .contact-info p { color: #666; font-size: 15px; margin-bottom: 15px; }
+        .footer { padding: 40px 20px; text-align: center; border-top: 1px solid #f0f0f0; color: #999; font-size: 13px; margin-top: 60px; }
+        .footer a { color: #666; text-decoration: none; margin: 0 12px; }
+        .footer a:hover { color: #dc143c; }
+        @media (max-width: 600px) { .header { padding: 30px 20px; } h1 { font-size: 24px; } .container { padding: 30px 20px; } }
+    </style>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6196194515460390"
+     crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="header">
+        <a href="/" class="logo">PDF to Scanned</a>
+        <div class="tagline">Convert your PDF to a scanned document</div>
+    </div>
+
+    <div class="container">
+        <h1>Contact Us</h1>
+        <div class="subtitle">We'd love to hear from you. Send us a message.</div>
+
+        <div class="success-message" id="successMessage">
+            Thank you! Your message has been sent successfully. We'll get back to you soon.
+        </div>
+
+        <form id="contactForm">
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="subject">Subject</label>
+                <input type="text" id="subject" name="subject" required>
+            </div>
+
+            <div class="form-group">
+                <label for="message">Message</label>
+                <textarea id="message" name="message" required></textarea>
+            </div>
+
+            <button type="submit" class="btn" id="submitBtn">Send Message</button>
+        </form>
+
+        <div class="contact-info">
+            <p><strong>Response Time:</strong> We typically respond within 24-48 hours.</p>
+            <p><strong>Email:</strong> You can also reach us at <strong>contact@pdftoscan.online</strong></p>
+        </div>
+    </div>
+
+    <div class="footer">
+        <a href="/">Home</a>
+        <a href="/how-it-works.html">How It Works</a>
+        <a href="/faq.html">FAQ</a>
+        <a href="/about.html">About</a>
+    </div>
+
+    <script>
+        const form = document.getElementById('contactForm');
+        const successMessage = document.getElementById('successMessage');
+        const submitBtn = document.getElementById('submitBtn');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const subject = document.getElementById('subject').value;
+            const message = document.getElementById('message').value;
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Sending...';
+
+            try {
+                // If you have a backend, send data here
+                // Example:
+                // const response = await fetch('/api/contact', {
+                //     method: 'POST',
+                //     headers: { 'Content-Type': 'application/json' },
+                //     body: JSON.stringify({ name, email, subject, message })
+                // });
+                
+                // For now, we'll just show success and log to console
+                console.log({ name, email, subject, message });
+                
+                successMessage.classList.add('show');
+                form.reset();
+                
+                // Hide success message after 5 seconds
+                setTimeout(() => {
+                    successMessage.classList.remove('show');
+                }, 5000);
+
+            } catch (err) {
+                console.error('Error:', err);
+                alert('Error sending message. Please try again.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Send Message';
+            }
+        });
+    </script>
+</body>
+</html>

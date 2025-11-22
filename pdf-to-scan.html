@@ -1,0 +1,381 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Make PDF Look Scanned – Free Online Tool (With Tilt & Noise)</title>
+    <meta name="title" content="Make PDF Look Scanned – Free Online Tool (Bypass Printers)">
+    <meta name="description" content="Convert digital PDFs to look like realistic scanned documents. Adds visible tilt, paper grain, and scanner noise. Fast, free, and secure.">
+    
+    <style>
+        :root { --primary: #A50113; --primary-dark: #8a0110; --bg: #f8f9fa; --text: #333; }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+        
+        /* Layout */
+        .container { max-width: 1000px; margin: 0 auto; padding: 40px 20px; }
+        .hero { text-align: center; margin-bottom: 40px; }
+        .hero h1 { font-size: 38px; font-weight: 800; margin-bottom: 15px; color: #222; }
+        .hero p { font-size: 18px; color: #666; max-width: 600px; margin: 0 auto; }
+
+        /* Tool Interface */
+        .tool-card { background: #fff; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); overflow: hidden; }
+        
+        .upload-zone { padding: 60px 20px; text-align: center; border-bottom: 2px dashed #eee; cursor: pointer; transition: 0.3s; }
+        .upload-zone:hover { background: #fffcfc; border-color: var(--primary); }
+        .upload-icon { font-size: 48px; margin-bottom: 15px; }
+
+        .settings-panel { padding: 30px; background: #fff; display: none; }
+        .settings-panel.active { display: block; }
+
+        /* Controls Grid */
+        .controls-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 25px; margin-bottom: 30px; }
+        
+        .control-group { display: flex; flex-direction: column; gap: 8px; }
+        .control-group label { font-weight: 600; font-size: 14px; color: #444; display: flex; justify-content: space-between; }
+        .control-group input[type="range"] { width: 100%; accent-color: var(--primary); height: 6px; }
+        
+        .checkbox-group { display: flex; gap: 20px; align-items: center; margin-top: 10px; padding: 15px; background: #f8f9fa; border-radius: 8px; }
+        .checkbox-group label { display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500; font-size: 14px; }
+        
+        /* Buttons */
+        .btn-group { display: flex; gap: 15px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
+        .btn { padding: 14px 30px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .btn-primary { background: var(--primary); color: #fff; }
+        .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+        .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
+        .btn-outline:hover { background: #fff5f5; }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+        /* Preview Modal */
+        .preview-area { margin-top: 30px; text-align: center; display: none; background: #2d3436; padding: 20px; border-radius: 8px; }
+        .preview-canvas { max-width: 100%; box-shadow: 0 0 20px rgba(0,0,0,0.5); border: 1px solid #444; }
+
+        /* Progress */
+        .progress-container { display: none; margin-top: 25px; }
+        .progress-bar { width: 100%; height: 10px; background: #eee; border-radius: 5px; overflow: hidden; }
+        .progress-fill { height: 100%; width: 0%; background: var(--primary); transition: width 0.3s; }
+        .status-text { text-align: center; margin-top: 8px; font-size: 14px; color: #666; }
+
+    </style>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6196194515460390"
+     crossorigin="anonymous"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+</head>
+<body>
+
+    <main class="container">
+        <div class="hero">
+            <h1>Make PDF Look Scanned</h1>
+            <p>Add realistic tilt, dirty edges, and noise to your digital PDFs.</p>
+        </div>
+
+        <div class="tool-card">
+            <div class="upload-zone" id="uploadSection" onclick="document.getElementById('fileInput').click()">
+                <div class="upload-icon">📄</div>
+                <h3>Click to Upload PDF</h3>
+                <p>or drag and drop file here</p>
+                <input type="file" id="fileInput" accept="application/pdf" style="display:none">
+            </div>
+
+            <div class="settings-panel" id="settingsSection">
+                <div id="fileInfo" style="margin-bottom:20px; padding:10px; background:#f1f1f1; border-radius:6px; font-size:14px; text-align:center;"></div>
+
+                <div class="controls-grid">
+                    <div class="control-group">
+                        <label>Tilt Angle (Crookedness) <span id="valTilt">Medium</span></label>
+                        <input type="range" id="tilt" min="0" max="4" step="0.5" value="1.5" oninput="updateLabels()">
+                    </div>
+                    <div class="control-group">
+                        <label>Noise Level (Dirt/Grain) <span id="valNoise">30</span></label>
+                        <input type="range" id="noise" min="0" max="80" value="25" oninput="updateLabels()">
+                    </div>
+                    <div class="control-group">
+                        <label>Blur (Ink Bleed) <span id="valBlur">0.4px</span></label>
+                        <input type="range" id="blur" min="0" max="1.5" step="0.1" value="0.4" oninput="updateLabels()">
+                    </div>
+                </div>
+
+                <div class="checkbox-group">
+                    <label><input type="checkbox" id="bwCheck" checked> Grayscale</label>
+                    <label><input type="checkbox" id="contrastCheck" checked> High Contrast</label>
+                    <label><input type="checkbox" id="borderCheck" checked> Show Scan Border</label>
+                </div>
+
+                <div class="preview-area" id="previewArea">
+                    <div style="color:#aaa; font-size:12px; margin-bottom:10px;">PREVIEW OF PAGE 1</div>
+                    <canvas id="previewCanvas" class="preview-canvas"></canvas>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-outline" id="previewBtn">👀 Preview Page 1</button>
+                    <button class="btn btn-primary" id="convertBtn">⚡ Convert Entire PDF</button>
+                </div>
+            </div>
+
+            <div class="progress-container" id="progressSection" style="padding:0 30px 30px;">
+                <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+                <div class="status-text" id="statusText">Processing...</div>
+            </div>
+
+            <div id="resultSection" style="display:none; padding:30px; text-align:center;">
+                <h3 style="color:green; margin-bottom:15px;">Scanned PDF Ready!</h3>
+                <button class="btn btn-primary" id="downloadBtn">Download PDF</button>
+                <br><br>
+                <button class="btn btn-outline" onclick="location.reload()">Start Over</button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // CONFIG
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        
+        let currentFile = null;
+        let generatedPdfBytes = null;
+
+        // ELEMENTS
+        const uploadSection = document.getElementById('uploadSection');
+        const settingsSection = document.getElementById('settingsSection');
+        const fileInput = document.getElementById('fileInput');
+        const previewBtn = document.getElementById('previewBtn');
+        const convertBtn = document.getElementById('convertBtn');
+        const progressSection = document.getElementById('progressSection');
+        const progressFill = document.getElementById('progressFill');
+        const statusText = document.getElementById('statusText');
+
+        // EVENTS
+        uploadSection.addEventListener('dragover', e => { e.preventDefault(); uploadSection.classList.add('dragover'); });
+        uploadSection.addEventListener('dragleave', () => uploadSection.classList.remove('dragover'));
+        uploadSection.addEventListener('drop', e => {
+            e.preventDefault();
+            if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+        });
+        fileInput.addEventListener('change', () => { if (fileInput.files.length) handleFile(fileInput.files[0]); });
+
+        function updateLabels() {
+            document.getElementById('valNoise').innerText = document.getElementById('noise').value;
+            document.getElementById('valBlur').innerText = document.getElementById('blur').value + 'px';
+            const t = document.getElementById('tilt').value;
+            document.getElementById('valTilt').innerText = t == 0 ? "None" : (t < 2 ? "Subtle" : "Obvious");
+        }
+
+        function handleFile(file) {
+            if (file.type !== 'application/pdf') return alert('Please upload a PDF file.');
+            currentFile = file;
+            document.getElementById('fileInfo').innerText = `${file.name}`;
+            uploadSection.style.display = 'none';
+            settingsSection.classList.add('active');
+        }
+
+        // --- VISUAL EFFECT ENGINE (The Magic) ---
+        async function applyScanEffectVisual(ctx, width, height) {
+            const noiseLvl = parseInt(document.getElementById('noise').value);
+            const blurLvl = parseFloat(document.getElementById('blur').value);
+            const tiltMax = parseFloat(document.getElementById('tilt').value); // e.g., 2.0 degrees
+            const isBW = document.getElementById('bwCheck').checked;
+            const highContrast = document.getElementById('contrastCheck').checked;
+            const showBorder = document.getElementById('borderCheck').checked;
+
+            // 1. Capture original PDF page as bitmap
+            const imgData = ctx.getImageData(0, 0, width, height);
+            const bmp = await createImageBitmap(imgData);
+
+            // 2. Clear Canvas with Scanner White Background
+            ctx.fillStyle = '#ffffff'; // Scanner bed color
+            ctx.fillRect(0, 0, width, height);
+
+            ctx.save(); // Save state before tilt
+
+            // 3. APPLY TILT & SCALE
+            // To show the "edges" of the scan, we must scale the content down slightly (98%)
+            // This allows the white background to show through at the corners when rotated
+            if (tiltMax > 0) {
+                // Random angle between -tiltMax and +tiltMax
+                const angle = (Math.random() - 0.5) * 2 * tiltMax * (Math.PI / 180);
+                
+                ctx.translate(width/2, height/2);
+                ctx.rotate(angle);
+                // Scale down to 98% if border check is on, otherwise full size
+                const scaleFactor = showBorder ? 0.97 : 1.0; 
+                ctx.scale(scaleFactor, scaleFactor);
+                ctx.translate(-width/2, -height/2);
+            }
+
+            // 4. PREPARE FILTERS
+            let filterStr = `blur(${blurLvl}px)`;
+            if (isBW) filterStr += ' grayscale(100%)';
+            if (highContrast) filterStr += ' contrast(120%) brightness(105%)';
+            ctx.filter = filterStr;
+
+            // 5. DRAW THE PAGE (Tilted & Scaled)
+            ctx.drawImage(bmp, 0, 0);
+            
+            ctx.restore(); // Restore coordination system (so noise is applied evenly over the whole canvas)
+            ctx.filter = 'none';
+
+            // 6. VIGNETTE (Shadows in corners of scanner)
+            if (showBorder) {
+                 const gradient = ctx.createRadialGradient(width/2, height/2, height/2, width/2, height/2, height);
+                 gradient.addColorStop(0, "rgba(0,0,0,0)");
+                 gradient.addColorStop(1, "rgba(0,0,0,0.05)"); // Subtle corner darkness
+                 ctx.fillStyle = gradient;
+                 ctx.globalCompositeOperation = 'multiply';
+                 ctx.fillRect(0, 0, width, height);
+                 ctx.globalCompositeOperation = 'source-over';
+            }
+
+            // 7. NOISE (Dust on the scanner glass)
+            // This goes ON TOP of everything (including the white borders)
+            if (noiseLvl > 0) {
+                const nCan = document.createElement('canvas');
+                nCan.width = 128; nCan.height = 128;
+                const nCtx = nCan.getContext('2d');
+                const nId = nCtx.createImageData(128, 128);
+                for(let i=0; i<nId.data.length; i+=4) {
+                    const random = Math.random();
+                    // Black dots (Dust)
+                    if(random > 0.98) {
+                        nId.data[i] = 30; nId.data[i+1] = 30; nId.data[i+2] = 30;
+                        nId.data[i+3] = (noiseLvl/100) * 150; 
+                    }
+                    // White dots (Scratch/Paper imperfections)
+                    else if(random < 0.02) {
+                        nId.data[i] = 255; nId.data[i+1] = 255; nId.data[i+2] = 255;
+                        nId.data[i+3] = (noiseLvl/100) * 100;
+                    }
+                    else {
+                        nId.data[i+3] = 0;
+                    }
+                }
+                nCtx.putImageData(nId, 0, 0);
+                ctx.fillStyle = ctx.createPattern(nCan, 'repeat');
+                ctx.fillRect(0, 0, width, height);
+            }
+        }
+
+        // --- ACTIONS ---
+
+        previewBtn.onclick = async () => {
+            if (!currentFile) return;
+            const previewDiv = document.getElementById('previewArea');
+            const canvas = document.getElementById('previewCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            previewBtn.disabled = true;
+            previewBtn.innerText = "Generating...";
+
+            try {
+                const buffer = await currentFile.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument(buffer).promise;
+                const page = await pdf.getPage(1);
+                const viewport = page.getViewport({ scale: 1.0 }); // Good res for preview
+
+                // Set canvas to reasonable preview size (max 800px width)
+                const scale = Math.min(800 / viewport.width, 1);
+                canvas.width = viewport.width * scale;
+                canvas.height = viewport.height * scale;
+
+                // Render Clean Page first
+                const renderViewport = page.getViewport({ scale: scale });
+                await page.render({ canvasContext: ctx, viewport: renderViewport }).promise;
+
+                // Apply "Dirty" Effects
+                await applyScanEffectVisual(ctx, canvas.width, canvas.height);
+                
+                previewDiv.style.display = 'block';
+                previewBtn.innerText = "👀 Update Preview";
+                previewBtn.disabled = false;
+            } catch (e) {
+                console.error(e);
+                alert("Preview error: " + e.message);
+                previewBtn.disabled = false;
+            }
+        };
+
+        convertBtn.onclick = async () => {
+            if (!currentFile) return;
+            
+            convertBtn.disabled = true;
+            progressSection.style.display = 'block';
+            statusText.innerText = "Initializing scanner...";
+
+            try {
+                const buffer = await currentFile.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument(buffer).promise;
+                const pdfDoc = await PDFLib.PDFDocument.create();
+                
+                // Set Producer to look like a hardware scanner
+                pdfDoc.setProducer('HP LaserJet Pro M404 / Scanned');
+                pdfDoc.setCreator('');
+                
+                // Resolution: 2 (200 DPI equivalent roughly)
+                const renderScale = 2.0; 
+
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    const pct = Math.round(((i-1) / pdf.numPages) * 100);
+                    progressFill.style.width = pct + "%";
+                    statusText.innerText = `Scanning Page ${i} of ${pdf.numPages}...`;
+                    
+                    // Anti-freeze delay
+                    await new Promise(r => setTimeout(r, 20));
+
+                    const page = await pdf.getPage(i);
+                    const viewport = page.getViewport({ scale: renderScale });
+                    
+                    const canvas = document.createElement('canvas');
+                    canvas.width = viewport.width;
+                    canvas.height = viewport.height;
+                    const ctx = canvas.getContext('2d');
+
+                    await page.render({ canvasContext: ctx, viewport }).promise;
+                    
+                    // Apply the heavy effects
+                    await applyScanEffectVisual(ctx, canvas.width, canvas.height);
+
+                    // Export to JPEG (Standard for scans)
+                    const imgDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+                    const imgBytes = await fetch(imgDataUrl).then(res => res.arrayBuffer());
+                    
+                    const embeddedImage = await pdfDoc.embedJpg(imgBytes);
+                    
+                    // Add page matching image dimensions
+                    const newPage = pdfDoc.addPage([embeddedImage.width, embeddedImage.height]);
+                    newPage.drawImage(embeddedImage, {
+                        x: 0, y: 0, width: embeddedImage.width, height: embeddedImage.height
+                    });
+
+                    // Free memory
+                    canvas.width = 1; canvas.height = 1; 
+                }
+
+                progressFill.style.width = "100%";
+                statusText.innerText = "Packing PDF...";
+                
+                generatedPdfBytes = await pdfDoc.save();
+                
+                document.getElementById('resultSection').style.display = 'block';
+                progressSection.style.display = 'none';
+                
+                document.getElementById('downloadBtn').onclick = () => {
+                    const blob = new Blob([generatedPdfBytes], { type: 'application/pdf' });
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = currentFile.name.replace('.pdf', '_scanned.pdf');
+                    link.click();
+                };
+
+            } catch (err) {
+                console.error(err);
+                alert("Error: " + err.message);
+                convertBtn.disabled = false;
+            }
+        };
+    </script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"version":"2024.11.0","token":"41342ae72cae4f17a1b1010d54e26477","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>

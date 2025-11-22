@@ -1,0 +1,283 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Unlock PDF Online - Free PDF Password Remover Tool</title>
+    <meta name="title" content="Unlock PDF Online - Free PDF Password Remover Tool">
+    <meta name="description" content="Remove passwords from PDF files instantly. 100% Secure: Your files are decrypted in your browser and never uploaded to servers. Free, fast, and unlimited.">
+    <meta name="keywords" content="unlock pdf, remove pdf password, decrypt pdf, pdf password remover, online pdf unlocker, secure pdf tool">
+    
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Secure PDF Unlocker",
+      "applicationCategory": "UtilityApplication",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "featureList": "Client-side decryption, No file upload, Instant password removal",
+      "description": "A secure, browser-based tool to remove passwords from PDF documents without uploading files to a server."
+    }
+    </script>
+
+    <style>
+        :root { --primary: #2563eb; --primary-dark: #1e40af; --bg: #f8fafc; --surface: #ffffff; --text: #334155; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); margin: 0; line-height: 1.6; }
+        
+        .container { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+        header { text-align: center; margin-bottom: 40px; }
+        h1 { font-size: 2.5rem; font-weight: 800; color: #0f172a; margin-bottom: 10px; }
+        .subtitle { color: #64748b; font-size: 1.1rem; max-width: 600px; margin: 0 auto; }
+        
+        /* Tool Card */
+        .tool-card { background: var(--surface); border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); padding: 40px; text-align: center; border: 1px solid #e2e8f0; }
+        
+        /* Upload Zone */
+        .upload-zone { 
+            border: 2px dashed #cbd5e1; border-radius: 12px; padding: 40px; background: #f1f5f9; 
+            cursor: pointer; transition: all 0.3s ease; position: relative;
+        }
+        .upload-zone:hover, .upload-zone.dragover { border-color: var(--primary); background: #eff6ff; }
+        .upload-icon { font-size: 48px; margin-bottom: 15px; display: block; }
+        .file-name { font-weight: bold; color: var(--primary); margin-top: 10px; display: block; font-size: 1.1rem; }
+
+        /* Inputs */
+        .input-group { margin-top: 25px; display: none; opacity: 0; transition: opacity 0.5s; }
+        .input-group.active { display: block; opacity: 1; }
+        
+        .password-wrapper { position: relative; max-width: 400px; margin: 0 auto 20px; }
+        input[type="password"], input[type="text"] {
+            width: 100%; padding: 15px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 16px; outline: none; box-sizing: border-box;
+        }
+        input:focus { border-color: var(--primary); }
+        
+        .toggle-password {
+            position: absolute; right: 15px; top: 50%; transform: translateY(-50%);
+            cursor: pointer; font-size: 14px; color: #64748b; user-select: none;
+        }
+
+        /* Buttons */
+        .btn { 
+            background: var(--primary); color: white; border: none; padding: 15px 40px; font-size: 18px; font-weight: bold; 
+            border-radius: 8px; cursor: pointer; transition: background 0.2s; width: 100%; max-width: 400px;
+        }
+        .btn:hover { background: var(--primary-dark); }
+        .btn:disabled { background: #94a3b8; cursor: not-allowed; }
+
+        /* Status */
+        #status { margin-top: 20px; font-weight: 600; min-height: 24px; }
+        .error { color: #ef4444; }
+        .success { color: #10b981; }
+
+        /* SEO Content Section */
+        .content-section { margin-top: 60px; background: white; padding: 40px; border-radius: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+        .content-section h2 { color: #1e293b; border-bottom: 2px solid #f1f5f9; padding-bottom: 15px; margin-bottom: 20px; }
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; margin-bottom: 40px; }
+        .feature h3 { color: var(--primary); margin-bottom: 10px; }
+        
+        .spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s ease-in-out infinite; margin-right: 10px; vertical-align: middle; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        #pdfInput { display: none; }
+    </style>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6196194515460390"
+     crossorigin="anonymous"></script>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Unlock PDF Online</h1>
+            <p class="subtitle">Remove passwords from PDF files instantly and securely. <br><strong>100% Client-Side Processing – Your files never leave your browser.</strong></p>
+        </header>
+
+        <main class="tool-card">
+            <div class="upload-zone" id="dropZone" onclick="document.getElementById('pdfInput').click()">
+                <span class="upload-icon">🔒</span>
+                <h3 id="uploadText">Click to Select PDF or Drag & Drop Here</h3>
+                <span id="fileName" class="file-name"></span>
+                <input type="file" id="pdfInput" accept=".pdf">
+            </div>
+
+            <div class="input-group" id="actionSection">
+                <div class="password-wrapper">
+                    <input type="password" id="pdfPassword" placeholder="Enter PDF Password">
+                    <span class="toggle-password" onclick="togglePass()">Show</span>
+                </div>
+                <button id="unlockBtn" class="btn" onclick="processPDF()">Unlock PDF</button>
+            </div>
+
+            <div id="status"></div>
+        </main>
+
+        <section class="content-section">
+            <h2>Why use our PDF Unlocker?</h2>
+            <div class="features-grid">
+                <div class="feature">
+                    <h3>🛡️ 100% Secure</h3>
+                    <p>Unlike other tools, we process your file using <strong>WebAssembly</strong> directly in your browser. Your sensitive documents are never uploaded to a server.</p>
+                </div>
+                <div class="feature">
+                    <h3>⚡ Blazing Fast</h3>
+                    <p>No upload times. Because it happens on your machine, unlocking is almost instant.</p>
+                </div>
+                <div class="feature">
+                    <h3>💸 Free Forever</h3>
+                    <p>Unlock as many files as you want. No limits, no watermarks.</p>
+                </div>
+            </div>
+
+            <h2>How to remove a password from a PDF?</h2>
+            <ol style="line-height: 1.8; margin-left: 20px; color: #475569;">
+                <li><strong>Upload your file:</strong> Click the box above or drag and drop your encrypted PDF.</li>
+                <li><strong>Enter the password:</strong> Type the correct password that currently locks the document.</li>
+                <li><strong>Click Unlock:</strong> Our tool will remove the encryption layer instantly.</li>
+            </ol>
+        </section>
+    </div>
+
+    <script src="https://unpkg.com/@neslinesli93/qpdf-wasm@0.3.0/dist/qpdf.js"></script>
+    <script>
+        // --- Variables ---
+        let qpdfModule = null;
+        let currentFile = null;
+        const statusEl = document.getElementById("status");
+        const unlockBtn = document.getElementById("unlockBtn");
+        const actionSection = document.getElementById("actionSection");
+        const dropZone = document.getElementById("dropZone");
+        const fileNameEl = document.getElementById("fileName");
+        const uploadText = document.getElementById("uploadText");
+
+        // --- Initialization ---
+        async function initQPDF() {
+            try {
+                qpdfModule = await window.Module({
+                    locateFile: () => "https://unpkg.com/@neslinesli93/qpdf-wasm@0.3.0/dist/qpdf.wasm",
+                    noInitialRun: true,
+                    preRun: [(m) => {
+                        try { m.FS.mkdir("/input"); } catch(e){}
+                        try { m.FS.mkdir("/output"); } catch(e){}
+                    }],
+                });
+                console.log("QPDF Engine Ready");
+            } catch (e) {
+                console.error("Failed to load WASM", e);
+                statusEl.textContent = "Error loading encryption engine. Please refresh.";
+            }
+        }
+        initQPDF();
+
+        // --- File Handling ---
+        function handleFileSelect(file) {
+            if (!file || file.type !== 'application/pdf') {
+                alert("Please select a valid PDF file.");
+                return;
+            }
+            currentFile = file;
+            fileNameEl.textContent = file.name;
+            uploadText.textContent = "File Selected";
+            dropZone.style.borderColor = "#2563eb";
+            dropZone.style.backgroundColor = "#eff6ff";
+            actionSection.classList.add("active");
+            document.getElementById("pdfPassword").focus();
+            statusEl.textContent = "";
+        }
+
+        document.getElementById("pdfInput").addEventListener("change", (e) => {
+            handleFileSelect(e.target.files[0]);
+        });
+
+        // Drag & Drop
+        dropZone.addEventListener("dragover", (e) => { e.preventDefault(); dropZone.classList.add("dragover"); });
+        dropZone.addEventListener("dragleave", () => dropZone.classList.remove("dragover"));
+        dropZone.addEventListener("drop", (e) => {
+            e.preventDefault();
+            dropZone.classList.remove("dragover");
+            if (e.dataTransfer.files[0]) handleFileSelect(e.dataTransfer.files[0]);
+        });
+
+        // --- Core Logic ---
+        function togglePass() {
+            const input = document.getElementById("pdfPassword");
+            input.type = input.type === "password" ? "text" : "password";
+        }
+
+        async function processPDF() {
+            if (!currentFile) return;
+            if (!qpdfModule) return alert("Engine still loading... wait 2 seconds.");
+            
+            const password = document.getElementById("pdfPassword").value;
+            if (!password) {
+                statusEl.innerHTML = '<span class="error">Please enter the password.</span>';
+                return;
+            }
+
+            unlockBtn.disabled = true;
+            unlockBtn.innerHTML = '<div class="spinner"></div> Decrypting...';
+            statusEl.textContent = "";
+
+            try {
+                const buffer = await currentFile.arrayBuffer();
+                
+                // Cleanup
+                try { qpdfModule.FS.unlink("/input/input.pdf"); } catch(e){}
+                try { qpdfModule.FS.unlink("/output/output.pdf"); } catch(e){}
+
+                qpdfModule.FS.writeFile("/input/input.pdf", new Uint8Array(buffer));
+
+                // Call QPDF with flag to ignore warnings (Code 3)
+                const exitCode = await qpdfModule.callMain([
+                    "--password=" + password,
+                    "--decrypt",
+                    "--warning-exit-0", // Treat warnings as success
+                    "/input/input.pdf",
+                    "/output/output.pdf"
+                ]);
+
+                // Robust check: Did the output file actually get created?
+                let success = false;
+                try {
+                    const output = qpdfModule.FS.readFile("/output/output.pdf");
+                    // If read succeeds, we have a file!
+                    const blob = new Blob([output], { type: "application/pdf" });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = "unlocked_" + currentFile.name;
+                    a.click();
+                    success = true;
+                } catch (readErr) {
+                    success = false;
+                }
+
+                if (success) {
+                    statusEl.innerHTML = '<span class="success">Success! Download started.</span>';
+                    unlockBtn.innerHTML = "Unlock Another";
+                } else {
+                    // Handle failure
+                    if (exitCode === 2) {
+                        statusEl.innerHTML = '<span class="error">Incorrect Password.</span>';
+                    } else {
+                        statusEl.innerHTML = '<span class="error">Decryption failed (Code: '+exitCode+'). File may be corrupt.</span>';
+                    }
+                    unlockBtn.innerHTML = "Try Again";
+                }
+
+            } catch (err) {
+                console.error(err);
+                statusEl.innerHTML = '<span class="error">System Error. Check console.</span>';
+                unlockBtn.innerHTML = "Try Again";
+            }
+
+            unlockBtn.disabled = false;
+        }
+    </script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"version":"2024.11.0","token":"41342ae72cae4f17a1b1010d54e26477","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>

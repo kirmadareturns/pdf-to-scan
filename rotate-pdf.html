@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rotate PDF Online – Free PDF Rotator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+    <style>
+        body { font-family: Arial, sans-serif; background:#f8f9fa; padding:20px; }
+        .container { max-width:1000px; margin:0 auto; background:#fff; padding:30px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,.08); }
+        h1 { text-align:center; margin-bottom:20px; }
+        
+        /* Upload Section */
+        .upload { border:2px dashed #ccc; padding:30px; text-align:center; border-radius:10px; background:#fafafa; cursor:pointer; margin-bottom:20px; transition: 0.2s; }
+        .upload:hover { border-color:#A50113; background:#fff5f5; }
+        
+        /* Toolbar for Global Actions */
+        .toolbar { display:none; justify-content:center; gap:15px; margin-bottom:20px; padding-bottom:20px; border-bottom:1px solid #eee; }
+        
+        /* Grid Layout for Pages */
+        .page-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap:20px; justify-content:center; margin-top:20px; }
+        
+        /* Individual Page Card */
+        .page-card { background:#f8f9fa; border:1px solid #ddd; border-radius:8px; padding:10px; text-align:center; transition: all 0.3s ease; position: relative; }
+        .page-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); border-color: #A50113; }
+        
+        /* The Canvas (Thumbnail) Wrapper */
+        .canvas-wrapper {
+            height: 220px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        
+        /* The actual canvas needs a transition for the rotation animation */
+        canvas { 
+            max-width: 100%; 
+            max-height: 100%; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+            transition: transform 0.3s ease; 
+        }
+
+        .page-number { font-size: 12px; color: #666; margin-bottom: 5px; }
+
+        /* Buttons */
+        .btn { background:#A50113; color:#fff; padding:10px 20px; border:none; border-radius:6px; cursor:pointer; font-weight:600; }
+        .btn:hover { background:#8a0110; }
+        .btn-secondary { background:#444; }
+        .btn-secondary:hover { background:#222; }
+        .btn-action { font-size: 13px; padding: 5px 10px; background: #e9ecef; color: #333; margin: 0 2px; }
+        .btn-action:hover { background: #ccc; }
+        .btn:disabled { background: #ccc; cursor: not-allowed; }
+
+        .rotate-controls { display: flex; justify-content: center; gap: 5px; }
+        .result-section { display:none; text-align:center; margin-top:30px; padding-top: 20px; border-top: 1px solid #eee; }
+        .loader { display:none; text-align:center; padding: 20px; color: #666; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Rotate PDF Pages</h1>
+    <p style="text-align:center;color:#666;">Upload a PDF, rotate individual pages or all pages, and download.</p>
+
+    <div class="upload" id="uploadBox" onclick="fileInput.click()">
+        <p><strong>Click to upload PDF</strong> or drag & drop</p>
+        <input type="file" id="fileInput" accept="application/pdf" style="display:none;">
+    </div>
+
+    <div id="loader" class="loader">Processing PDF and generating previews...</div>
+
+    <div class="toolbar" id="toolbar">
+        <button class="btn btn-secondary" onclick="rotateAll(-90)">↶ Rotate All Left</button>
+        <button class="btn btn-secondary" onclick="rotateAll(90)">↷ Rotate All Right</button>
+        <button class="btn" onclick="resetAll()">Reset</button>
+    </div>
+
+    <div id="pageGrid" class="page-grid"></div>
+
+    <div class="result-section" id="resultSection">
+        <button class="btn" id="downloadBtn" style="padding: 15px 30px; font-size: 16px;">Apply Rotation & Download PDF</button>
+    </div>
+</div>
+
+<script>
+    // 1. CONFIGURATION
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+    let rotations = []; 
+    let totalPages = 0;
+
+    const uploadBox = document.getElementById("uploadBox");
+    const fileInput = document.getElementById("fileInput");
+    const pageGrid = document.getElementById("pageGrid");
+    const toolbar = document.getElementById("toolbar");
+    const resultSection = document.getElementById("resultSection");
+    const downloadBtn = document.getElementById("downloadBtn");
+    const loader = document.getElementById("loader");
+
+    // 2. UPLOAD HANDLERS
+    uploadBox.addEventListener("dragover", e => e.preventDefault());
+    uploadBox.addEventListener("drop", e => {
+        e.preventDefault();
+        if(e.dataTransfer.files.length > 0) {
+            fileInput.files = e.dataTransfer.files; // Sync file input
+            handleFile(e.dataTransfer.files[0]);
+        }
+    });
+    fileInput.addEventListener("change", () => handleFile(fileInput.files[0]));
+
+    async function handleFile(file) {
+        if (!file || file.type !== "application/pdf") return alert("Please upload a valid PDF.");
+        
+        uploadBox.style.display = "none";
+        loader.style.display = "block";
+        pageGrid.innerHTML = "";
+        
+        try {
+            // We read the buffer purely for the Preview Generation
+            const buffer = await file.arrayBuffer();
+            await renderPreviews(buffer);
+            
+            loader.style.display = "none";
+            toolbar.style.display = "flex";
+            resultSection.style.display = "block";
+        } catch (err) {
+            console.error(err);
+            alert("Error loading PDF: " + err.message);
+            loader.style.display = "none";
+            uploadBox.style.display = "block";
+        }
+    }
+
+    // 3. RENDER PREVIEWS
+    async function renderPreviews(pdfBytes) {
+        // Using a copy of the bytes ensures PDF.js doesn't lock the buffer
+        const pdf = await pdfjsLib.getDocument(pdfBytes.slice(0)).promise;
+        totalPages = pdf.numPages;
+        rotations = new Array(totalPages).fill(0);
+
+        for (let i = 1; i <= totalPages; i++) {
+            const page = await pdf.getPage(i);
+            const viewport = page.getViewport({ scale: 0.4 }); // Smaller thumbnail
+
+            const card = document.createElement("div");
+            card.className = "page-card";
+            
+            const canvasWrapper = document.createElement("div");
+            canvasWrapper.className = "canvas-wrapper";
+
+            const canvas = document.createElement("canvas");
+            canvas.id = `canvas-${i-1}`; 
+            const context = canvas.getContext("2d");
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+
+            await page.render({ canvasContext: context, viewport: viewport }).promise;
+
+            canvasWrapper.appendChild(canvas);
+
+            const controls = document.createElement("div");
+            controls.className = "rotate-controls";
+            controls.innerHTML = `
+                <button class="btn btn-action" onclick="rotatePage(${i-1}, -90)">↶</button>
+                <div class="page-number">Page ${i}</div>
+                <button class="btn btn-action" onclick="rotatePage(${i-1}, 90)">↷</button>
+            `;
+
+            card.appendChild(canvasWrapper);
+            card.appendChild(controls);
+            pageGrid.appendChild(card);
+        }
+    }
+
+    // 4. ROTATION LOGIC (VISUAL)
+    function rotatePage(index, angle) {
+        rotations[index] = (rotations[index] + angle); 
+        // We keep 'rotations' as raw degrees (can be negative) for CSS logic
+        // But we will normalize it in the Save function
+        
+        const canvas = document.getElementById(`canvas-${index}`);
+        if(canvas) {
+            canvas.style.transform = `rotate(${rotations[index]}deg)`;
+        }
+    }
+
+    function rotateAll(angle) {
+        for (let i = 0; i < totalPages; i++) {
+            rotatePage(i, angle);
+        }
+    }
+
+    function resetAll() {
+        for (let i = 0; i < totalPages; i++) {
+            rotatePage(i, -rotations[i]);
+        }
+    }
+
+    // Helper: Ensure angle is always 0, 90, 180, 270 (No negatives)
+    const normalizeAngle = (angle) => (angle % 360 + 360) % 360;
+
+    // 5. SAVE PDF (ROBUST VERSION)
+    downloadBtn.onclick = async function () {
+        const originalBtnText = downloadBtn.innerText;
+        downloadBtn.disabled = true;
+        downloadBtn.innerText = "Processing...";
+
+        try {
+            // CRITICAL FIX: Re-read the file fresh from input to avoid buffer conflict
+            if(!fileInput.files[0]) throw new Error("File source lost. Please re-upload.");
+            const freshBytes = await fileInput.files[0].arrayBuffer();
+
+            const pdfDoc = await PDFLib.PDFDocument.load(freshBytes);
+            const pages = pdfDoc.getPages();
+
+            pages.forEach((page, index) => {
+                const rotationToAdd = rotations[index];
+                
+                if (rotationToAdd !== 0) {
+                    const currentRotation = page.getRotation().angle; 
+                    const finalAngle = normalizeAngle(currentRotation + rotationToAdd);
+                    page.setRotation(PDFLib.degrees(finalAngle));
+                }
+            });
+
+            const pdfBytes = await pdfDoc.save();
+            const blob = new Blob([pdfBytes], { type: "application/pdf" });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "rotated-document.pdf";
+            link.click();
+
+        } catch (error) {
+            console.error("Full Error:", error);
+            alert("Error saving PDF: " + error.message);
+        }
+
+        downloadBtn.disabled = false;
+        downloadBtn.innerText = originalBtnText;
+    };
+</script>
+
+</body>
+</html>

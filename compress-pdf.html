@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Smart Batch PDF Compressor</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:#f4f7f6; padding:20px; color:#333; }
+        .container { max-width:800px; margin:0 auto; background:#fff; padding:40px; border-radius:16px; box-shadow:0 10px 25px rgba(0,0,0,.05); }
+        h1 { text-align:center; margin-bottom:10px; color:#2c3e50; }
+        
+        /* Upload Area */
+        .upload { 
+            border:2px dashed #cbd5e0; padding:40px; text-align:center; border-radius:12px; 
+            background:#fafbfc; cursor:pointer; margin-bottom:25px; transition:0.2s; 
+        }
+        .upload:hover { border-color:#A50113; background:#fff5f5; }
+        .upload p { margin:0; font-size:18px; color:#718096; }
+
+        /* File List */
+        .file-list { margin-bottom:25px; max-height: 250px; overflow-y: auto; border:1px solid #eee; border-radius:8px; }
+        .file-item { 
+            padding:12px 15px; border-bottom:1px solid #eee; display:flex; 
+            justify-content:space-between; align-items:center; background:#fff; 
+        }
+        .file-item:last-child { border-bottom:none; }
+        .file-name { font-weight:500; font-size:14px; }
+        .file-size { color:#718096; font-size:12px; margin-left:8px; background:#edf2f7; padding:2px 6px; border-radius:4px; }
+        .remove-btn { background:none; border:none; color:#e53e3e; cursor:pointer; font-size:18px; line-height:1; }
+        
+        /* Controls Area */
+        .controls { display:none; background:#f8f9fa; padding:20px; border-radius:10px; margin-bottom:20px; }
+        
+        /* Mode Switcher */
+        .mode-switch { display:flex; gap:20px; margin-bottom:20px; justify-content:center; border-bottom:2px solid #eee; padding-bottom:15px; }
+        .mode-option { cursor:pointer; padding:8px 15px; border-radius:6px; font-weight:600; color:#718096; user-select:none; }
+        .mode-option.active { background:#A50113; color:#fff; }
+
+        /* Inputs */
+        .input-section { text-align:center; display:none; }
+        .input-section.active { display:block; }
+        
+        input[type=range] { width:100%; max-width:300px; accent-color:#A50113; height:6px; }
+        input[type=number] { 
+            padding:10px; width:120px; text-align:center; font-size:18px; border:2px solid #cbd5e0; border-radius:8px; 
+        }
+        input[type=number]:focus { border-color:#A50113; outline:none; }
+
+        .desc-text { font-size:13px; color:#718096; margin-top:8px; }
+
+        /* Main Button */
+        .btn-main { 
+            background:#A50113; color:#fff; width:100%; padding:15px; border:none; border-radius:8px; 
+            font-size:16px; font-weight:700; cursor:pointer; transition:0.2s; 
+        }
+        .btn-main:hover { background:#82010f; transform:translateY(-1px); }
+        .btn-main:disabled { background:#cbd5e0; transform:none; cursor:not-allowed; }
+
+        /* Progress */
+        .progress-area { display:none; margin-top:20px; }
+        .progress-track { background:#edf2f7; height:10px; border-radius:5px; overflow:hidden; }
+        .progress-fill { background:#A50113; height:100%; width:0%; transition:width 0.2s; }
+        .status-text { text-align:center; margin-top:8px; font-size:14px; color:#4a5568; font-family:monospace; }
+
+        /* Results */
+        .result-area { display:none; margin-top:20px; padding:20px; background:#c6f6d5; border-radius:8px; text-align:center; color:#22543d; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Batch PDF Compressor</h1>
+    <p style="text-align:center;color:#718096; margin-bottom:30px;">Reduce file size by percentage or set a maximum MB limit.</p>
+
+    <div class="upload" id="uploadBox" onclick="fileInput.click()">
+        <p><strong>Click to Upload PDFs</strong><br><span style="font-size:14px">(Multi-file selection supported)</span></p>
+        <input type="file" id="fileInput" accept="application/pdf" multiple style="display:none;">
+    </div>
+
+    <div class="file-list" id="fileList"></div>
+
+    <div class="controls" id="controls">
+        
+        <div class="mode-switch">
+            <div class="mode-option active" id="modePercent" onclick="setMode('percent')">By Percentage</div>
+            <div class="mode-option" id="modeTarget" onclick="setMode('target')">Max File Size (MB)</div>
+        </div>
+
+        <div class="input-section active" id="sectionPercent">
+            <div style="font-size:20px; font-weight:bold; margin-bottom:10px; color:#A50113;" id="percentValue">50%</div>
+            <input type="range" id="slider" min="10" max="90" value="50" step="5" oninput="updateSliderLabel()">
+            <p class="desc-text">Reduces file size to roughly this percentage of the original.</p>
+        </div>
+
+        <div class="input-section" id="sectionTarget">
+            <label style="display:block; margin-bottom:10px; font-weight:600;">Maximum Size per File</label>
+            <input type="number" id="targetMB" placeholder="e.g. 2.5" step="0.1" min="0.1">
+            <span style="font-weight:bold; margin-left:5px;">MB</span>
+            <p class="desc-text">Files larger than this will be compressed to fit.<br>Smaller files will be preserved.</p>
+        </div>
+
+        <div style="margin-top:25px;">
+            <button class="btn-main" id="compressBtn">Compress & Download ZIP</button>
+        </div>
+    </div>
+
+    <div class="progress-area" id="progressArea">
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="status-text" id="statusText">Starting...</div>
+    </div>
+
+    <div class="result-area" id="resultArea">
+        <h3 style="margin:0 0 10px 0;">Compression Complete!</h3>
+        <div id="statsText"></div>
+    </div>
+</div>
+
+<script>
+    // --- SETUP ---
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    const { jsPDF } = window.jspdf;
+
+    let files = [];
+    let currentMode = 'percent'; // 'percent' or 'target'
+
+    // --- DOM ELEMENTS ---
+    const uploadBox = document.getElementById('uploadBox');
+    const fileInput = document.getElementById('fileInput');
+    const fileListDiv = document.getElementById('fileList');
+    const controls = document.getElementById('controls');
+    const compressBtn = document.getElementById('compressBtn');
+    const progressArea = document.getElementById('progressArea');
+    const progressFill = document.getElementById('progressFill');
+    const statusText = document.getElementById('statusText');
+    const resultArea = document.getElementById('resultArea');
+
+    // --- EVENT LISTENERS ---
+    fileInput.addEventListener('change', () => addFiles(fileInput.files));
+    uploadBox.addEventListener('dragover', e => e.preventDefault());
+    uploadBox.addEventListener('drop', e => {
+        e.preventDefault();
+        addFiles(e.dataTransfer.files);
+    });
+
+    // --- LOGIC ---
+
+    function addFiles(fileList) {
+        for (let file of fileList) {
+            if (file.type === 'application/pdf') {
+                files.push(file);
+            }
+        }
+        renderFileList();
+        if (files.length > 0) {
+            controls.style.display = 'block';
+            uploadBox.style.display = 'none';
+        }
+    }
+
+    function renderFileList() {
+        fileListDiv.innerHTML = '';
+        files.forEach((file, index) => {
+            const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+            const div = document.createElement('div');
+            div.className = 'file-item';
+            div.innerHTML = `
+                <div class="file-name">${index+1}. ${file.name} <span class="file-size">${sizeMB} MB</span></div>
+                <button class="remove-btn" onclick="removeFile(${index})">×</button>
+            `;
+            fileListDiv.appendChild(div);
+        });
+    }
+
+    window.removeFile = function(index) {
+        files.splice(index, 1);
+        renderFileList();
+        if (files.length === 0) {
+            controls.style.display = 'none';
+            uploadBox.style.display = 'block';
+        }
+    }
+
+    window.setMode = function(mode) {
+        currentMode = mode;
+        document.getElementById('modePercent').className = mode === 'percent' ? 'mode-option active' : 'mode-option';
+        document.getElementById('modeTarget').className = mode === 'target' ? 'mode-option active' : 'mode-option';
+        
+        document.getElementById('sectionPercent').className = mode === 'percent' ? 'input-section active' : 'input-section';
+        document.getElementById('sectionTarget').className = mode === 'target' ? 'input-section active' : 'input-section';
+    }
+
+    window.updateSliderLabel = function() {
+        const val = document.getElementById('slider').value;
+        document.getElementById('percentValue').innerText = val + "% Size";
+    }
+
+    // --- COMPRESSION ENGINE ---
+
+    compressBtn.onclick = async () => {
+        // Validation
+        let targetMB = null;
+        if (currentMode === 'target') {
+            targetMB = parseFloat(document.getElementById('targetMB').value);
+            if (!targetMB || targetMB <= 0) return alert("Please enter a valid MB limit (e.g., 2.0)");
+        }
+
+        compressBtn.disabled = true;
+        progressArea.style.display = 'block';
+        resultArea.style.display = 'none';
+
+        const zip = new JSZip();
+        let totalOriginalBytes = 0;
+        let totalSavedBytes = 0;
+
+        try {
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const fileSizeMB = file.size / (1024 * 1024);
+                totalOriginalBytes += file.size;
+
+                statusText.innerText = `Processing: ${file.name} (${fileSizeMB.toFixed(1)} MB)...`;
+                
+                // --- CALCULATE SETTINGS PER FILE ---
+                let quality = 0.5;
+                let scale = 1.0;
+
+                if (currentMode === 'percent') {
+                    // Slider Mode
+                    const percent = parseInt(document.getElementById('slider').value) / 100;
+                    quality = Math.max(0.1, percent); 
+                    scale = percent < 0.4 ? 1.0 : 1.5; // Maintain resolution unless heavy compression requested
+                } else {
+                    // Target MB Mode
+                    if (fileSizeMB <= targetMB) {
+                        // File is already small enough. Use high quality.
+                        quality = 0.95;
+                        scale = 1.5;
+                    } else {
+                        // File needs compression
+                        const ratio = targetMB / fileSizeMB;
+                        // Map ratio to quality (clamp between 0.1 and 0.8)
+                        quality = Math.max(0.1, Math.min(0.8, ratio));
+                        // If ratio is very aggressive (needs to be 10% of original), drop resolution
+                        scale = ratio < 0.2 ? 0.8 : (ratio < 0.5 ? 1.0 : 1.5); 
+                    }
+                }
+
+                // --- EXECUTE COMPRESSION ---
+                const buffer = await file.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument(buffer).promise;
+                const doc = new jsPDF({ orientation: 'p', unit: 'px', compress: true });
+
+                for (let p = 1; p <= pdf.numPages; p++) {
+                    // Progress Bar Math
+                    const step = ((i / files.length) * 100) + ((p / pdf.numPages) * (100 / files.length));
+                    progressFill.style.width = step + "%";
+
+                    const page = await pdf.getPage(p);
+                    const viewport = page.getViewport({ scale: scale });
+
+                    const canvas = document.createElement("canvas");
+                    const ctx = canvas.getContext("2d");
+                    canvas.width = viewport.width;
+                    canvas.height = viewport.height;
+
+                    await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+
+                    const imgData = canvas.toDataURL("image/jpeg", quality);
+                    
+                    const imgProps = doc.getImageProperties(imgData);
+                    const pdfWidth = doc.internal.pageSize.getWidth();
+                    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+                    if (p > 1) doc.addPage();
+                    doc.internal.pageSize.width = pdfWidth;
+                    doc.internal.pageSize.height = pdfHeight;
+                    doc.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+                }
+
+                const compressedBlob = doc.output('blob');
+                totalSavedBytes += compressedBlob.size;
+                zip.file(`compressed_${file.name}`, compressedBlob);
+            }
+
+            statusText.innerText = "Generating ZIP file...";
+            progressFill.style.width = "100%";
+            
+            const zipContent = await zip.generateAsync({ type: "blob" });
+            const url = URL.createObjectURL(zipContent);
+            
+            // Stats
+            const savedPercent = (100 - ((totalSavedBytes / totalOriginalBytes) * 100)).toFixed(0);
+            const origTotalMB = (totalOriginalBytes / (1024*1024)).toFixed(1);
+            const newTotalMB = (totalSavedBytes / (1024*1024)).toFixed(1);
+
+            resultArea.style.display = 'block';
+            document.getElementById('statsText').innerHTML = `
+                Original: <b>${origTotalMB} MB</b> &rarr; New: <b>${newTotalMB} MB</b><br>
+                Total Reduction: <b>${savedPercent}%</b>
+            `;
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = "batch_compressed_pdfs.zip";
+            link.textContent = "Click here if download doesn't start";
+            link.className = "btn-main";
+            link.style.marginTop = "15px";
+            link.style.display = "inline-block";
+            link.style.width = "auto";
+            
+            // Auto click
+            link.click();
+            
+            // Append button for manual re-download
+            resultArea.appendChild(document.createElement('br'));
+            resultArea.appendChild(link);
+
+        } catch (err) {
+            console.error(err);
+            alert("Error: " + err.message);
+        }
+        
+        compressBtn.disabled = false;
+    }
+</script>
+</body>
+</html>

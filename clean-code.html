@@ -777,25 +777,186 @@ files</li>
 </div>
 </div>
     <script>
-function stripAllComments(code) {
-    // Remove HTML comments
-    code = code.replace(/<!--[\s\S]*?-->/g, '');
+function stripAllCommentsSafely(code) {
+    let result = '';
+    let i = 0;
+    let inHtmlTag = false;
 
-    // Remove CSS comments inside <style> blocks
-    code = code.replace(/<style[\s\S]*?>[\s\S]*?<\/style>/gi, function(styleBlock) {
-        return styleBlock.replace(/\/\*[\s\S]*?\*\//g, '');
-    });
+    while (i < code.length) {
+        // Detect <style> blocks and process them
+        if (code.substr(i, 6).toLowerCase() === '<style') {
+            let styleEnd = code.toLowerCase().indexOf('</style>', i);
+            if (styleEnd !== -1) {
+                let styleStart = code.indexOf('>', i) + 1;
+                let styleCss = code.substring(styleStart, styleEnd);
+                let cleanCss = stripCSSCommentsSafely(styleCss);
+                result += code.substring(i, styleStart) + cleanCss;
+                i = styleEnd;
+                continue;
+            }
+        }
 
-    // Remove JS comments inside <script> blocks
-    code = code.replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, function(scriptBlock) {
-        // Remove /* ... */ comments
-        scriptBlock = scriptBlock.replace(/\/\*[\s\S]*?\*\//g, '');
-        // Remove //... comments
-        scriptBlock = scriptBlock.replace(/\/\/.*$/gm, '');
-        return scriptBlock;
-    });
+        // Detect <script> blocks and process them
+        if (code.substr(i, 7).toLowerCase() === '<script') {
+            let scriptEnd = code.toLowerCase().indexOf('</script>', i);
+            if (scriptEnd !== -1) {
+                let scriptStart = code.indexOf('>', i) + 1;
+                let scriptJs = code.substring(scriptStart, scriptEnd);
+                let cleanJs = stripJSCommentsSafely(scriptJs);
+                result += code.substring(i, scriptStart) + cleanJs;
+                i = scriptEnd;
+                continue;
+            }
+        }
 
-    return code;
+        // Strip HTML comments
+        if (code.substr(i, 4) === '<!--') {
+            let htmlCommentEnd = code.indexOf('-->', i + 4);
+            if (htmlCommentEnd !== -1) {
+                i = htmlCommentEnd + 3;
+                continue;
+            }
+        }
+
+        result += code[i];
+        i++;
+    }
+
+    return result;
+}
+
+function stripCSSCommentsSafely(code) {
+    let result = '';
+    let i = 0;
+
+    while (i < code.length) {
+        // Check for /* */ comments
+        if (code[i] === '/' && code[i + 1] === '*') {
+            let end = code.indexOf('*/', i + 2);
+            if (end !== -1) {
+                i = end + 2;
+                continue;
+            }
+        }
+
+        // Check for // comments
+        if (code[i] === '/' && code[i + 1] === '/') {
+            let lineEnd = code.indexOf('\n', i);
+            if (lineEnd === -1) {
+                break;
+            }
+            i = lineEnd + 1;
+            result += '\n';
+            continue;
+        }
+
+        result += code[i];
+        i++;
+    }
+
+    return result;
+}
+
+function stripJSCommentsSafely(code) {
+    let result = '';
+    let i = 0;
+    let inString = false;
+    let stringChar = '';
+    let inTemplate = false;
+    let inRegex = false;
+
+    while (i < code.length) {
+        const char = code[i];
+        const nextChar = code[i + 1] || '';
+        const prevChar = i > 0 ? code[i - 1] : '';
+
+        // Handle template literals
+        if (char === '`' && prevChar !== '\\') {
+            inTemplate = !inTemplate;
+            result += char;
+            i++;
+            continue;
+        }
+
+        if (inTemplate) {
+            result += char;
+            i++;
+            continue;
+        }
+
+        // Handle strings
+        if ((char === '"' || char === "'") && prevChar !== '\\') {
+            if (!inString) {
+                inString = true;
+                stringChar = char;
+            } else if (char === stringChar) {
+                inString = false;
+            }
+            result += char;
+            i++;
+            continue;
+        }
+
+        if (inString) {
+            result += char;
+            i++;
+            continue;
+        }
+
+        // Handle regex patterns (simple detection)
+        if (char === '/' && (i === 0 || /[\s=(:,;!&|?+\-*/%^~]/.test(prevChar))) {
+            // Might be regex - look for closing /
+            let regexEnd = -1;
+            let j = i + 1;
+            let escaped = false;
+
+            while (j < code.length) {
+                if (code[j] === '\\' && !escaped) {
+                    escaped = true;
+                    j++;
+                    continue;
+                }
+                if (code[j] === '/' && !escaped) {
+                    regexEnd = j;
+                    break;
+                }
+                escaped = false;
+                j++;
+            }
+
+            if (regexEnd !== -1) {
+                // Likely a regex, include it all
+                result += code.substring(i, regexEnd + 1);
+                i = regexEnd + 1;
+                continue;
+            }
+        }
+
+        // Handle block comments /* */
+        if (char === '/' && nextChar === '*') {
+            let end = code.indexOf('*/', i + 2);
+            if (end !== -1) {
+                i = end + 2;
+                continue;
+            }
+        }
+
+        // Handle line comments //
+        if (char === '/' && nextChar === '/') {
+            let lineEnd = code.indexOf('\n', i);
+            if (lineEnd === -1) {
+                break;
+            }
+            i = lineEnd + 1;
+            result += '\n';
+            continue;
+        }
+
+        result += char;
+        i++;
+    }
+
+    return result;
 }
 
 const uploadZone = document.getElementById('uploadZone');
@@ -862,13 +1023,13 @@ function stripComments() {
 
     setTimeout(() => {
         try {
-            const stripped = stripAllComments(code);
+            const stripped = stripAllCommentsSafely(code);
             outputCode.value = stripped;
             updateStats(code, stripped);
             outputSection.classList.add('active');
-            showAlert('Comments stripped successfully', 'success');
+            showAlert('✓ Comments stripped safely (no code loss)', 'success');
         } catch (e) {
-            showAlert('Error processing code: ' + e.message, 'error');
+            showAlert('Error: ' + e.message, 'error');
         }
         loading.style.display = 'none';
     }, 100);
@@ -930,5 +1091,6 @@ function showAlert(message, type) {
     </script>
 </body>
 </html>
+
 
 

@@ -59,6 +59,55 @@
         .progress-fill { height: 100%; width: 0%; background: var(--primary); transition: width 0.3s; }
         .status-text { text-align: center; margin-top: 8px; font-size: 14px; color: #666; }
 
+
+        /* Scan Effect Overlay */
+        .scan-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+            display: none;
+            background: rgba(0, 0, 0, 0.02);
+        }
+        .scan-overlay.active { display: block; }
+        .scan-beam {
+            width: 100%;
+            height: 80px;
+            position: absolute;
+            top: 0;
+            background: linear-gradient(
+                to bottom,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(100, 200, 255, 0.3) 20%,
+                rgba(100, 200, 255, 0.6) 50%,
+                rgba(100, 200, 255, 0.3) 80%,
+                rgba(255, 255, 255, 0) 100%
+            );
+            box-shadow: 
+                0 0 40px rgba(100, 200, 255, 0.8),
+                0 0 80px rgba(100, 200, 255, 0.5),
+                0 10px 100px rgba(100, 200, 255, 0.4);
+            animation: scanDown 2.5s ease-in-out infinite;
+            filter: blur(5px);
+        }
+        .scan-beam::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: rgba(100, 200, 255, 0.9);
+            box-shadow: 0 0 20px rgba(100, 200, 255, 1);
+            transform: translateY(-50%);
+        }
+        @keyframes scanDown {
+            0% { top: -80px; }
+            100% { top: 100%; }
+        }
     </style>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6196194515460390"
      crossorigin="anonymous"></script>
@@ -75,6 +124,10 @@
         </div>
 
         <div class="tool-card">
+            <div class="scan-overlay" id="scanOverlay">
+                <div class="scan-beam"></div>
+            </div>
+            
             <div class="upload-zone" id="uploadSection" onclick="document.getElementById('fileInput').click()">
                 <div class="upload-icon">📄</div>
                 <h3>Click to Upload PDF</h3>
@@ -298,6 +351,8 @@
         };
 
         convertBtn.onclick = async () => {
+            
+            document.getElementById('scanOverlay').classList.add('active');
             if (!currentFile) return;
             
             convertBtn.disabled = true;
@@ -358,8 +413,12 @@
                 
                 generatedPdfBytes = await pdfDoc.save();
                 
-                document.getElementById('resultSection').style.display = 'block';
-                progressSection.style.display = 'none';
+                
+                setTimeout(() => {
+                    document.getElementById('scanOverlay').classList.remove('active');
+                    document.getElementById('resultSection').style.display = 'block';
+                    progressSection.style.display = 'none';
+                }, 500);
                 
                 document.getElementById('downloadBtn').onclick = () => {
                     const blob = new Blob([generatedPdfBytes], { type: 'application/pdf' });
@@ -372,6 +431,7 @@
             } catch (err) {
                 console.error(err);
                 alert("Error: " + err.message);
+                document.getElementById('scanOverlay').classList.remove('active');
                 convertBtn.disabled = false;
             }
         };

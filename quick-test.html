@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quick Test</title>
+    <script src="comment-stripper.js"></script>
+</head>
+<body>
+    <h1>Quick Module Test</h1>
+    <pre id="output"></pre>
+    <script>
+        const output = document.getElementById('output');
+        
+        try {
+            // Test 1
+            const js = 'const x = 5; // comment\n';
+            const result1 = window.CommentStripper.strip(js, 'javascript');
+            output.innerHTML += 'Test 1 (JS): ' + (result1.includes('const x = 5;') && !result1.includes('// comment') ? 'PASS' : 'FAIL') + '\n';
+            
+            // Test 2
+            const css = 'body { /* comment */ color: red; }';
+            const result2 = window.CommentStripper.strip(css, 'css');
+            output.innerHTML += 'Test 2 (CSS): ' + (result2.includes('body {') && result2.includes('color: red;') && !result2.includes('/* comment */') ? 'PASS' : 'FAIL') + '\n';
+            
+            // Test 3
+            const html = '<div><!-- comment --></div>';
+            const result3 = window.CommentStripper.strip(html, 'html');
+            output.innerHTML += 'Test 3 (HTML): ' + (result3.includes('<div>') && result3.includes('</div>') && !result3.includes('<!-- comment -->') ? 'PASS' : 'FAIL') + '\n';
+            
+            // Test 4
+            const auto = 'const y = 10; // auto\n';
+            const result4 = window.CommentStripper.strip(auto, 'auto');
+            output.innerHTML += 'Test 4 (Auto): ' + (result4.includes('const y = 10;') && !result4.includes('// auto') ? 'PASS' : 'FAIL') + '\n';
+            
+            output.innerHTML += '\n✓ All quick tests passed!';
+        } catch (e) {
+            output.innerHTML += '\n✗ Error: ' + e.message;
+            console.error(e);
+        }
+    </script>
+</body>
+</html>

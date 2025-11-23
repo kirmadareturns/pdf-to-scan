@@ -777,174 +777,79 @@ files</li>
 </div>
 </div>
     <script>
-       function stripAllComments(code) {
-    let result = '';
-    let i = 0;
+function stripAllComments(code) {
+    // Remove HTML comments
+    code = code.replace(/<!--[\s\S]*?-->/g, '');
 
-    while (i < code.length) {
-        // Check for HTML comments
-        if (code.substr(i, 4) === '<!--') {
-            let end = code.indexOf('-->', i + 4);
-            if (end !== -1) {
-                i = end + 3;
-                continue;
-            }
-        }
+    // Remove CSS comments inside <style> blocks
+    code = code.replace(/<style[\s\S]*?>[\s\S]*?<\/style>/gi, function(styleBlock) {
+        return styleBlock.replace(/\/\*[\s\S]*?\*\//g, '');
+    });
 
-        // Check for <style> block
-        if (code.substr(i, 6).toLowerCase() === '<style') {
-            let styleEnd = code.toLowerCase().indexOf('</style>', i);
-            if (styleEnd !== -1) {
-                let styleContent = code.substring(i, styleEnd + 8);
-                // Find where the actual CSS starts (after >)
-                let cssStart = styleContent.indexOf('>') + 1;
-                let cssEnd = styleContent.lastIndexOf('</style>');
-                let css = styleContent.substring(cssStart, cssEnd);
-                
-                // Strip CSS comments from the content
-                css = stripCSSCommentsOnly(css);
-                
-                // Reconstruct the style block
-                result += styleContent.substring(0, cssStart) + css + '</style>';
-                i = styleEnd + 8;
-                continue;
-            }
-        }
+    // Remove JS comments inside <script> blocks
+    code = code.replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, function(scriptBlock) {
+        // Remove /* ... */ comments
+        scriptBlock = scriptBlock.replace(/\/\*[\s\S]*?\*\//g, '');
+        // Remove //... comments
+        scriptBlock = scriptBlock.replace(/\/\/.*$/gm, '');
+        return scriptBlock;
+    });
 
-        // Check for <script> block
-        if (code.substr(i, 7).toLowerCase() === '<script') {
-            let scriptEnd = code.toLowerCase().indexOf('</script>', i);
-            if (scriptEnd !== -1) {
-                let scriptContent = code.substring(i, scriptEnd + 9);
-                // Find where the actual JS starts (after >)
-                let jsStart = scriptContent.indexOf('>') + 1;
-                let jsEnd = scriptContent.lastIndexOf('</script>');
-                let js = scriptContent.substring(jsStart, jsEnd);
-                
-                // Strip JS comments from the content
-                js = stripJSCommentsOnly(js);
-                
-                // Reconstruct the script block
-                result += scriptContent.substring(0, jsStart) + js + '</script>';
-                i = scriptEnd + 9;
-                continue;
-            }
-        }
-
-        result += code[i];
-        i++;
-    }
-
-    return result;
+    return code;
 }
 
-function stripCSSCommentsOnly(code) {
-    let result = '';
-    let i = 0;
+const uploadZone = document.getElementById('uploadZone');
+const fileInput = document.getElementById('fileInput');
+const inputCode = document.getElementById('inputCode');
+const outputCode = document.getElementById('outputCode');
+const languageSelect = document.getElementById('languageSelect');
+const outputSection = document.getElementById('outputSection');
+const stats = document.getElementById('stats');
+const loading = document.getElementById('loading');
+const alert = document.getElementById('alert');
 
-    while (i < code.length) {
-        // Check for block comment /* */
-        if (code[i] === '/' && code[i + 1] === '*') {
-            let end = code.indexOf('*/', i + 2);
-            if (end !== -1) {
-                i = end + 2;
-                continue;
-            }
-        }
-
-        // Check for line comment //
-        if (code[i] === '/' && code[i + 1] === '/') {
-            let end = code.indexOf('\n', i);
-            if (end === -1) {
-                break;
-            }
-            i = end + 1;
-            result += '\n';
-            continue;
-        }
-
-        result += code[i];
-        i++;
+uploadZone.addEventListener('click', () => fileInput.click());
+uploadZone.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        fileInput.click();
     }
+});
+uploadZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    uploadZone.classList.add('dragover');
+});
+uploadZone.addEventListener('dragleave', () => {
+    uploadZone.classList.remove('dragover');
+});
+uploadZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    uploadZone.classList.remove('dragover');
+    const files = e.dataTransfer.files;
+    if (files.length > 0) handleFile(files[0]);
+});
 
-    return result;
+fileInput.addEventListener('change', (e) => {
+    if (e.target.files.length > 0) handleFile(e.target.files[0]);
+});
+
+function handleFile(file) {
+    if (file.size > 50 * 1024 * 1024) {
+        showAlert('File size exceeds 50MB limit', 'error');
+        return;
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        inputCode.value = e.target.result;
+        const ext = file.name.split('.').pop().toLowerCase();
+        if (['html', 'css', 'js'].includes(ext)) {
+            languageSelect.value = ext;
+        }
+        showAlert(`Loaded ${file.name} (${formatBytes(file.size)})`, 'success');
+    };
+    reader.readAsText(file);
 }
 
-function stripJSCommentsOnly(code) {
-    let result = '';
-    let inString = false;
-    let stringChar = '';
-    let inTemplate = false;
-    let i = 0;
-
-    while (i < code.length) {
-        const char = code[i];
-        const nextChar = code[i + 1];
-        const prevChar = i > 0 ? code[i - 1] : '';
-
-        // Handle template literals
-        if (char === '`' && (i === 0 || prevChar !== '\\')) {
-            inTemplate = !inTemplate;
-            result += char;
-            i++;
-            continue;
-        }
-
-        if (inTemplate) {
-            result += char;
-            i++;
-            continue;
-        }
-
-        // Handle string literals
-        if ((char === '"' || char === "'" || char === '`') && (i === 0 || prevChar !== '\\')) {
-            if (!inString) {
-                inString = true;
-                stringChar = char;
-            } else if (char === stringChar) {
-                inString = false;
-            }
-            result += char;
-            i++;
-            continue;
-        }
-
-        if (inString) {
-            result += char;
-            i++;
-            continue;
-        }
-
-        // Handle block comments /* */
-        if (char === '/' && nextChar === '*') {
-            let end = code.indexOf('*/', i + 2);
-            if (end !== -1) {
-                i = end + 2;
-                continue;
-            } else {
-                break;
-            }
-        }
-
-        // Handle line comments //
-        if (char === '/' && nextChar === '/') {
-            let end = code.indexOf('\n', i);
-            if (end === -1) {
-                break;
-            }
-            i = end + 1;
-            result += '\n';
-            continue;
-        }
-
-        result += char;
-        i++;
-    }
-
-    return result;
-}
-
-// REPLACE YOUR stripComments() FUNCTION WITH THIS:
 function stripComments() {
     const code = inputCode.value.trim();
     if (!code) {
@@ -957,12 +862,11 @@ function stripComments() {
 
     setTimeout(() => {
         try {
-            // Use the new mixed-content stripper
             const stripped = stripAllComments(code);
             outputCode.value = stripped;
             updateStats(code, stripped);
             outputSection.classList.add('active');
-            showAlert('Comments stripped successfully (auto-detected HTML/CSS/JS)', 'success');
+            showAlert('Comments stripped successfully', 'success');
         } catch (e) {
             showAlert('Error processing code: ' + e.message, 'error');
         }
@@ -970,9 +874,61 @@ function stripComments() {
     }, 100);
 }
 
-// YOU CAN ALSO REMOVE THE languageSelect DROPDOWN FROM YOUR HTML NOW
-// Or hide it with: languageSelect.style.display = 'none';
+function updateStats(before, after) {
+    const beforeSize = new Blob([before]).size;
+    const afterSize = new Blob([after]).size;
+    const reduction = ((1 - afterSize / beforeSize) * 100).toFixed(1);
+
+    document.getElementById('beforeSize').textContent = formatBytes(beforeSize);
+    document.getElementById('afterSize').textContent = formatBytes(afterSize);
+    document.getElementById('reduction').textContent = `${reduction}% reduction`;
+
+    stats.style.display = 'grid';
+}
+
+function formatBytes(bytes) {
+    if (bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+function copyToClipboard() {
+    outputCode.select();
+    document.execCommand('copy');
+    showAlert('Code copied to clipboard', 'success');
+}
+
+function downloadCode() {
+    const ext = languageSelect.value === 'auto' ? 'txt' : languageSelect.value;
+    const filename = `stripped-code.${ext}`;
+    const blob = new Blob([outputCode.value], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+    showAlert(`Downloaded as ${filename}`, 'success');
+}
+
+function clearAll() {
+    inputCode.value = '';
+    outputCode.value = '';
+    languageSelect.value = 'auto';
+    outputSection.classList.remove('active');
+    stats.style.display = 'none';
+    alert.classList.remove('show');
+}
+
+function showAlert(message, type) {
+    alert.textContent = message;
+    alert.className = `alert show ${type}`;
+    setTimeout(() => alert.classList.remove('show'), 3000);
+}
     </script>
 </body>
 </html>
+
 

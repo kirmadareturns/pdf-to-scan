@@ -5,10 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Type V Civilization-Level Accessible Q&A: Companies Act Knowledge Base with Neural-Grade UX">
   <title>Companies Act Q&A — Type V Accessibility</title>
-  You're absolutely right. True accessibility = MINIMALIST clarity. Let me give you the REFINED version.
-
-Replace the entire <style> section with this MINIMAL masterpiece:
-
+  
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Atkinson+Hyperlegible:wght@400;700&display=swap');
 
@@ -407,34 +404,28 @@ Replace the entire <style> section with this MINIMAL masterpiece:
 
   <div class="control-group">
     <label for="font-size">Text Size:</label>
-   type="range" 
-          id="font-size" 
-          min="12" 
-          max="28" 
-          value="16" 
-          aria-label="Adjust text size from 12px to 28px for comfortable reading"
-        >
-        <span class="font-size-display" aria-live="polite" aria-atomic="true">16px</span>
-      </div>
+    <input 
+      type="range" 
+      id="font-size" 
+      min="12" 
+      max="28" 
+      value="16" 
+      aria-label="Adjust text size from 12px to 28px for comfortable reading"
+    >
+    <span class="font-size-display" aria-live="polite" aria-atomic="true">16px</span>
+  </div>
 
-      <div class="control-group">
-        <label for="theme-toggle">
-          <input 
-            type="checkbox" 
-            id="theme-toggle" 
-            aria-label="Toggle dark mode for comfortable night reading"
-          >
-          <span>Dark Mode</span>
-        </label>
-      </div>
-    </div>
-  </header>
-
-  <main id="main-qa">
-    <div class="progress-indicator" role="region" aria-label="Learning progress">
-      <span aria-live="polite" aria-atomic="true" class="sr-only" id="progress-announce"></span>
-    </div>
-
+  <div class="control-group">
+    <label for="theme-toggle">
+      <input 
+        type="checkbox" 
+        id="theme-toggle" 
+        aria-label="Toggle dark mode for comfortable night reading"
+      >
+      <span>Dark Mode</span>
+    </label>
+  </div>
+</div>
     <section class="qa-list" role="region" aria-label="Questions and answers from Companies Act">
       <!-- Q&A 1 -->
       <article class="qa-item" tabindex="0">
@@ -1708,4 +1699,5 @@ Given the director already has 7 directorships in public companies, he can accep
     });
 </script>
 </body> </html> 
+
 

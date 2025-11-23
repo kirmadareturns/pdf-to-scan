@@ -1,0 +1,2152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Type V Civilization-Level Accessible Q&A: Companies Act Knowledge Base with Neural-Grade UX">
+  <title>Companies Act Q&A — Type V Accessibility</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap');
+
+    /* ===== ROOT CSS VARIABLES ===== */
+    :root {
+      /* Base Colors */
+      --text-primary: #0a0e27;
+      --text-secondary: #3d4557;
+      --text-tertiary: #6b7280;
+      --bg-primary: #ffffff;
+      --bg-secondary: #f8
+fafc;
+--bg-tertiary: #f1f5f9;
+--bg-accent: #eff6ff;
+
+  /* Accent Colors (3 Color Harmony) */
+  --accent-primary: #0066cc;
+  --accent-primary-light: #e6f2ff;
+  --accent-primary-dark: #003d99;
+  
+  --accent-secondary: #00b4d8;
+  --accent-secondary-light: #e0f7ff;
+  --accent-secondary-dark: #0086a8;
+  
+  --accent-tertiary: #06b6d4;
+  --accent-tertiary-light: #e0f7ff;
+  
+  /* Status Colors */
+  --success: #10b981;
+  --warning: #f59e0b;
+  --error: #ef4444;
+  --info: #3b82f6;
+  
+  /* Borders & Shadows */
+  --border-light: #e2e8f0;
+  --border-medium: #cbd5e1;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  
+  /* Typography Scales */
+  --font-family-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-family-mono: 'JetBrains Mono', monospace;
+  --font-family-accessible: 'Atkinson Hyperlegible', sans-serif;
+  
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+  
+  /* Spacing Scale */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+  --spacing-3xl: 4rem;
+  
+  /* Transitions */
+  --transition-fast: 100ms ease-out;
+  --transition-base: 150ms ease-out;
+  --transition-slow: 200ms ease-out;
+  
+  /* Z-index */
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-fixed: 300;
+  --z-modal: 400;
+  --z-tooltip: 500;
+  --z-notification: 600;
+  
+  /* Current Font Size */
+  --current-font-size: 16px;
+  --current-line-height: 1.6;
+}
+
+/* ===== DARK MODE ===== */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text-primary: #f1f5f9;
+    --text-secondary: #cbd5e1;
+    --text-tertiary: #94a3b8;
+    --bg-primary: #0f172a;
+    --bg-secondary: #1e293b;
+    --bg-tertiary: #334155;
+    --bg-accent: #1e3a8a;
+    
+    --accent-primary: #60a5fa;
+    --accent-primary-light: #1e3a8a;
+    --accent-primary-dark: #93c5fd;
+    
+    --accent-secondary: #06b6d4;
+    --accent-secondary-light: #164e63;
+    --accent-secondary-dark: #22d3ee;
+    
+    --accent-tertiary: #06b6d4;
+    --accent-tertiary-light: #164e63;
+    
+    --border-light: #475569;
+    --border-medium: #64748b;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+  }
+}
+
+/* ===== HIGH CONTRAST MODE ===== */
+@media (prefers-contrast: more) {
+  :root {
+    --text-primary: #000;
+    --text-secondary: #000;
+    --text-tertiary: #000;
+    --bg-primary: #fff;
+    --bg-secondary: #f5f5f5;
+    --bg-tertiary: #eeeeee;
+    --accent-primary: #000;
+    --border-light: #000;
+    --border-medium: #000;
+  }
+  
+  body, .qa-item, .control-group, button {
+    border: 2px solid #000;
+  }
+  
+  .question, .answer {
+    border-left: 4px solid #000 !important;
+  }
+}
+
+/* ===== GLOBAL STYLES ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-family-sans);
+  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  color: var(--text-primary);
+  line-height: var(--current-line-height);
+  font-size: var(--current-font-size);
+  transition: background-color var(--transition-slow), color var(--transition-slow);
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Animated gradient background */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 20% 50%, var(--accent-primary-light) 0%, transparent 50%),
+              radial-gradient(circle at 80% 80%, var(--accent-secondary-light) 0%, transparent 50%);
+  opacity: 0.3;
+  pointer-events: none;
+  z-index: -1;
+  animation: gradientShift 15s ease-in-out infinite;
+}
+
+@keyframes gradientShift {
+  0%, 100% { filter: brightness(1) saturate(1); }
+  50% { filter: brightness(1.1) saturate(1.1); }
+}
+
+/* ===== DYSLEXIA MODE ===== */
+body.dyslexia-font {
+  font-family: var(--font-family-accessible);
+  letter-spacing: 0.1em;
+  word-spacing: 0.15em;
+  line-height: 1.8;
+}
+
+body.dyslexia-font .question h2,
+body.dyslexia-font .answer p {
+  background: linear-gradient(to right, transparent 0%, var(--bg-tertiary) 50%, transparent 100%);
+  padding: 0.5em 0;
+}
+
+/* ===== SKIP LINK ===== */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--accent-primary);
+  color: white;
+  padding: var(--spacing-md) var(--spacing-lg);
+  text-decoration: none;
+  z-index: var(--z-tooltip);
+  border-radius: 0 0 8px 0;
+  font-weight: 600;
+  font-size: var(--text-sm);
+  letter-spacing: 0.5px;
+  box-shadow: var(--shadow-lg);
+  transition: top var(--transition-base);
+}
+
+.skip-link:focus {
+  top: 0;
+  outline: 3px solid var(--accent-secondary);
+  outline-offset: 2px;
+}
+
+/* ===== FOCUS STYLES ===== */
+*:focus-visible {
+  outline: 3px solid var(--accent-primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+button:focus-visible,
+input:focus-visible,
+a:focus-visible {
+  box-shadow: 0 0 0 4px var(--accent-primary-light);
+}
+
+/* ===== HEADER ===== */
+header {
+  background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+  border-bottom: 2px solid var(--border-light);
+  padding: var(--spacing-3xl) var(--spacing-lg);
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow-md);
+  animation: slideDown 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+header h1 {
+  font-size: var(--text-4xl);
+  font-weight: 800;
+  margin-bottom: var(--spacing-md);
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: fadeInUp 0.8s ease-out 0.2s both;
+}
+
+header p {
+  color: var(--text-tertiary);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-bottom: var(--spacing-lg);
+  animation: fadeInUp 0.8s ease-out 0.3s both;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== ACCESSIBILITY CONTROLS ===== */
+.accessibility-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-lg);
+  align-items: center;
+  padding: var(--spacing-xl);
+  background: var(--bg-primary);
+  border-radius: 12px;
+  box-shadow: var(--shadow-md);
+  animation: fadeInUp 0.8s ease-out 0.4s both;
+  border: 1px solid var(--border-light);
+}
+
+.control-group {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: var(--bg-tertiary);
+  border-radius: 8px;
+  border: 1px solid var(--border-light);
+  transition: all var(--transition-base);
+}
+
+.control-group:hover {
+  background: var(--bg-secondary);
+  border-color: var(--accent-primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.control-group label {
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  user-select: none;
+  font-size: var(--text-sm);
+  letter-spacing: 0.3px;
+}
+
+/* ===== FORM ELEMENTS ===== */
+input[type="checkbox"],
+input[type="radio"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: var(--accent-primary);
+  transition: all var(--transition-base);
+}
+
+input[type="checkbox"]:hover,
+input[type="radio"]:hover {
+  transform: scale(1.1);
+}
+
+input[type="range"] {
+  width: 100%;
+  max-width: 200px;
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(to right, var(--accent-primary), var(--accent-secondary));
+  outline: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--accent-primary);
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-base);
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: var(--shadow-lg);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--accent-primary);
+  cursor: pointer;
+  border: none;
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-base);
+}
+
+input[type="range"]::-moz-range-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: var(--shadow-lg);
+}
+
+.font-size-display {
+  font-weight: 700;
+  min-width: 4ch;
+  text-align: center;
+  color: var(--accent-primary);
+  font-family: var(--font-family-mono);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--bg-accent);
+  border-radius: 6px;
+  border: 1px solid var(--border-light);
+  font-size: var(--text-sm);
+}
+
+/* ===== BUTTONS ===== */
+button {
+  font-size: var(--text-base);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border: 2px solid var(--accent-primary);
+  border-radius: 8px;
+  background: var(--accent-primary);
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  transition: all var(--transition-base);
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width var(--transition-base), height var(--transition-base);
+}
+
+button:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  background: var(--accent-primary-dark);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ===== MAIN CONTENT ===== */
+main {
+  max-width: 900px;
+  margin: var(--spacing-3xl) auto;
+  padding: 0 var(--spacing-lg);
+  animation: fadeIn 0.8s ease-out 0.5s both;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ===== Q&A SECTION ===== */
+.qa-list {
+  display: grid;
+  gap: var(--spacing-xl);
+}
+
+/* ===== Q&A ITEMS ===== */
+.qa-item {
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--bg-primary);
+  transition: all var(--transition-slow);
+  position: relative;
+  box-shadow: var(--shadow-md);
+  animation: scaleIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: grid;
+  grid-template-rows: auto auto;
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.qa-item:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-xl);
+  border-color: var(--accent-primary);
+}
+
+.qa-item:focus-within {
+  box-shadow: 0 0 0 3px var(--accent-primary-light);
+  border-color: var(--accent-primary);
+}
+
+/* Question styles */
+.question {
+  padding: var(--spacing-xl);
+  background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+  border-left: 5px solid var(--accent-primary);
+  border-bottom: 1px solid var(--border-light);
+  position: relative;
+  overflow: hidden;
+}
+
+.question::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary), var(--accent-tertiary));
+}
+
+.question-number {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--accent-primary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: var(--spacing-sm);
+  font-family: var(--font-family-mono);
+  display: inline-block;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: var(--accent-primary-light);
+  border-radius: 4px;
+}
+
+.question h2 {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  margin-bottom: 0;
+  line-height: 1.5;
+  word-break: break-word;
+  color: var(--text-primary);
+  transition: color var(--transition-base);
+}
+
+.qa-item:hover .question h2 {
+  color: var(--accent-primary);
+}
+
+/* Answer styles */
+.answer {
+  padding: var(--spacing-xl);
+  background: var(--bg-primary);
+  border-left: 5px solid var(--accent-secondary);
+  transition: all var(--transition-base);
+}
+
+.qa-item:hover .answer {
+  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--accent-primary-light) 100%);
+}
+
+.answer h3 {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  margin-bottom: var(--spacing-md);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--accent-secondary);
+  display: inline-block;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: var(--accent-secondary-light);
+  border-radius: 4px;
+  font-family: var(--font-family-mono);
+}
+
+.answer p,
+.answer div {
+  margin-bottom: var(--spacing-md);
+  line-height: 1.8;
+  word-break: break-word;
+  white-space: pre-wrap;
+  color: var(--text-secondary);
+  transition: color var(--transition-base);
+}
+
+.qa-item:hover .answer p,
+.qa-item:hover .answer div {
+  color: var(--text-primary);
+}
+
+.answer p:last-child,
+.answer div:last-child {
+  margin-bottom: 0;
+}
+
+/* ===== READING INDICATOR ===== */
+.reading-indicator {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: var(--accent-primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: var(--text-sm);
+  box-shadow: var(--shadow-lg);
+  z-index: var(--z-fixed);
+  animation: slideInRight 0.6s ease-out;
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(100px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ===== PROGRESS BAR ===== */
+.progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary), var(--accent-tertiary));
+  z-index: var(--z-fixed);
+  box-shadow: var(--shadow-md);
+}
+
+/* ===== REDUCED MOTION ===== */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ===== MOBILE RESPONSIVE ===== */
+@media (max-width: 768px) {
+  :root {
+    --text-4xl: 1.875rem;
+    --text-3xl: 1.5rem;
+    --spacing-3xl: 2rem;
+  }
+
+  header {
+    padding: var(--spacing-2xl) var(--spacing-md);
+  }
+
+  header h1 {
+    font-size: var(--text-2xl);
+  }
+
+  main {
+    margin: var(--spacing-2xl) auto;
+    padding: 0 var(--spacing-md);
+  }
+
+  .accessibility-controls {
+    flex-direction: column;
+    align-items: stretch
+;
+}
+
+  .control-group {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .question h2 {
+    font-size: var(--text-base);
+  }
+
+  .qa-item {
+    gap: 0;
+  }
+
+  .reading-indicator {
+    width: 45px;
+    height: 45px;
+    font-size: var(--text-xs);
+    bottom: 15px;
+    right: 15px;
+  }
+}
+
+/* ===== PRINT STYLES ===== */
+@media print {
+  .accessibility-controls,
+  .skip-link,
+  .reading-indicator,
+  .progress-bar {
+    display: none;
+  }
+
+  body::before {
+    display: none;
+  }
+
+  .qa-item {
+    page-break-inside: avoid;
+    margin-bottom: var(--spacing-lg);
+    box-shadow: none;
+    border: 1px solid var(--border-light);
+  }
+
+  header {
+    position: relative;
+    margin-bottom: var(--spacing-2xl);
+  }
+}
+
+/* ===== SCREEN READER ONLY ===== */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* ===== CUSTOM SCROLLBAR ===== */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, var(--accent-primary), var(--accent-secondary));
+  border-radius: 5px;
+  transition: background var(--transition-base);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(to bottom, var(--accent-primary-dark), var(--accent-secondary-dark));
+}
+
+/* Firefox Scrollbar */
+* {
+  scrollbar-color: var(--accent-primary) var(--bg-secondary);
+  scrollbar-width: thin;
+}
+
+/* ===== ANIMATIONS FOR STAGGER ===== */
+.qa-item:nth-child(1) { animation-delay: 0.1s; }
+.qa-item:nth-child(2) { animation-delay: 0.15s; }
+.qa-item:nth-child(3) { animation-delay: 0.2s; }
+.qa-item:nth-child(4) { animation-delay: 0.25s; }
+.qa-item:nth-child(5) { animation-delay: 0.3s; }
+.qa-item:nth-child(n+6) { animation-delay: 0.35s; }
+</style> </head> <body> <div class="progress-bar" id="progressBar"></div> <a href="#main-qa" class="skip-link">Skip to main content</a> <header> <p>COMPANIES ACT KNOWLEDGE BASE</p> <h1>Type V Civilization Accessible Q&A</h1>
+<div class="accessibility-controls" role="region" aria-label="Accessibility controls and settings">
+  <div class="control-group">
+    <label for="contrast-toggle">
+      <input 
+        type="checkbox" 
+        id="contrast-toggle" 
+        aria-label="Toggle high contrast mode for maximum visibility"
+      >
+      <span>High Contrast</span>
+    </label>
+  </div>
+
+  <div class="control-group">
+    <label for="dyslexia-toggle">
+      <input 
+        type="checkbox" 
+        id="dyslexia-toggle" 
+        aria-label="Toggle dyslexia-friendly Atkinson Hyperlegible font with improved spacing"
+      >
+      <span>Dyslexia Font</span>
+    </label>
+  </div>
+
+  <div class="control-group">
+    <label for="font-size">Text Size:</label>
+   type="range" 
+          id="font-size" 
+          min="12" 
+          max="28" 
+          value="16" 
+          aria-label="Adjust text size from 12px to 28px for comfortable reading"
+        >
+        <span class="font-size-display" aria-live="polite" aria-atomic="true">16px</span>
+      </div>
+
+      <div class="control-group">
+        <label for="theme-toggle">
+          <input 
+            type="checkbox" 
+            id="theme-toggle" 
+            aria-label="Toggle dark mode for comfortable night reading"
+          >
+          <span>Dark Mode</span>
+        </label>
+      </div>
+    </div>
+  </header>
+
+  <main id="main-qa">
+    <div class="progress-indicator" role="region" aria-label="Learning progress">
+      <span aria-live="polite" aria-atomic="true" class="sr-only" id="progress-announce"></span>
+    </div>
+
+    <section class="qa-list" role="region" aria-label="Questions and answers from Companies Act">
+      <!-- Q&A 1 -->
+      <article class="qa-item" tabindex="0">
+        <section class="question">
+          <div class="question-number">Q1</div>
+          <h2>
+Min. No. Of directors in dormant public co</h2>
+</section>
+<section class="answer">
+<h3>Answer</h3>
+<p>3 Director</p>
+</section>
+</article>
+
+  <!-- Q&A 2 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q2</div>
+      <h2>Sec 212,Cases when CG will appoint SFIO for investigation</h2>
+    </section>
+    <section class="answer">
+      <h3>Answer</h3>
+      <p>Report of Registrar u/s 208, SR by Co., Public Interest, Request by CG SG Dep.</p>
+    </section>
+  </article>
+
+  <!-- Q&A 3 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q3</div>
+      <h2>X & Y have shares of nidhi company jointly in their names and in the application X name appears first while in the register of members Y name appears first. To whom the loan can be given?</h2>
+    </section>
+    <section class="answer">
+      <h3>Answer</h3>
+      <p>Y, because his name appear first in Register of member</p>
+    </section>
+  </article>
+
+  <!-- Q&A 4 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q4</div>
+      <h2>Nidhi company penalty</h2>
+    </section>
+    <section class="answer">
+      <h3>Answer</h3>
+      <p>Nidhi Co & Officer in default
+Fine upto Rs. 5,000 & further fine of Rs. 500/day</p>
+</section>
+</article>
+
+  <!-- Q&A 5 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q5</div>
+      <h2>Advisory committee consitute how many number of members in Winding Up</h2>
+    </section>
+    <section class="answer">
+      <h3>Answer</h3>
+      <p>Maximum 12 member</p>
+    </section>
+  </article>
+
+  <!-- Q&A 6 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q6</div>
+      <h2>Whether a person related to promoter of a company be appointed as ID in that co. or its subsidiary.</h2>
+    </section>
+    <section class="answer">
+      <h3>Answer</h3>
+      <p>No</p>
+    </section>
+  </article>
+
+  <!-- Q&A 7 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q7</div>
+      <h2>Question related to Proportional representation (163)</h2>
+    </section>
+    <section class="answer">
+      <h3>Answer</h3>
+      <p>2/3 and 3 years</p>
+    </section>
+  </article>
+
+  <!-- Q&A 8 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q8</div>
+      <h2>Can a SSD appointed as Human resource manager during the cooling period?</h2>
+    </section>
+    <section class="answer">
+      <h3>Answer</h3>
+      <p>No</p>
+    </section>
+  </article>
+
+  <!-- Q&A 9 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q9</div>
+      <h2>Whether NR can be a Registered valuer Inspection of company subsidiary</h2>
+    </section>
+    <section class="answer">
+      <h3>Answer</h3>
+      <p>No, only resident in
+India</p>
+</section>
+</article>
+
+  <!-- Q&A 10 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q10</div>
+      <h2>who can be contributories in case of winding up (272)</h2>
+    </section>
+    <section class="answer">
+      <h3>Answer</h3>
+      <p>Holder of fully paidup share</p>
+    </section>
+  </article>
+
+  <!-- Q&A 11 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q11</div>
+      <h2>Time Limit on AA to admit the application of winding up</h2>
+    </section>
+    <section class="answer">
+      <h3>Answer</h3>
+      <p>90 days</p>
+    </section>
+  </article>
+
+  <!-- Q&A 12 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q12</div>
+      <h2>Fail to file of financial statements/annual reports for how many consecutive years to consider as dormant company</h2>
+    </section>
+    <section class="answer">
+      <h3>Answer</h3>
+      <p>2FY</p>
+    </section>
+  </article>
+
+  <!-- Q&A 13 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q13</div>
+      <h2>AA Ltd. had its name removed by the ROC. The stakeholders want to know the time limit for filing an application for restoration with the NCLT.</h2>
+    </section>
+    <section class="answer">
+      <h3>Answer</h3>
+      <p>Yes, Person aggrieved by order of ROC within 3 years</p>
+    </section>
+  </article>
+
+  <!-- Q&A 14 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q14</div>
+      <h2>Cost and expenses of winding up fall in which sequence of payment as per winding up</h2>
+    </section>
+    <section class="answer">
+      <h3>Answer</h3>
+      <p>first payment: Workmen dues
+Second payment: Cost & Expense</p>
+</section>
+</article>
+
+  <!-- Q&A 15 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q15</div>
+      <h2>Tenure of FD Granted by Nidhi Co.</h2>
+    </section>
+    <section class="answer">
+      <h3>Answer</h3>
+      <p>6month to 60 month</p>
+    </section>
+  </article>
+
+  <!-- Q&A 16 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q16</div>
+      <h2>Class Action (sec 245) is not applicable to whom?</h2>
+    </section>
+    <section class="answer">
+      <h3>Answer</h3>
+      <p>Banking Company</p>
+    </section>
+  </article>
+
+  <!-- Q&A 17 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q17</div>
+      <h2>sec 420, whether rectification can made by NCLT if any appeal is preferred in NCLAT</h2>
+    </section>
+    <section class="answer">
+      <h3>Answer</h3>
+      <p>No</p>
+    </section>
+  </article>
+
+  <!-- Q&A 18 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q18</div>
+      <h2>In case of Nidhi company dividend paid should be</h2>
+    </section>
+    <section class="answer">
+      <h3>Answer</h3>
+      <p>not more than 25%</p>
+    </section>
+  </article>
+
+  <!-- Q&A 19 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q19</div>
+      <h2>Reappointment of Nidhi company directors only after</h2>
+    </section>
+    <section class="answer">
+      <h3>Answer</h3>
+      <p>Cooling period of 2 years</p>
+    </section>
+  </article>
+
+  <!-- Q&A 20 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q20</div>
+      <h2>Who may be appointed as provisional liquidator or company liquidator by tribunal?</h2>
+    </section>
+    <section class="answer">
+      <h3>Answer</h3>
+      <p>IP required under IBC</p>
+    </section>
+  </article>
+
+  <!-- Q&A 21 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q21</div>
+      <h2>Mr. A is director of ABC Ltd. Brother of Mr A holds exactly 2% of PUSC in another company. Whether another company is related party to ABC Ltd?</h2>
+    </section>
+    <section class="answer">
+      <h3>Answer</h3>
+      <p>No</p>
+    </section>
+  </article>
+
+  <!-- Q&A 22 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q22</div>
+      <h2>Sec 421, No. of days in which Appeal can be made to NCLAT & SC</h2>
+    </section>
+    <section class="answer">
+      <h3>Answer</h3>
+      <p>45 days & 60 days(in question of law only) respectively</p>
+    </section>
+  </article>
+
+  <!-- Q&A 23 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q23</div>
+      <h2>By which resolution, board can exercise power related to sell, lease or dispose of undertaking of company (180) or A company wishes to dispose of part of its undertaking under two different schemes: Dispose of 6% undertaking and Dispose of 22% undertaking under a compromise scheme.</h2>
+    </section>
+    <section class="answer">
+      <h3>Answer</h3>
+      <p>Special Resolution for both</p>
+    </section>
+  </article>
+
+  <!-- Q&A 24 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q24</div>
+      <h2>XYZ Nidhi Company has the following financial details: Paid-up Share Capital: INR 10 crores Free Reserves: INR 2 crores Accumulated Losses: INR 1 crore Investments in other Nidhi Companies: INR 1 crore Question:Based on the above information, calculate the Net Owned Funds and Effective Capital.</h2>
+    </section>
+    <section class="answer">
+      <h3>Answer</h3>
+      <p>Net Owned Funds:
+Paid-up Share Capital + Free Reserves – Accumulated Losses
+NOF: 11 Crore
+Effective Capital: 10 crore</p>
+</section>
+</article>
+
+  <!-- Q&A 25 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q25</div>
+      <h2>Penalty on contravention of duties of Directors(166)</h2>
+    </section>
+    <section class="answer">
+      <h3>Answer</h3>
+      <p>Rs. 1 lakh to 5 Lakh</p>
+    </section>
+  </article>
+
+  <!-- Q&A 26 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q26</div>
+      <h2>Applicability of Secretarial audit (204)</h2>
+    </section>
+    <section class="answer">
+      <h3>Answer</h3>
+      <p>Listed; PUSC>=50Cr; T/O>=250Cr; O/s Loan/Borrowing>=100cr</p>
+    </section>
+  </article>
+
+  <!-- Q&A 27 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q27</div>
+      <h2>Sec 219, whose prior permission is required for inspector to investigate subsidiary co.?</h2>
+    </section>
+    <section class="answer">
+      <h3>Answer</h3>
+      <p>Central Government</p>
+    </section>
+  </article>
+
+  <!-- Q&A 28 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q28</div>
+      <h2>ROC to strikeoff name of dormant co from register if it remains dormant for how many year?</h2>
+    </section>
+    <section class="answer">
+      <h3>Answer</h3>
+      <p>5 years</p>
+    </section>
+  </article>
+
+  <!-- Q&A 29 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q29</div>
+      <h2>Whether Waiver of the excess remuneration paid is possible & whats time limit ?</h2>
+    </section>
+    <section class="answer">
+      <h3>Answer</h3>
+      <p>By passing Special Resolution & within 2 years</p>
+    </section>
+  </article>
+
+  <!-- Q&A 30 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q30</div>
+      <h2>PQR Ltd. has incurred a loss and provided the following details: Effective Capital: INR 50 crores As per Schedule V of the Companies Act, 2013, the remuneration can be paid up to INR 60 lakhs if effective capital is between INR 5 crores to INR 100 crores. Question:Based on the above information, calculate the permissible managerial remuneration.</h2>
+    </section>
+    <section class="answer">
+      <h3>Answer</h3>
+      <p>84Lakh</p>
+    </section>
+  </article>
+
+  <!-- Q&A 31 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q31</div>
+      <h2>Objection to compromise raised by a shar
+eholder holding 15% & creditor holding 9% debt – whether valid?</h2>
+</section>
+<section class="answer">
+<h3>Answer</h3>
+<p>Valid because sh holder has 10% or more or creditor has 5% or more</p>
+</section>
+</article>
+
+  <!-- Q&A 32 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q32</div>
+      <h2>Whether appointment of 3 directors via single resolution is valid if around 90% of members who were present at meeting voted in favour & balance 10 % abstained from voting? (162)</h2>
+    </section>
+    <section class="answer">
+      <h3>Answer</h3>
+      <p>Yes, as complied "without any vote being case against it"</p>
+    </section>
+  </article>
+
+  <!-- Q&A 33 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q33</div>
+      <h2>W.r.t. the manner of utilisation of undue gain recovered which of these is NOT power of tribunal?</h2>
+    </section>
+    <section class="answer">
+      <h3>Answer</h3>
+      <p>Order for repay money to Company in which person was employed</p>
+    </section>
+  </article>
+
+  <!-- Q&A 34 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q34</div>
+      <h2>Quorum of Sec 8 Company</h2>
+    </section>
+    <section class="answer">
+      <h3>Answer
+</h3> <p>8 member or 25% of total W.E. lower</p> </section> </article>
+  <!-- Q&A 35 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q35</div>
+      <h2>Is Quorum of Directors should be present in the beginning.(174)</h2>
+    </section>
+    <section class="answer">
+      <h3>Answer</h3>
+      <p>No. through out the meeting</p>
+    </section>
+  </article>
+
+  <!-- Q&A 36 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q36</div>
+      <h2>Liability of contributories who transferred partly paid up shares before 1 yr of WUP</h2>
+    </section>
+    <section class="answer">
+      <h3>Answer</h3>
+      <p>the company has to duly notify the amount due on shares/debentures to the transferee</p>
+    </section>
+  </article>
+
+  <!-- Q&A 37 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q37</div>
+      <h2>ABC Ltd. has the following financial details: Equity Share Capital: INR 50 crores Preference Share Capital: INR 10 crores Free Reserves: INR 30 crores Securities Premium: INR 20 crores Accumulated Losses: INR 5 crores Preliminary Expenses not written off: INR 2 crores Question:Based on the above information, calculate the effective capital for determining managerial remuneration as per the Companies Act, 2013.</h2>
+    </section>
+    <section class="answer">
+      <h3>Answer</h3>
+      <p>Effective Capital =
+INR 60 crores + INR 30 crores + INR 20 crores – INR 5 crores –
+
+INR 2 crores = INR 103 crores</p>
+</section>
+</article>
+
+  <!-- Q&A 38 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q38</div>
+      <h2>Whether SSD appointed in one company for period of 3 years ad he was appointed also in another company for the period of 2 year. Can he appointed to do so?</h2>
+    </section>
+    <section class="answer">
+      <h3>Answer</h3>
+      <p>Yes, he can apointed in Maximum 2 companies provided other company should not in compete business with first company</p>
+    </section>
+  </article>
+
+  <!-- Q&A 39 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q39</div>
+      <h2>Can a SSD eligible for reappointment</h2>
+    </section>
+    <section class="answer">
+      <h3>Answer</h3>
+      <p>Not Eligible</p>
+    </section>
+  </article>
+
+  <!-- Q&A 40 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q40</div>
+      <h2>Approval regarding borrowing by director. (185)</h2>
+    </section>
+    <section class="answer">
+      <h3>Answer</h3>
+      <p>Member's Special Resolution</p>
+    </section>
+  </article>
+
+  <!-- Q&A 41 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q41</div>
+      <h2>Period of custody of Inspection books vested by civil court or How many days inspector can keep records and documents during inspection/ investigation?
+</h2> </section> <section class="answer"> <h3>Answer</h3> <p>180 days</p> </section> </article>
+  <!-- Q&A 42 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q42</div>
+      <h2>The Registrar of Companies (RoC) suspects a company of fraudulent activities. What powers does the RoC have to conduct an investigation, and where can the RoC approach if further investigation is required?</h2>
+    </section>
+    <section class="answer">
+      <h3>Answer</h3>
+      <p>Central Government</p>
+    </section>
+  </article>
+
+  <!-- Q&A 43 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q43</div>
+      <h2>PQR Limited filed with NCLT to terminate an employee during proceedings. No objections were received within 30 days, and now the company is debating if they can proceed with the termination.</h2>
+    </section>
+    <section class="answer">
+      <h3>Answer</h3>
+      <p>PQR Limited contention regarding no approval received within 30 days then company can proceed to take proposed action against the employee is correct</p>
+    </section>
+  </article>
+
+  <!-- Q&A 44 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q44</div>
+      <h2>Sec 244, minimum requirement for application to Tribunal</h2>
+    </section>
+    <section class="answer">
+      <h3>Answer</h3>
+      <p>Having Share Capital: Lower of – 100 members or 1/10th of total members;or 1/10th of total issued capital
+Not having share capital: – 1/5th of total members</p>
+</section>
+</article>
+
+  <!-- Q&A 45 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q45</div>
+      <h2>Who can raise Objection to compromise scheme</h2>
+    </section>
+    <section class="answer">
+      <h3>Answer</h3>
+      <p>Member having>= 10% PUSC or Crs having O/s debt>=5% of total</p>
+    </section>
+  </article>
+
+  <!-- Q&A 46 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q46</div>
+      <h2>If the director is removed by a tribunal considered unfit, the period for disqualification</h2>
+    </section>
+    <section class="answer">
+      <h3>Answer</h3>
+      <p>5 years or less than 5 years as specified.</p>
+    </section>
+  </article>
+
+  <!-- Q&A 47 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q47</div>
+      <h2>Can Company make alteration in MOA which is inconsistent with alteration already made by tribunal- options</h2>
+    </section>
+    <section class="answer
+">
+<h3>Answer</h3>
+<p>yes with leave of tribunal</p>
+</section>
+</article>
+
+  <!-- Q&A 48 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q48</div>
+      <h2>Whether Political contribution can be approved by board through resolution by circulation? (175)</h2>
+    </section>
+    <section class="answer">
+      <h3>Answer</h3>
+      <p>No</p>
+    </section>
+  </article>
+
+  <!-- Q&A 49 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q49</div>
+      <h2>Is it mandatory for private company to maintain sec 189 register even if it complied with AR & FS?</h2>
+    </section>
+    <section class="answer">
+      <h3>Answer</h3>
+      <p>Yes</p>
+    </section>
+  </article>
+
+  <!-- Q&A 50 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q50</div>
+      <h2>Can ID be appointed for 3rd term, any cooling period applicable ?</h2>
+    </section>
+    <section class="answer">
+      <h3>Answer</h3>
+      <p>No & Cooling Period: 3 Years</p>
+    </section>
+  </article>
+
+  <!-- Q&A 51 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q51</div>
+      <h2>Minimum no. of director in Top 2000 listed entities</h2>
+    </section>
+    <section class="answer">
+      <h3>Answer</h3>
+      <p>6 Directors</p>
+    </section>
+  </article>
+
+  <!-- Q&A 52 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q52</div>
+      <h2>What a nidhi co can do? A) Open savings acc with members b)open current acc with members, c) accept deposit from non members, d) Buy secturies of body corporates</h2>
+    </section>
+    <section class="answer">
+      <h3>Answer</h3>
+      <p>Open savings acc
+</p> </section> </article>
+  <!-- Q&A 53 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q53</div>
+      <h2>When RBC considered as deemed passed? (175)</h2>
+    </section>
+    <section class="answer">
+      <h3>Answer</h3>
+      <p>Approved by majority of Directors</p>
+    </section>
+  </article>
+
+  <!-- Q&A 54 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q54</div>
+      <h2>Can CFLO be given in case of Removal of MD during Winding Up due to default of director</h2>
+    </section>
+    <section class="answer">
+      <h3>Answer</h3>
+      <p>No</p>
+    </section>
+  </article>
+
+  <!-- Q&A 55 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q55</div>
+      <h2>BCL Limited received an objection from the NCLT under section 218 for taking action against an employee. The company is considering appealing the objection</h2>
+    </section>
+    <section class="answer">
+      <h3>Answer</h3>
+      <p>Company or person concerned may, within a period of 30 days of receipt of notice of objection, prefer an appeal to NCLAT</p>
+    </section>
+  </article>
+
+  <!-- Q&A 56 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q56</div>
+      <h2>No. Of Directors to be retire by rotation</h2>
+    </section>
+    <section class="answer">
+      <h3>Answer</h3>
+      <p>1/3rd out of Rotational Director</p>
+    </section>
+  </article>
+
+  <!-- Q&A 57 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q57</div>
+      <h2>Sec 162 applicable to which of these Companies : a)Sec 8 Co., b) Govt Co., c) Subsidiary of govt co, d)Pvt co.</h2>
+    </section>
+    <section class="answer">
+      <h3>Answer</h3>
+      <p>Section 8 Company</p>
+    </section>
+  </article>
+
+  <!-- Q&A 58 -->
+  <article class="qa-item" tabindex="0">
+    <section class="question">
+      <div class="question-number">Q58</div>
+      <h2>Amount of Deposits that can be accepted by Nidhi co.</h2>
+        </section>
+        <section class="answer">
+          <h3>Answer</h3>
+          <p>Not more than 20 times of NOF</p>
+        </section>
+      </article>
+
+      <!-- Q&A 59 -->
+      <article class="qa-item" tabindex="0">
+        <section class="question">
+          <div class="question-number">Q59</div>
+          <h2>Penalty if director continue to function when office if vacated (167)</h2>
+        </section>
+        <section class="answer">
+          <h3>Answer</h3>
+          <p>Rs. 1 lakh to 5 Lakh</p>
+        </section>
+      </article>
+
+      <!-- Q&A 60 -->
+      <article class="qa-item" tabindex="0">
+        <section class="question">
+          <div class="question-number">Q60</div>
+          <h2>Sec 236, If Minority shareholder offered a price for purchase of share & not disposed within stipulated time, he will able to receive the amount upto?</h2>
+        </section>
+        <section class="answer">
+          <h3>Answer</h3>
+          <p>Disbursement shall continue for 1 year</p>
+        </section>
+      </article>
+
+      <!-- Q&A 61 -->
+      <article class="qa-item" tabindex="0">
+        <section class="question">
+          <div class="question-number">Q61</div>
+          <h2>Can 2 or more director be appointed by single resolution in GM? (162)</h2>
+        </section>
+        <section class="answer">
+          <h3>Answer</h3>
+          <p>No unless a proposal is passed without any vote caste against it for that resolution</p>
+        </section>
+      </article>
+
+      <!-- Q&A 62 -->
+      <article class="qa-item" tabindex="0">
+        <section class="question">
+          <div class="question-number">Q62</div>
+          <h2>Company didn't have any SAT (ROC fees is not SAT) during last 2 years. Is it active/inactive/ dormant/defunct company?</h2>
+        </section>
+        <section class="answer">
+          <h3>Answer</h3>
+          <p>Inactive Company</p>
+        </section>
+      </article>
+
+      <!-- Q&A 63 -->
+      <article class="qa-item" tabindex="0">
+        <section class="question">
+          <div class="question-number">Q63</div>
+          <h2>Legal position of Mr. Jack (NR) for being appointed as MD of company which is in SEZ</h2>
+        </section>
+        <section class="answer">
+          <h3>Answer</h3>
+          <p>Valid, as condition of resident of india not applicable to SEZ company</p>
+        </section>
+      </article>
+
+      <!-- Q&A 64 -->
+      <article class="qa-item" tabindex="0">
+        <section class="question">
+          <div class="question-number">Q64</div>
+          <h2>which resolution pass to increase limit of max no of directors (more than 15 director)</h2>
+        </section>
+        <section class="answer">
+          <h3>Answer</h3>
+          <p>Special Resolution</p>
+        </section>
+      </article>
+
+      <!-- Q&A 65 -->
+      <article class="qa-item" tabindex="0">
+        <section class="question">
+          <div class="question-number">Q65</div>
+          <h2>When resulution of RBC put up in meeting? (175)</h2>
+        </section>
+        <section class="answer">
+          <h3>Answer</h3>
+          <p>>=1/3 of total director require that resolution decided in meeting</p>
+        </section>
+      </article>
+
+      <!-- Q&A 66 -->
+      <article class="qa-item" tabindex="0">
+        <section class="question">
+          <div class="question-number">Q66</div>
+          <h2>Validity of Resolution passed in contravention of sec 162</h2>
+        </section>
+        <section class="answer">
+          <h3>Answer</h3>
+          <p>Void Always</p>
+        </section>
+      </article>
+
+      <!-- Q&A 67 -->
+      <article class="qa-item" tabindex="0">
+        <section class="question">
+          <div class="question-number">Q67</div>
+          <h2>Sec 230- How many days in which order of tribunal file with roc</h2>
+        </section>
+        <section class="answer">
+          <h3>Answer</h3>
+          <p>30 days</p>
+        </section>
+      </article>
+
+      <!-- Q&A 68 -->
+      <article class="qa-item" tabindex="0">
+        <section class="question">
+          <div class="question-number">Q68</div>
+          <h2>Can SSD be appointed in a competing business</h2>
+        </section>
+        <section class="answer">
+          <h3>Answer</h3>
+          <p>No</p>
+        </section>
+      </article>
+
+      <!-- Q&A 69 -->
+      <article class="qa-item" tabindex="0">
+        <section class="question">
+          <div class="question-number">Q69</div>
+          <h2>Case Study related to Nidhi Company: Paid up SC: 23Lakh Free Reserves: 2 Lakh Assets : 10 Lakh Deposit accepted till now: 1.5 Cr Q1: Maximum additional deposit it can further accept Q2. Amount of loan it can be given if deposit of member are 1.5Cr</h2>
+        </section>
+        <section class="answer">
+          <h3>Answer</h3>
+          <p>A1: 3.5Cr
+A2: 2Lakh</p>
+        </section>
+      </article>
+
+      <!-- Q&A 70 -->
+      <article class="qa-item" tabindex="0">
+        <section class="question">
+          <div class="question-number">Q70</div>
+          <h2>Form for Getting status of active co.</h2>
+        </section>
+        <section class="answer">
+          <h3>Answer</h3>
+          <p>MSC 4</p>
+        </section>
+      </article>
+
+      <!-- Q&A 71 -->
+      <article class="qa-item" tabindex="0">
+        <section class="question">
+          <div class="question-number">Q71</div>
+          <h2>Penalty in case of violation of provision of political contribution (182)?</h2>
+        </section>
+        <section class="answer">
+          <h3>Answer</h3>
+          <p>Co: 5X amount contributed
+Officer in default: Jail 6 Month and 5X amt contributed</p>
+        </section>
+      </article>
+
+      <!-- Q&A 72 -->
+      <article class="qa-item" tabindex="0">
+        <section class="question">
+          <div class="question-number">Q72</div>
+          <h2>Section 174, Quorum vs SEBI Quorum</h2>
+        </section>
+        <section class="answer">
+          <h3>Answer</h3>
+          <p>Normal: 1/3rd or 2 director
+SEBI: 1/3rd or 3 director including 1 ID</p>
+        </section>
+      </article>
+
+      <!-- Q&A 73 -->
+      <article class="qa-item" tabindex="0">
+        <section class="question">
+          <div class="question-number">Q73</div>
+          <h2>Notice for meeting sent 15 days before date of meeting & it mentioned the options to vote as – vote by self / proxy – whats validity of notice?</h2>
+        </section>
+        <section class="answer">
+          <h3>Answer</h3>
+          <p>invalid because timelimit is 1 month & notice didn't mention option of post ballot</p>
+        </section>
+      </article>
+
+      <!-- Q&A 74 -->
+      <article class="qa-item" tabindex="0">
+        <section class="question">
+          <div class="question-number">Q74</div>
+          <h2>Non Executive Managerial Remuneration if Effective capital is 245 crs</h2>
+        </section>
+        <section class="answer">
+          <h3>Answer</h3>
+          <p>24 Lakhs</p>
+        </section>
+      </article>
+
+      <!-- Q&A 75 -->
+      <article class="qa-item" tabindex="0">
+        <section class="question">
+          <div class="question-number">Q75</div>
+          <h2>Circumstances where Special Notice by members is required (169)</h2>
+        </section>
+        <section class="answer">
+          <h3>Answer</h3>
+          <p>Removal of Director & Special Notice at least 14 days before meeting</p>
+        </section>
+      </article>
+
+      <!-- Q&A 76 -->
+      <article class="qa-item" tabindex="0">
+        <section class="question">
+          <div class="question-number">Q76</div>
+          <h2>If company removed such employee without getting permission from tribunal, is the act valid?</h2>
+        </section>
+        <section class="answer">
+          <h3>Answer</h3>
+          <p>Not valid as the investigation is pending</p>
+        </section>
+      </article>
+
+      <!-- Q&A 77 -->
+      <article class="qa-item" tabindex="0">
+        <section class="question">
+          <div class="question-number">Q77</div>
+          <h2>Under compromise, who ordered for the meeting of creditors</h2>
+        </section>
+        <section class="answer">
+          <h3>Answer</h3>
+          <p>Tribunal</p>
+        </section>
+      </article>
+
+      <!-- Q&A 78 -->
+      <article class="qa-item" tabindex="0">
+        <section class="question">
+          <div class="question-number">Q78</div>
+          <h2>Who can be appointed as RV out of 4 options a). PROI b). imprisoned for 2 months, c). imprisoned for 7 months, d). valuation exam passed beyond 3 yrs related</h2>
+        </section>
+        <section class="answer">
+          <h3>Answer</h3>
+          <p>imprisoned for 2 months</p>
+        </section>
+      </article>
+
+      <!-- Q&A 79 -->
+      <article class="qa-item" tabindex="0">
+        <section class="question">
+          <div class="question-number">Q79</div>
+          <h2>Normally appeal against order of NCLT to whom & within how many days ? (other than section 218)</h2>
+        </section>
+        <section class="answer">
+          <h3>Answer</h3>
+          <p>To NCLAT within 45 days (+45 days extention)</p>
+        </section>
+      </article>
+
+      <!-- Q&A 80 -->
+      <article class="qa-item" tabindex="0">
+        <section class="question">
+          <div class="question-number">Q80</div>
+          <h2>XYZ Ltd. has provided the following details: Net Profit (as per Section 198 of the Companies Act, 2013): INR 200 crores Managerial Remuneration limit as per Section 197 of the Companies Act, 2013: 11% of the Net Profit Question: Determine if the provided profit is correct and calculate the permissible managerial remuneration.</h2>
+        </section>
+        <section class="answer">
+          <h3>Answer</h3>
+          <p>Net Profit: INR 200 crores
+Permissible Managerial Remuneration: 11% of INR 200 crores = INR 22 crores</p>
+        </section>
+      </article>
+
+      <!-- Q&A 81 -->
+      <article class="qa-item" tabindex="0">
+        <section class="question">
+          <div class="question-number">Q81</div>
+          <h2>Calculation of donations to Charitable funds limit</h2>
+        </section>
+        <section class="answer">
+          <h3>Answer</h3>
+          <p>5% of avg 3 yr net profit</p>
+        </section>
+      </article>
+
+      <!-- Q&A 82 -->
+      <article class="qa-item" tabindex="0">
+        <section class="question">
+          <div class="question-number">Q82</div>
+          <h2>Submission of report by Company Liquidator to tribunal</h2>
+        </section>
+        <section class="answer">
+          <h3>Answer</h3>
+          <p>within 60 days</p>
+        </section>
+      </article>
+
+      <!-- Q&A 83 -->
+      <article class="qa-item" tabindex="0">
+        <section class="question">
+          <div class="question-number">Q83</div>
+          <h2>Can a Non resident person become MD of Indian Company?</h2>
+        </section>
+        <section class="answer">
+          <h3>Answer</h3>
+          <p>Yes with approval of CG</p>
+        </section>
+      </article>
+
+      <!-- Q&A 84 -->
+      <article class="qa-item" tabindex="0">
+        <section class="question">
+          <div class="question-number">Q84</div>
+          <h2>Can director hold excess remuneration without necessary approval?</h2>
+        </section>
+        <section class="answer">
+          <h3>Answer</h3>
+          <p>Yes & hold it in trust of Company</p>
+        </section>
+      </article>
+
+      <!-- Q&A 85 -->
+      <article class="qa-item" tabindex="0">
+        <section class="question">
+          <div class="question-number">Q85</div>
+          <h2>No. of days in which office need to vacated from the date of order</h2>
+        </section>
+        <section class="answer">
+          <h3>Answer</h3>
+          <p>30 days</p>
+        </section>
+      </article>
+
+      <!-- Q&A 86 -->
+      <article class="qa-item" tabindex="0">
+        <section class="question">
+          <div class="question-number">Q86</div>
+          <h2>Can Women director sitting fees lower from other directors?</h2>
+        </section>
+        <section class="answer">
+          <h3>Answer</h3>
+          <p>No</p>
+        </section>
+      </article>
+
+      <!-- Q&A 87 -->
+      <article class="qa-item" tabindex="0">
+        <section class="question">
+          <div class="question-number">Q87</div>
+          <h2>Sec 247 – Reg.Valuer penalty in both cases</h2>
+        </section>
+        <section class="answer">
+          <h3>Answer</h3>
+          <p>Penalty: 50,000
+In case of defraud: Jail upto 1 year & fine: 1 lakh to 5 lakh</p>
+        </section>
+      </article>
+
+      <!-- Q&A 88 -->
+      <article class="qa-item" tabindex="0">
+        <section class="question">
+          <div class="question-number">Q88</div>
+          <h2>A director has the following directorships: 7 public companies 2 unlisted companies 3 private listed companies (out of which some are subsidiaries or holding of public companies) Question: How many directorships can he accept in public and private companies as per Section 165 of the Companies Act, 2013?</h2>
+        </section>
+        <section class="answer">
+          <h3>Answer</h3>
+          <p>Maximum directorships in public companies (including subsidiaries of public companies): 10 Maximum directorships in private companies: 20
+Given the director already has 7 directorships in public companies, he can accept up to 3 more directorships in public companies.</p>
+        </section>
+      </article>
+
+      <!-- Q&A 89 -->
+      <article class="qa-item" tabindex="0">
+        <section class="question">
+          <div class="question-number">Q89</div>
+          <h2>Amount of Loan that can be given by Nidhi Co. if deposit is less than 2 crore</h2>
+        </section>
+        <section class="answer">
+          <h3>Answer</h3>
+          <p>2 lakh</p>
+        </section>
+      </article>
+    </section>
+  </main>
+
+  <div class="reading-indicator" id="readingIndicator" aria-label="Reading progress" role="region">
+    <span id="progressText">0%</span>
+  </div>
+
+  <script>
+    // ===== UTILITY FUNCTIONS =====
+    function lerp(start, end, t) {
+      return start + (end - start) * t;
+    }
+
+    function easeOutExpo(t) {
+      return t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
+    }
+
+    // ===== PROGRESS BAR =====
+    const progressBar = document.getElementById('progressBar');
+    window.addEventListener('scroll', () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const scrolled = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      progressBar.style.width = scrolled + '%';
+    });
+
+    // ===== READING PROGRESS INDICATOR =====
+    const readingIndicator = document.getElementById('readingIndicator');
+    const progressText = document.getElementById('progressText');
+    const qaItems = document.querySelectorAll('.qa-item');
+
+    window.addEventListener('scroll', () => {
+      let visibleCount = 0;
+      qaItems.forEach((item, index) => {
+        const rect = item.getBoundingClientRect();
+        if (rect.top < window.innerHeight * 0.5) visibleCount = index + 1;
+      });
+      const progress = Math.round((visibleCount / qaItems.length) * 100);
+      progressText.textContent = progress + '%';
+      
+      // Announce progress to screen readers
+      if (visibleCount % 10 === 0) {
+        document.getElementById('progress-announce').textContent = `You have read ${visibleCount} questions out of ${qaItems.length}`;
+      }
+    });
+
+    // ===== FONT SIZE CONTROL =====
+    const fontSizeInput = document.getElementById('font-size');
+    const fontSizeDisplay = document.querySelector('.font-size-display');
+
+    fontSizeInput.addEventListener('input', (e) => {
+      const size = parseInt(e.target.value);
+      document.documentElement.style.setProperty('--current-font-size', size + 'px');
+      fontSizeDisplay.textContent = size + 'px';
+      localStorage.setItem('accessibility-fontSize', size);
+      
+      const announcement = `Font size changed to ${size} pixels`;
+      document.getElementById('progress-announce').textContent = announcement;
+    });
+
+    // ===== HIGH CONTRAST TOGGLE =====
+    const contrastToggle = document.getElementById('contrast-toggle');
+    contrastToggle.addEventListener('change', (e) => {
+      if (e.target.checked) {
+        document.documentElement.setAttribute('data-contrast', 'high');
+        document.getElementById('progress-announce').textContent = 'High contrast mode enabled';
+      } else {
+        document.documentElement.removeAttribute('data-contrast');
+        document.getElementById('progress-announce').textContent = 'High contrast mode disabled';
+      }
+      localStorage.setItem('accessibility-contrast', e.target.checked);
+    });
+
+    // ===== DYSLEXIA FONT
+TOGGLE =====
+const dyslexiaToggle = document.getElementById('dyslexia-toggle');
+dyslexiaToggle.addEventListener('change', (e) => {
+document.body.classList.toggle('dyslexia-font', e.target.checked);
+const announcement = e.target.checked
+? 'Dyslexia-friendly font Atkinson Hyperlegible enabled with enhanced spacing'
+: 'Dyslexia-friendly font disabled, returning to Inter font';
+document.getElementById('progress-announce').textContent = announcement;
+localStorage.setItem('accessibility-dyslexia', e.target.checked);
+});
+
+// ===== DARK MODE TOGGLE =====
+const themeToggle = document.getElementById('theme-toggle');
+themeToggle.addEventListener('change', (e) => {
+  if (e.target.checked) {
+    document.documentElement.style.colorScheme = 'dark';
+    document.documentElement.setAttribute('data-theme', 'dark');
+    document.getElementById('progress-announce').textContent = 'Dark mode enabled for comfortable night reading';
+  } else {
+    document.documentElement.style.colorScheme = 'light';
+    document.documentElement.removeAttribute('data-theme');
+    document.getElementById('progress-announce').textContent = 'Dark mode disabled, light mode activated';
+  }
+  localStorage.setItem('accessibility-darkMode', e.target.checked);
+});
+
+// ===== RESTORE USER PREFERENCES =====
+window.addEventListener('load', () => {
+  const savedFontSize = localStorage.getItem('accessibility-fontSize');
+  if (savedFontSize) {
+    fontSizeInput.value = savedFontSize;
+    document.documentElement.style.setProperty('--current-font-size', savedFontSize + 'px');
+    fontSizeDisplay.textContent = savedFontSize + 'px';
+  }
+
+  const savedDyslexia = localStorage.getItem('accessibility-dyslexia') === 'true';
+  dyslexiaToggle.checked = savedDyslexia;
+  document.body.classList.toggle('dyslexia-font', savedDyslexia);
+
+  const savedContrast = localStorage.getItem('accessibility-contrast') === 'true';
+  contrastToggle.checked = savedContrast;
+  if (savedContrast) {
+    document.documentElement.setAttribute('data-contrast', 'high');
+  }
+
+  const savedDarkMode = localStorage.getItem('accessibility-darkMode') === 'true';
+  themeToggle.checked = savedDarkMode;
+  if (savedDarkMode) {
+    document.documentElement.style.colorScheme = 'dark';
+    document.documentElement.setAttribute('data-theme', 'dark');
+  }
+});
+
+// ===== KEYBOARD NAVIGATION =====
+document.addEventListener('keydown', (e) => {
+  // Alt + 1: Go to main content
+  if (e.altKey && e.key === '1') {
+    document.getElementById('main-qa').focus();
+    document.getElementById('progress-announce').textContent = 'Navigated to main Q&A content';
+  }
+
+  // Alt + 0: Focus first Q&A
+  if (e.altKey && e.key === '0') {
+    qaItems[0].focus();
+    document.getElementById('progress-announce').textContent = 'Navigated to first question';
+  }
+
+  // Alt + 9: Focus last Q&A
+  if (e.altKey && e.key === '9') {
+    qaItems[qaItems.length - 1].focus();
+    document.getElementById('progress-announce').textContent = 'Navigated to last question';
+  }
+
+  // Arrow keys for navigation between Q&A items
+  if (e.key === 'ArrowDown') {
+    const current = document.activeElement.closest('.qa-item');
+    if (current) {
+      const next = current.nextElementSibling;
+      if (next && next.classList.contains('qa-item')) {
+        next.focus();
+        e.preventDefault();
+      }
+    }
+  }
+
+  if (e.key === 'ArrowUp') {
+    const current = document.activeElement.closest('.qa-item');
+    if (current) {
+      const prev = current.previousElementSibling;
+      if (prev && prev.classList.contains('qa-item')) {
+        prev.focus();
+        e.preventDefault();
+      }
+    }
+  }
+});
+
+// ===== INTERSECTION OBSERVER FOR ANIMATIONS =====
+const observerOptions = {
+  threshold: 0.1,
+  rootMargin: '0px 0px -50px 0px'
+};
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry) => {
+    if (entry.isIntersecting) {
+      entry.target.style.animation = 'scaleIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
+    }
+  });
+}, observerOptions);
+
+qaItems.forEach((item, index) => {
+  observer.observe(item);
+});
+
+// ===== SMOOTH SCROLL ANCHOR LINKS =====
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+  anchor.addEventListener('click', function (e) {
+    e.preventDefault();
+    const target = document.querySelector(this.getAttribute('href'));
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      target.focus();
+    }
+  });
+});
+
+// ===== ENHANCE FOCUS MANAGEMENT =====
+document.querySelectorAll('button, input, a').forEach(element => {
+  element.addEventListener('focus', function() {
+    this.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+});
+
+// ===== NOTIFICATION SYSTEM =====
+function announce(message) {
+  const announcement = document.getElementById('progress-announce');
+  announcement.textContent = message;
+  setTimeout(() => {
+    announcement.textContent = '';
+  }, 3000);
+}
+
+// ===== LOAD TIME ANNOUNCEMENT =====
+window.addEventListener('load', () => {
+  announce('Page loaded successfully. Use Alt+0 to go to first question, Alt+1 for main content, Alt+9 for last question. Arrow keys navigate
+between questions.');
+});
+
+// ===== PREVENT CONTEXT LOSS =====
+window.addEventListener('beforeunload', () => {
+  localStorage.setItem('lastScrollPosition', window.scrollY);
+});
+
+window.addEventListener('load', () => {
+  const lastPosition = localStorage.getItem('lastScrollPosition');
+  if (lastPosition) {
+    window.scrollTo(0, parseInt(lastPosition));
+  }
+});
+</script> </body> </html> 

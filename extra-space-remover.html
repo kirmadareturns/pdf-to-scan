@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Remove extra spaces from code instantly, 100% client-side. No server uploads, instant processing, and size reduction stats.">
+  <meta name="keywords" content="code formatter, remove spaces, whitespace remover, code optimization, minify">
+  <meta name="author" content="pdf-to-scan">
+  <meta property="og:title" content="Code Space Remover">
+  <meta property="og:description" content="Remove all extra spaces from code instantly with our 100% client-side tool.">
+  <meta property="og:type" content="website">
+  <title>Code Space Remover – Remove Extra Spaces Instantly</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: #ffffff;
+      color: #181818;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .header {
+      padding: 24px 16px 16px;
+      background: #ffffff;
+      border-bottom: 1px solid #e0e0e0;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: #181818;
+      margin-bottom: 4px;
+      letter-spacing: -0.5px;
+    }
+
+    .header p {
+      font-size: 0.95rem;
+      color: #666666;
+      font-weight: 400;
+    }
+
+    .main-content {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      padding: 24px 16px;
+      overflow-y: auto;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 900px;
+    }
+
+    .mode-selector {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .mode-selector label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      color: #333333;
+      font-weight: 500;
+    }
+
+    .mode-selector input[type="radio"] {
+      cursor: pointer;
+      width: 18px;
+      height: 18px;
+      accent-color: #0066cc;
+    }
+
+    .mode-selector input[type="radio"]:focus {
+      outline: 2px solid #0066cc;
+      outline-offset: 2px;
+    }
+
+    .editor-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .editor-section {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .editor-column {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .editor-column label {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #181818;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    textarea {
+      flex: 1;
+      padding: 12px;
+      border: 2px solid #d0d0d0;
+      border-radius: 6px;
+      font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      resize: none;
+      background: #f9f9f9;
+      color: #181818;
+      min-height: 300px;
+      transition: border-color 0.2s, background-color 0.2s;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: #0066cc;
+      background: #ffffff;
+      box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+    }
+
+    textarea:disabled {
+      background: #f0f0f0;
+      color: #999999;
+      cursor: not-allowed;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 44px;
+      min-width: 44px;
+    }
+
+    .btn-primary {
+      background: #0066cc;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #0052a3;
+    }
+
+    .btn-primary:active {
+      background: #003d7a;
+    }
+
+    .btn-primary:focus {
+      outline: 2px solid #0066cc;
+      outline-offset: 2px;
+    }
+
+    .btn-secondary {
+      background: #f0f0f0;
+      color: #181818;
+      border: 1px solid #d0d0d0;
+    }
+
+    .btn-secondary:hover {
+      background: #e8e8e8;
+    }
+
+    .btn-secondary:active {
+      background: #dcdcdc;
+    }
+
+    .btn-secondary:focus {
+      outline: 2px solid #0066cc;
+      outline-offset: 2px;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: #f5f5f5;
+      padding: 12px 16px;
+      border-radius: 6px;
+      border-left: 4px solid #0066cc;
+    }
+
+    .stat-label {
+      font-size: 0.85rem;
+      color: #666666;
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #181818;
+      font-family: 'Monaco', monospace;
+    }
+
+    .stat-reduction {
+      font-size: 0.9rem;
+      color: #22863a;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+
+    .footer {
+      background: #f9f9f9;
+      border-top: 1px solid #e0e0e0;
+      padding: 16px;
+      text-align: center;
+    }
+
+    details {
+      display: inline-block;
+      width: 100%;
+    }
+
+    summary {
+      cursor: pointer;
+      font-size: 0.9rem;
+      color: #0066cc;
+      font-weight: 600;
+      padding: 8px;
+      border-radius: 4px;
+      user-select: none;
+      transition: background 0.2s;
+    }
+
+    summary:hover {
+      background: rgba(0, 102, 204, 0.05);
+    }
+
+    summary:focus {
+      outline: 2px solid #0066cc;
+      outline-offset: 2px;
+    }
+
+    .seo-content {
+      margin-top: 12px;
+      padding: 16px;
+      background: #ffffff;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      text-align: left;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      color: #333333;
+    }
+
+    .seo-content h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #181818;
+      margin-bottom: 8px;
+    }
+
+    .seo-content p {
+      margin-bottom: 8px;
+    }
+
+    .seo-content ul {
+      margin-left: 20px;
+      margin-bottom: 8px;
+    }
+
+    .seo-content li {
+      margin-bottom: 6px;
+    }
+
+    .seo-content code {
+      background: #f0f0f0;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: monospace;
+      color: #d73a49;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #181818;
+      color: white;
+      padding: 12px 16px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      z-index: 1000;
+      animation: slideIn 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border-width: 0;
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <h1>Code Space Remover</h1>
+    <p>Remove all extra spaces from your code instantly</p>
+  </header>
+
+  <main class="main-content">
+    <div class="container">
+      <!-- Mode Selector -->
+      <fieldset class="mode-selector">
+        <legend class="sr-only">Space removal mode</legend>
+        <label>
+          <input type="radio" name="mode" value="all" checked aria-label="Remove all extra spaces">
+          Remove all extra spaces
+        </label>
+        <label>
+          <input type="radio" name="mode" value="lines" aria-label="Remove leading and trailing spaces per line">
+          Trim per line
+        </label>
+        <label>
+          <input type="radio" name="mode" value="blank" aria-label="Remove blank lines">
+          Remove blank lines
+        </label>
+        <label>
+          <input type="radio" name="mode" value="combined" aria-label="Combine all modes">
+          All of above
+        </label>
+      </fieldset>
+
+      <!-- Stats Bar -->
+      <div class="stats-bar">
+        <div class="stat-card">
+          <div class="stat-label">Original Size</div>
+          <div class="stat-value" id="originalSize">0 B</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Final Size</div>
+          <div class="stat-value" id="finalSize">0 B</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Reduction</div>
+          <div class="stat-value" id="reductionPercent">0%</div>
+          <div class="stat-reduction" id="reductionBytes">0 B saved</div>
+        </div>
+      </div>
+
+      <!-- Editor Section -->
+      <div class="editor-section">
+        <div class="editor-column">
+          <label for="input">Input Code</label>
+          <textarea id="input" placeholder="Paste your code here..." aria-label="Input code textarea"></textarea>
+        </div>
+        <div class="editor-column">
+          <label for="output">Output Code</label>
+          <textarea id="output" placeholder="Cleaned code will appear here..." readonly aria-label="Output code textarea"></textarea>
+        </div>
+      </div>
+
+      <!-- Button Group -->
+      <div class="button-group">
+        <button class="btn-primary" id="processBtn" aria-label="Process and remove spaces">
+          Process
+        </button>
+        <button class="btn-secondary" id="copyBtn" aria-label="Copy output to clipboard">
+          Copy Output
+        </button>
+        <button class="btn-secondary" id="clearBtn" aria-label="Clear all text">
+          Clear All
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <details>
+      <summary>Learn More – How This Tool Works</summary>
+      <div class="seo-content">
+        <h3>Code Space Remover Tool</h3>
+        <p><strong>What does it do?</strong> This tool removes unnecessary whitespace from your code, including extra spaces, tabs, and blank lines. It processes your code instantly without sending anything to a server.</p>
+        
+        <p><strong>How it works:</strong></p>
+        <ul>
+          <li><strong>Remove all extra spaces:</strong> Replaces multiple consecutive spaces with a single space throughout your code</li>
+          <li><strong>Trim per line:</strong> Removes leading and trailing whitespace from each line independently</li>
+          <li><strong>Remove blank lines:</strong> Eliminates empty lines from your code</li>
+          <li><strong>All of above:</strong> Combines all three modes for maximum compression</li>
+        </ul>
+
+        <p><strong>Why use it?</strong></p>
+        <ul>
+          <li><strong>Reduce file size:</strong> Smaller code files load faster and consume less bandwidth</li>
+          <li><strong>Optimize code:</strong> Clean up poorly formatted or auto-generated code</li>
+          <li><strong>Privacy:</strong> All processing happens in your browser—no data sent to servers</li>
+          <li><strong>Instant:</strong> Real-time processing as you type or on demand</li>
+        </ul>
+
+        <p><strong>Use cases:</strong> Minifying scripts before deployment, cleaning up generated code, removing accidental formatting, reducing payload size for embedded code.</p>
+      </div>
+    </details>
+  </footer>
+
+  <script>
+    const inputTextarea = document.getElementById('input');
+    const outputTextarea = document.getElementById('output');
+    const processBtn = document.getElementById('processBtn');
+    const copyBtn = document.getElementById('copyBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const modeRadios = document.querySelectorAll('input[name="mode"]');
+    const originalSizeEl = document.getElementById('originalSize');
+    const finalSizeEl = document.getElementById('finalSize');
+    const reductionPercentEl = document.getElementById('reductionPercent');
+    const reductionBytesEl = document.getElementById('reductionBytes');
+
+    function formatBytes(bytes) {
+      if (bytes === 0) return '0 B';
+      const k = 1024;
+      const sizes = ['B', 'KB', 'MB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
+    }
+
+    function removeSpaces(text, mode) {
+      if (!text) return '';
+
+      let result = text;
+
+      if (mode === 'all' || mode === 'combined') {
+        result = result.replace(/ {2,}/g, ' ');
+      }
+
+      if (mode === 'lines' || mode === 'combined') {
+        result = result.split('\n').map(line => line.trim()).join('\n');
+      }
+
+      if (mode === 'blank' || mode === 'combined') {
+        result = result.split('\n').filter(line => line.trim() !== '').join('\n');
+      }
+
+      return result;
+    }
+
+    function updateStats() {
+      const originalSize = new Blob([inputTextarea.value]).size;
+      const finalSize = new Blob([outputTextarea.value]).size;
+      const saved = originalSize - finalSize;
+      const percent = originalSize > 0 ? Math.round((saved / originalSize) * 100) : 0;
+
+      originalSizeEl.textContent = formatBytes(originalSize);
+      finalSizeEl.textContent = formatBytes(finalSize);
+      reductionPercentEl.textContent = percent + '%';
+      reductionBytesEl.textContent = formatBytes(saved) + ' saved';
+    }
+
+    function processCode() {
+      const mode = document.querySelector('input[name="mode"]:checked').value;
+      const input = inputTextarea.value;
+      const output = removeSpaces(input, mode);
+      outputTextarea.value = output;
+      updateStats();
+    }
+
+    function copyToClipboard() {
+      if (!outputTextarea.value) {
+        showToast('Nothing to copy');
+        return;
+      }
+      outputTextarea.select();
+      document.execCommand('copy');
+      showToast('Copied to clipboard!');
+    }
+
+    function clearAll() {
+      inputTextarea.value = '';
+      outputTextarea.value = '';
+      updateStats();
+      inputTextarea.focus();
+    }
+
+    function showToast(message) {
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.textContent = message;
+      toast.setAttribute('role', 'status');
+      toast.setAttribute('aria-live', 'polite');
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 2000);
+    }
+
+    // Event listeners
+    processBtn.addEventListener('click', processCode);
+    copyBtn.addEventListener('click', copyToClipboard);
+    clearBtn.addEventListener('click', clearAll);
+    inputTextarea.addEventListener('input', updateStats);
+    modeRadios.forEach(radio => radio.addEventListener('change', processCode));
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      if (e.ctrlKey || e.metaKey) {
+        if (e.key === 'Enter') {
+          processCode();
+        }
+      }
+    });
+  </script>
+</body>
+</html>

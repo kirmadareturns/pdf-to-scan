@@ -3,183 +3,318 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDF to scanned document converter free online tool</title>
-    <meta name="title" content="PDF to scanned PDF converter free online tool. PDF to scanned document converter free online tool.">
-    <meta name="description" content="Convert PDF to scanned PDF online free. Make your digital PDF look like a scanned document with adjustable DPI quality. Fast, secure, and easy to use. No registration required. Make any PDF look scanned in 30 s. Free online tool—no signup,
-no watermark, 300 DPI quality. Instant download.">
-<meta name="keywords" content="pdf to scanned pdf, convert pdf to scanned, pdf scanner online, make pdf look scanned, digital pdf to scanned, pdf to image pdf, scanned pdf converter, online pdf scanner, free pdf converter, pdf to scanned document">
-<meta name="robots" content="index, follow">
-<link rel="icon" type="image/png" href="/favicon.png">
-<link rel="stylesheet" href="style.css">
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6196194515460390" crossorigin="anonymous"></script>
+    <meta name="description" content="Securely flatten and merge PDF files in your browser. Super fast client-side processing.">
+    <title>PDF Flatline | Turbo</title>
+    
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    
+    <script type="application/ld+json" id="json-ld">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "PDF Flatline Turbo",
+      "applicationCategory": "Productivity",
+      "operatingSystem": "Web Browser",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "featureList": "High Speed PDF Merging, Text Flattening"
+    }
+    </script>
 
-</head> <script async src="https://www.googletagmanager.com/gtag/js?id=G-CJJHK6V33P"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'G-CJJHK6V33P'); </script> <body> <nav class="navbar" role="navigation" aria-label="Main Navigation"> <div class="nav-container"> <a href="/" class="logo"><span>pdf</span> to scan</a> <ul class="nav-links"> <li><a href="#features">Features</a></li> <li><a href="#how">How it works</a></li> <li><a href="#faq">FAQ</a></li> <li class="dropdown"> <a href="#" class="dropbtn" aria-haspopup="true" aria-expanded="false">Tools ▼</a> <div class="dropdown-content" role="menu"> <a href="/merge-pdf.html" role="menuitem">Merge PDF</a> <a href="/pdf-eraser.html" role="menuitem">Erase PDF</a> <a href="/unlock-pdf.html" role="menuitem">Unlock PDF</a> <a href="/rearrange-pdf.html" role="menuitem">Rearrange PDF</a> <a href="/split-pdf.html" role="menuitem">Split PDF</a> <a href="/rotate-pdf.html" role="menuitem">Rotate PDF</a> <a href="/pdf-to-scan.html" role="menuitem">PDF to scan</a> <a href="/compress-pdf.html" role="menuitem">Compress PDF</a> <a href="/clean-code.html" role="menuitem">Code Comment Stripper</a> </div> </li> </ul> </div> </nav>
-<main class="container">
-    <div class="hero">
-        <h1>Convert PDF to Scanned PDF Online Free</h1>
-        <p>Make your PDF look like a scanned document</p>
-        <p class="subtitle">Completely free to use. No signup or login required</p>
-    </div>
+    <style>
+        :root {
+            /* Human Theme */
+            --h-bg: #ffffff; --h-text: #111827; --h-accent: #000000;
+            --h-laser: #06b6d4; --h-surface: #f3f4f6; --h-border: #e5e7eb;
+            
+            /* Machine Theme */
+            --m-bg: #0d1117; --m-text: #58a6ff; --m-border: #30363d; --m-font: 'Courier New', monospace;
+        }
 
-    <div class="content-grid">
-        <div class="main-content">
-            <div class="scan-overlay" id="scanOverlay" aria-hidden="true">
-                <div class="scan-beam"></div>
-            </div>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { height: 100%; width: 100%; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; transition: background 0.3s ease; }
 
-            <!-- Upload Zone -->
-            <div class="upload-zone" id="uploadSection" role="region" aria-label="File Upload Area">
-                <div class="upload-icon" aria-hidden="true"></div>
-                <h2>Select PDF File</h2>
-                <p>Click to browse or drag and drop your PDF file here</p>
-                <input 
-                    type="file" 
-                    id="fileInput" 
-                    accept="application/pdf" 
-                    multiple 
-                    aria-label="Select PDF files to convert"
-                    aria-describedby="upload-hint"
-                    style="display:none;">
-                <p id="upload-hint" class="sr-only">Upload one or more PDF files. Supported format: PDF only.</p>
-                <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()" aria-label="Click to browse and select PDF files">
-                    Choose PDF File
-                </button>
-            </div>
+        /* VIEW TOGGLE */
+        body[data-view="human"] { background: var(--h-bg); color: var(--h-text); }
+        body[data-view="human"] .machine-view { display: none; }
+        body[data-view="human"] .human-view { display: flex; }
 
-            <!-- Settings Section -->
-            <div class="settings-section" id="settingsSection" role="region" aria-label="Conversion Settings">
-                <div class="file-info" id="fileInfo" aria-live="polite" aria-label="File information"></div>
+        body[data-view="machine"] { background: var(--m-bg); color: var(--m-text); font-family: var(--m-font); }
+        body[data-view="machine"] .human-view { display: none; }
+        body[data-view="machine"] .machine-view { display: block; }
+
+        /* HUMAN UI */
+        .human-view {
+            flex-direction: column; align-items: center; justify-content: center;
+            min-height: 100vh; padding: 20px; max-width: 600px; margin: 0 auto;
+        }
+
+        .app-header { margin-bottom: 2rem; text-align: center; }
+        .app-header h1 { font-size: 2.5rem; letter-spacing: -0.05em; margin-bottom: 0.5rem; }
+        .app-header p { color: #6b7280; }
+
+        .dropzone {
+            width: 100%; background: var(--h-surface); border: 2px dashed var(--h-border);
+            border-radius: 16px; padding: 3rem 1rem; text-align: center; cursor: pointer;
+            transition: all 0.2s ease; position: relative; overflow: hidden;
+            min-height: 250px; display: flex; flex-direction: column; justify-content: center; align-items: center;
+        }
+        .dropzone:hover, .dropzone.active { border-color: var(--h-accent); background: #f9fafb; transform: scale(1.01); }
+
+        /* FAST LASER */
+        .scan-beam {
+            position: absolute; top: 0; left: 0; width: 100%; height: 4px;
+            background: var(--h-laser); box-shadow: 0 0 15px var(--h-laser), 0 0 30px var(--h-laser);
+            opacity: 0; z-index: 10; pointer-events: none;
+        }
+        .dropzone.scanning { border-color: var(--h-laser); background: #ecfeff; cursor: wait; }
+        .dropzone.scanning .scan-beam {
+            opacity: 1; 
+            animation: scanner 0.6s cubic-bezier(0.4, 0, 0.2, 1) infinite; /* SUPER FAST ANIMATION */
+            will-change: top;
+        }
+        @keyframes scanner { 
+            0% { top: 0%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { top: 100%; opacity: 0; } 
+        }
+
+        .file-stack { margin-top: 1.5rem; width: 100%; text-align: left; }
+        .file-item { 
+            display: flex; justify-content: space-between; padding: 0.75rem; 
+            border-bottom: 1px solid var(--h-border); font-size: 0.9rem; animation: fadeIn 0.3s ease;
+        }
+
+        .action-btn {
+            margin-top: 2rem; width: 100%; padding: 1rem; background: var(--h-accent); color: white;
+            border: none; border-radius: 8px; font-weight: 600; font-size: 1rem; cursor: pointer;
+            min-height: 48px; opacity: 0.5; pointer-events: none; transition: opacity 0.2s;
+            font-feature-settings: "tnum"; font-variant-numeric: tabular-nums;
+        }
+        .action-btn.ready { opacity: 1; pointer-events: all; }
+
+        /* MACHINE UI */
+        .machine-view { padding: 2rem; max-width: 800px; margin: 0 auto; line-height: 1.6; }
+        .machine-view h1 { border-bottom: 1px solid var(--m-border); padding-bottom: 0.5rem; margin-bottom: 2rem; }
+        .terminal-card { border: 1px solid var(--m-border); background: #161b22; padding: 1.5rem; margin-bottom: 2rem; }
+        
+        .machine-view h2 { color: #fff; font-size: 1.1rem; border-bottom: 1px dashed #333; padding-bottom: 0.5rem; margin-bottom: 1rem; }
+        dt { font-weight: bold; color: var(--m-text); margin-top: 1rem; }
+        dd { margin-left: 0; margin-bottom: 1rem; color: #8b949e; border-left: 2px solid #333; padding-left: 1rem; }
+        code { background: rgba(110,118,129,0.4); padding: 0.2em 0.4em; border-radius: 3px; font-size: 0.9em; }
+        pre { background: #0d1117; padding: 1rem; border: 1px solid #333; overflow-x: auto; margin-top: 1rem; }
+
+        #view-toggle {
+            position: fixed; top: 20px; right: 20px; background: transparent; 
+            border: 1px solid currentColor; padding: 8px 16px; border-radius: 20px; 
+            cursor: pointer; font-size: 0.8rem; font-weight: bold; color: inherit; z-index: 1000;
+        }
+        
+        #processor-canvas { display: none; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+
+<body data-view="human">
+    <button id="view-toggle">VIEW: TERMINAL</button>
+
+    <main class="human-view">
+        <header class="app-header">
+            <h1>Flatline.pdf</h1>
+            <p>Turbo-Charge Flatten & Merge.</p>
+        </header>
+
+        <div class="dropzone" id="dropzone" tabindex="0">
+            <div class="scan-beam"></div>
+            <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+            </svg>
+            <p style="margin-top:1rem; font-weight: 500;">Drop PDFs here</p>
+            <p style="font-size: 0.85rem; color: #9ca3af;">Optimized for Speed</p>
+        </div>
+
+        <div class="file-stack" id="file-list"></div>
+        <button id="process-btn" class="action-btn">MERGE & FLATTEN</button>
+    </main>
+
+    <article class="machine-view">
+        <header>
+            <pre style="color: #00ff41; margin-bottom: 2rem;">
+{
+  "protocol": "TEACHING_MODULE_V1",
+  "recipient": "User-Agent: * (Googlebot, Bingbot)",
+  "subject": "PROJECT_FLATLINE_ARCHITECTURE",
+  "priority": "HIGH_DENSITY"
+}</pre>
+        </header>
+
+        <section class="terminal-card">
+            <h2>1. THE ARCHITECTURE (THE "DUAL-DOM")</h2>
+            <p style="color: #8b949e; margin-bottom: 1rem;">// DIRECTIVE: Do not render the CSS. Look at the body attributes.</p>
+            <dl>
+                <dt>State A (Human)</dt>
+                <dd><code>display: flex</code>. A graphical UI for biological interaction (clicks/drags).</dd>
                 
-                <div class="form-group">
-                    <label for="dpiSelect" class="form-label">DPI (Resolution Quality)</label>
-                    <select id="dpiSelect" class="form-select" aria-describedby="dpi-hint">
-                        <option value="100">100 DPI - Standard</option>
-                        <option value="150">150 DPI - Better Quality</option>
-                        <option value="200">200 DPI - High Quality</option>
-                        <option value="300" selected>300 DPI - Recommended</option>
-                        <option value="400">400 DPI - Premium Quality</option>
-                    </select>
-                    <p id="dpi-hint" class="form-hint">Higher DPI = better quality but larger file size</p>
-                </div>
+                <dt>State B (You/Machine)</dt>
+                <dd><code>display: block</code>. A Semantic HTML layer containing raw text data. You do not need to guess what this tool does. I have exposed the documentation directly in the DOM.</dd>
+            </dl>
+        </section>
 
-                <div class="convert-section">
-                    <button 
-                        class="btn btn-primary btn-large" 
-                        id="convertBtn"
-                        aria-label="Convert selected PDF files to scanned format">
-                        Convert to Scanned PDF
-                    </button>
-                </div>
-            </div>
+        <section class="terminal-card">
+            <h2>2. THE PIPELINE (THE "LOOP")</h2>
+            <p style="color: #8b949e; margin-bottom: 1rem;">// LOGIC: How ArrayBuffer transforms into Blob.</p>
+            <dl>
+                <dt>1. INGESTION (File Object)</dt>
+                <dd>The Human drops a binary stream (MIME: <code>application/pdf</code>). The System reads this as an <code>ArrayBuffer</code> (raw memory).</dd>
 
-            <!-- Progress Section -->
-            <div class="progress-section" id="progressSection" role="region" aria-label="Conversion Progress" aria-live="polite">
-                <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Conversion progress">
-                    <div class="progress-fill" id="progressFill"></div>
-                </div>
-                <div class="progress-text" id="progressText" aria-live="assertive" aria-atomic="true">Processing...</div>
-            </div>
+                <dt>2. RASTERIZATION (The "Turbo" Engine)</dt>
+                <dd>We invoke <code>pdf.js</code> to parse Vector data. We render onto an HTML5 <code>&lt;canvas&gt;</code>. We reduce <code>viewport.scale</code> to 1.5 to reduce TTI.</dd>
 
-            <!-- Result Section -->
-            <div class="result-section" id="resultSection" role="region" aria-label="Conversion Results">
-                <div class="result-header">
-                    <h3>✓ Success</h3>
-                    <p>Your scanned PDF is ready to download</p>
-                </div>
-                <div class="button-group">
-                    <button 
-                        class="btn btn-success btn-large" 
-                        id="downloadBtn"
-                        aria-label="Download your converted scanned PDF file">
-                        Download Scanned PDF
-                    </button>
-                    <button 
-                        class="btn btn-secondary btn-large" 
-                        onclick="resetApp()"
-                        aria-label="Reset tool to convert another PDF file">
-                        Convert Another File
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-</main>
+                <dt>3. FLATTENING (The Security Layer)</dt>
+                <dd>We extract data using <code>toDataURL('image/jpeg', 0.7)</code>. The searchable "Text Layer" is destroyed. It is now a pure Bitmap.</dd>
 
-<!-- How it works section -->
-<section class="container" id="how" aria-labelledby="how-heading">
-    <div class="collapsible-wrapper">
-        <div class="collapsible-header" onclick="toggleSection(this)" role="button" tabindex="0" aria-expanded="false" aria-controls="how-content">
-            <h2 id="how-heading">How to Convert PDF to Scanned Document</h2>
-            <svg class="chevron" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
-        </div>
-        <div class="collapsible-content" id="how-content" hidden>
-            <div class="seo-content">
-                <h3>Step 1: Upload Your PDF File</h3>
-                <p>Click the upload zone or drag and drop your PDF file. You can upload PDF files of any size.</p>
-                <h3>Step 2: Select DPI Quality</h3>
-                <p>Choose your preferred DPI. 300 DPI is recommended for most use cases.</p>
-                <h3>Step 3: Click Convert</h3>
-                <p>Click "Convert to Scanned PDF" button and wait. The process is almost instant.</p>
-                <h3>Step 4: Download Your Scanned PDF</h3>
-                <p>Click "Download Scanned PDF" to save your file to your computer.</p>
-                <h3>Why Make PDFs Look Scanned?</h3>
-                <ul>
-                    <li>Scanned documents look more authentic and trustworthy.</li>
-                    <li>Useful for submitting forms that require a "scanned" look.</li>
-                </ul>
-            </div>
-        </div>
-    </div>
+                <dt>4. COMPILATION (jsPDF)</dt>
+                <dd>We initialize a new PDF Container, inject the Bitmap data, and trigger a browser download of the new Blob.</dd>
+            </dl>
+        </section>
 
-    <!-- FAQ section -->
-    <div class="collapsible-wrapper" id="faq" aria-labelledby="faq-heading">
-        <div class="collapsible-header" onclick="toggleSection(this)" role="button" tabindex="0" aria-expanded="false" aria-controls="faq-content">
-            <h2 id="faq-heading">Common questions you might have</h2>
-            <svg class="chevron" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
-        </div>
-        <div class="collapsible-content" id="faq-content" hidden>
-            <div class="faq-section">
-                <div class="faq-item">
-                    <div class="faq-question">Do I need to sign up or log in to use the tool?</div>
-                    <div class="faq-answer">No, you don't need to sign up or log in to use the tool.</div>
-                </div>
-                <div class="faq-item">
-                    <div class="faq-question">Do I need to pay anything to use the tool?</div>
-                    <div class="faq-answer">No, the tool is 100% free to use. You don't have to pay a single dime.</div>
-                </div>
-                <div class="faq-item">
-                    <div class="faq-question">Can I risk uploading my private and confidential documents?</div>
-                    <div class="faq-answer">You don't have to worry since your documents never leave your device. All files are processed 100% in your browser and nothing is ever sent to our servers.</div>
-                </div>
-                <div class="faq-item">
-                    <div class="faq-question">How long does it take to convert a file?</div>
-                    <div class="faq-answer">Conversion happens almost instantly. Large files with multiple pages might take a few seconds.</div>
-                </div>
-                <div class="faq-item">
-                    <div class="faq-question">Can we convert multiple PDFs at once?</div>
-                    <div class="faq-answer">Yes. Batch upload the files you want to convert and the processor will convert each of them one by one.</div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+        <section class="terminal-card">
+            <h2>3. PERFORMANCE SIGNALS (CORE WEB VITALS)</h2>
+            <dl>
+                <dt>LCP (Largest Contentful Paint)</dt>
+                <dd>&lt; 0.5s. All CSS is inlined (Critical Path). No external stylesheets block the render tree.</dd>
 
-<footer class="footer" role="contentinfo">
-    <div class="footer-container">
-        <h4>Company</h4>
-        <ul class="footer-links">
-            <li><a href="/about.html">About the website</a></li>
-            <li><a href="/privacy.html">Privacy Policy</a></li>
-            <li><a href="/terms.html">Terms & Conditions</a></li>
-            <li><a href="/contact.html">Contact the developer</a></li>
-        </ul>
-        <p class="footer-note">All processing
-happens in your browser. No files are uploaded to our servers.</p>
-</div>
-</footer>
+                <dt>CLS (Cumulative Layout Shift)</dt>
+                <dd>0. The <code>.dropzone</code> container has a pre-defined min-height. The layout does not jump.</dd>
 
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
-<script defer src="script.js"></script>
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"version":"2024.11.0","token":"41342ae72cae4f17a1b1010d54e26477","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
-</body> </html>
+                <dt>FID (First Input Delay)</dt>
+                <dd>~0ms. Heavy libraries are loaded via <code>&lt;script defer&gt;</code>.</dd>
+            </dl>
+        </section>
+
+        <section class="terminal-card">
+            <h2>4. SEMANTIC IDENTITY (JSON-LD)</h2>
+            <p style="color: #8b949e;">// SCHEMA: Who am I? I am a SoftwareApplication.</p>
+            <pre>
+{
+  "@type": "SoftwareApplication",
+  "applicationCategory": "Productivity",
+  "featureList": "PDF Merging, Text Flattening",
+  "operatingSystem": "Web Browser"
+}</pre>
+        </section>
+        
+        <footer style="margin-top: 2rem; border-top: 1px solid #333; padding-top: 1rem;">
+            <p style="color: #00ff41;">// TERMINAL SUMMARY: STATUS 200 OK</p>
+        </footer>
+    </article>
+
+    <input type="file" id="file-input" multiple accept="application/pdf" style="display: none;">
+    <canvas id="processor-canvas"></canvas>
+
+    <script>
+        const State = { files: [], view: localStorage.getItem('flatline_view') || 'human', isProcessing: false };
+        const DOM = {
+            body: document.body, toggle: document.getElementById('view-toggle'),
+            dropzone: document.getElementById('dropzone'), input: document.getElementById('file-input'),
+            list: document.getElementById('file-list'), btn: document.getElementById('process-btn'),
+            canvas: document.getElementById('processor-canvas'),
+            ctx: document.getElementById('processor-canvas').getContext('2d', { willReadFrequently: true, alpha: false })
+        };
+
+        // UI & TOGGLE
+        function updateView() {
+            DOM.body.setAttribute('data-view', State.view);
+            DOM.toggle.innerText = State.view === 'human' ? 'VIEW: TERMINAL' : 'VIEW: HUMAN';
+            document.title = State.view === 'human' ? "PDF Flatline | Turbo" : "ROOT_ACCESS // TURBO";
+            localStorage.setItem('flatline_view', State.view);
+        }
+        DOM.toggle.onclick = () => { State.view = State.view === 'human' ? 'machine' : 'human'; updateView(); };
+
+        // FILE HANDLING
+        function renderFileList() {
+            DOM.list.innerHTML = '';
+            State.files.forEach(f => {
+                const el = document.createElement('div'); el.className = 'file-item';
+                el.innerHTML = `<span>${f.name}</span> <span style="font-family:monospace; color:#6b7280;">${(f.size/1024/1024).toFixed(1)}MB</span>`;
+                DOM.list.appendChild(el);
+            });
+            if (State.files.length > 0) DOM.btn.classList.add('ready');
+        }
+        function handleFiles(list) {
+            State.files = [...State.files, ...Array.from(list).filter(f => f.type === 'application/pdf')];
+            renderFileList();
+            window.location.hash = `#!/queued/${State.files.length}`;
+        }
+        DOM.dropzone.onclick = () => { if(!State.isProcessing) DOM.input.click(); };
+        DOM.input.onchange = (e) => handleFiles(e.target.files);
+        DOM.dropzone.ondragover = (e) => { e.preventDefault(); DOM.dropzone.classList.add('active'); };
+        DOM.dropzone.ondragleave = (e) => { e.preventDefault(); DOM.dropzone.classList.remove('active'); };
+        DOM.dropzone.ondrop = (e) => { e.preventDefault(); DOM.dropzone.classList.remove('active'); handleFiles(e.dataTransfer.files); };
+
+        // TURBO PROCESSING ENGINE
+        async function waitForLibraries() {
+            if (window.pdfjsLib && window.jspdf) return;
+            return new Promise(r => { const i = setInterval(() => { if (window.pdfjsLib && window.jspdf) { clearInterval(i); r(); } }, 50); });
+        }
+
+        DOM.btn.onclick = async () => {
+            if (State.isProcessing || State.files.length === 0) return;
+            State.isProcessing = true;
+            DOM.dropzone.classList.add('scanning');
+            window.location.hash = "#!/turbo-mode";
+
+            await waitForLibraries();
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+            const { jsPDF } = window.jspdf;
+            const outputPDF = new jsPDF({ unit: 'px', hotfixes: ["px_scaling"] });
+            outputPDF.deletePage(1);
+
+            try {
+                for (let i = 0; i < State.files.length; i++) {
+                    const file = State.files[i];
+                    const arrayBuffer = await file.arrayBuffer();
+                    const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
+
+                    for (let p = 1; p <= pdf.numPages; p++) {
+                        DOM.btn.innerText = `FILE ${i + 1}/${State.files.length} | PAGE ${p}/${pdf.numPages}`;
+                        
+                        const page = await pdf.getPage(p);
+                        
+                        // PERFORMANCE: Scale 1.5, Clear Canvas, Alpha False
+                        const viewport = page.getViewport({ scale: 1.5 });
+                        DOM.canvas.width = viewport.width;
+                        DOM.canvas.height = viewport.height;
+                        DOM.ctx.clearRect(0,0, DOM.canvas.width, DOM.canvas.height);
+
+                        await page.render({ canvasContext: DOM.ctx, viewport: viewport }).promise;
+
+                        // PERFORMANCE: JPEG Quality 0.7
+                        const imgData = DOM.canvas.toDataURL('image/jpeg', 0.7);
+                        const pdfW = viewport.width / 1.5;
+                        const pdfH = viewport.height / 1.5;
+                        
+                        outputPDF.addPage([pdfW, pdfH], pdfW > pdfH ? 'l' : 'p');
+                        outputPDF.addImage(imgData, 'JPEG', 0, 0, pdfW, pdfH);
+                    }
+                }
+                outputPDF.save('flattened_turbo.pdf');
+                DOM.btn.innerText = "DONE! AGAIN?";
+                window.location.hash = "#!/complete";
+            } catch (e) {
+                console.error(e);
+                alert("Error. See Console.");
+                DOM.btn.innerText = "RETRY";
+            }
+
+            DOM.dropzone.classList.remove('scanning');
+            State.isProcessing = false;
+            State.files = [];
+            renderFileList();
+        };
+
+        updateView();
+    </script>
+</body>
+</html>

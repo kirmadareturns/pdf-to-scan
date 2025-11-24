@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Merge HTML CSS JS - Combine Files into Single HTML</title>
+    <meta name="description" content="Merge separate HTML, CSS, and JavaScript files into a single HTML document. Paste code or upload files.">
+    <style>
+        /* ===== CSS Variables ===== */
+        :root {
+            --primary: #E3362B;
+            --primary-dark: #c4251b;
+            --bg-light: #f4f4f9;
+            --text-dark: #333;
+            --border-color: #ddd;
+            --success-green: #28a745;
+        }
+
+        /* ===== Global Styles ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+            background: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            padding: 40px;
+        }
+
+        /* ===== Header ===== */
+        h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            color: var(--text-dark);
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        /* ===== Tab Navigation ===== */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .tab-button {
+            padding: 12px 24px;
+            border: none;
+            background: none;
+            color: #666;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            position: relative;
+            top: 2px;
+        }
+
+        .tab-button:hover {
+            color: var(--primary);
+        }
+
+        .tab-button.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab-button:focus {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
+
+        /* ===== Tab Content Panels ===== */
+        .tab-content {
+            display: none;
+            padding: 20px 0;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* ===== Input Section ===== */
+        .input-section {
+            margin-bottom: 20px;
+        }
+
+        .input-methods {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .file-upload-btn {
+            padding: 10px 20px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .file-upload-btn:focus {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .file-name {
+            padding: 10px;
+            color: #666;
+            font-size: 14px;
+            font-style: italic;
+        }
+
+        /* ===== Textarea Styles ===== */
+        textarea {
+            width: 100%;
+            min-height: 300px;
+            padding: 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        textarea::placeholder {
+            color: #999;
+        }
+
+        /* ===== Stats Display ===== */
+        .stats {
+            display: flex;
+            gap: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .stat-label {
+            font-weight: 600;
+            color: #666;
+        }
+
+        .stat-value {
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        /* ===== Action Buttons ===== */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: 700;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .btn:focus {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(227, 54, 43, 0.3);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+            color: white;
+            display: none;
+        }
+
+        .btn-success.show {
+            display: inline-block;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        /* ===== Output Section ===== */
+        .output-section {
+            display: none;
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 2px solid var(--success-green);
+        }
+
+        .output-section.show {
+            display: block;
+        }
+
+        .output-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .output-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--success-green);
+        }
+
+        .output-preview {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            max-height: 300px;
+            overflow: auto;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        /* ===== Responsive Design ===== */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .tabs {
+                flex-direction: column;
+                gap: 0;
+            }
+
+            .tab-button {
+                border-bottom: none;
+                border-left: 3px solid transparent;
+                text-align: left;
+                padding: 12px 15px;
+            }
+
+            .tab-button.active {
+                border-left-color: var(--primary);
+                border-bottom-color: transparent;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header Section -->
+        <h1>HTML CSS JS Merger</h1>
+        <p class="subtitle">Combine separate HTML, CSS, and JavaScript files into a single HTML document</p>
+
+        <!-- Tab Navigation -->
+        <div class="tabs" role="tablist">
+            <button 
+                class="tab-button active" 
+                role="tab" 
+                aria-selected="true" 
+                aria-controls="html-panel" 
+                onclick="switchTab('html')"
+                id="html-tab">
+                HTML
+            </button>
+            <button 
+                class="tab-button" 
+                role="tab" 
+                aria-selected="false" 
+                aria-controls="css-panel" 
+                onclick="switchTab('css')"
+                id="css-tab">
+                CSS
+            </button>
+            <button 
+                class="tab-button" 
+                role="tab" 
+                aria-selected="false" 
+                aria-controls="js-panel" 
+                onclick="switchTab('js')"
+                id="js-tab">
+                JavaScript
+            </button>
+        </div>
+
+        <!-- HTML Tab Panel -->
+        <div class="tab-content active" id="html-panel" role="tabpanel" aria-labelledby="html-tab">
+            <div class="input-section">
+                <div class="input-methods">
+                    <label for="html-file-input">
+                        <button class="file-upload-btn" onclick="document.getElementById('html-file-input').click()">
+                            📁 Upload HTML File
+                        </button>
+                    </label>
+                    <input type="file" id="html-file-input" accept=".html,.htm" onchange="handleFileUpload('html', this)">
+                    <span class="file-name" id="html-file-name"></span>
+                </div>
+                <textarea 
+                    id="html-input" 
+                    placeholder="Paste your HTML code here or upload a file above..."
+                    oninput="updateStats('html')"
+                    aria-label="HTML code input"></textarea>
+                <div class="stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Characters:</span>
+                        <span class="stat-value" id="html-chars">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Size:</span>
+                        <span class="stat-value" id="html-size">0 B</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CSS Tab Panel -->
+        <div class="tab-content" id="css-panel" role="tabpanel" aria-labelledby="css-tab">
+            <div class="input-section">
+                <div class="input-methods">
+                    <label for="css-file-input">
+                        <button class="file-upload-btn" onclick="document.getElementById('css-file-input').click()">
+                            📁 Upload CSS File
+                        </button>
+                    </label>
+                    <input type="file" id="css-file-input" accept=".css" onchange="handleFileUpload('css', this)">
+                    <span class="file-name" id="css-file-name"></span>
+                </div>
+                <textarea 
+                    id="css-input" 
+                    placeholder="Paste your CSS code here or upload a file above..."
+                    oninput="updateStats('css')"
+                    aria-label="CSS code input"></textarea>
+                <div class="stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Characters:</span>
+                        <span class="stat-value" id="css-chars">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Size:</span>
+                        <span class="stat-value" id="css-size">0 B</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- JavaScript Tab Panel -->
+        <div class="tab-content" id="js-panel" role="tabpanel" aria-labelledby="js-tab">
+            <div class="input-section">
+                <div class="input-methods">
+                    <label for="js-file-input">
+                        <button class="file-upload-btn" onclick="document.getElementById('js-file-input').click()">
+                            📁 Upload JavaScript File
+                        </button>
+                    </label>
+                    <input type="file" id="js-file-input" accept=".js" onchange="handleFileUpload('js', this)">
+                    <span class="file-name" id="js-file-name"></span>
+                </div>
+                <textarea 
+                    id="js-input" 
+                    placeholder="Paste your JavaScript code here or upload a file above..."
+                    oninput="updateStats('js')"
+                    aria-label="JavaScript code input"></textarea>
+                <div class="stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Characters:</span>
+                        <span class="stat-value" id="js-chars">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Size:</span>
+                        <span class="stat-value" id="js-size">0 B</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <button class="btn btn-primary" onclick="mergeFiles()" aria-label="Merge all files into single HTML">
+                🔗 Merge Files
+            </button>
+            <button class="btn btn-success" id="download-btn" onclick="downloadMerged()" aria-label="Download merged HTML file">
+                ⬇️ Download Merged HTML
+            </button>
+            <button class="btn btn-secondary" onclick="clearAll()" aria-label="Clear all inputs">
+                🗑️ Clear All
+            </button>
+        </div>
+
+        <!-- Output Section -->
+        <div class="output-section" id="output-section">
+            <div class="output-header">
+                <span class="output-title">✅ Merged Successfully!</span>
+                <div class="stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Total Size:</span>
+                        <span class="stat-value" id="merged-size">0 B</span>
+                    </div>
+                </div>
+            </div>
+            <div class="output-preview" id="output-preview"></div>
+        </div>
+    </div>
+
+    <script>
+        // ===== State Management =====
+        let mergedContent = '';
+
+        // ===== Tab Switching Function =====
+        function switchTab(tabName) {
+            // Hide all tab contents
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // Deactivate all tab buttons
+            const tabButtons = document.querySelectorAll('.tab-button');
+            tabButtons.forEach(button => {
+                button.classList.remove('active');
+                button.setAttribute('aria-selected', 'false');
+            });
+
+            // Activate selected tab
+            const selectedPanel = document.getElementById(`${tabName}-panel`);
+            const selectedButton = document.getElementById(`${tabName}-tab`);
+            
+            if (selectedPanel && selectedButton) {
+                selectedPanel.classList.add('active');
+                selectedButton.classList.add('active');
+                selectedButton.setAttribute('aria-selected', 'true');
+            }
+        }
+
+        // ===== File Upload Handler =====
+        function handleFileUpload(type, input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            // Display file name
+            const fileNameElement = document.getElementById(`${type}-file-name`);
+            fileNameElement.textContent = `📄 ${file.name}`;
+
+            // Read file content
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const content = e.target.result;
+                const textarea = document.getElementById(`${type}-input`);
+                textarea.value = content;
+                updateStats(type);
+            };
+            reader.onerror = function() {
+                alert(`Error reading ${type.toUpperCase()} file. Please try again.`);
+            };
+            reader.readAsText(file);
+        }
+
+        // ===== Statistics Update Function =====
+        function updateStats(type) {
+            const textarea = document.getElementById(`${type}-input`);
+            const content = textarea.value;
+            const charCount = content.length;
+            const byteSize = new Blob([content]).size;
+
+            // Update character count
+            document.getElementById(`${type}-chars`).textContent = charCount.toLocaleString();
+
+            // Update file size with appropriate unit
+            document.getElementById(`${type}-size`).textContent = formatBytes(byteSize);
+        }
+
+        // ===== Format Bytes Helper Function =====
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // ===== Merge Files Function =====
+        function mergeFiles() {
+            // Get content from all textareas
+            const htmlContent = document.getElementById('html-input').value.trim();
+            const cssContent = document.getElementById('css-input').value.trim();
+            const jsContent = document.getElementById('js-input').value.trim();
+
+            // Check if at least one input has content
+            if (!htmlContent && !cssContent && !jsContent) {
+                alert('Please add some content to at least one field before merging.');
+                return;
+            }
+
+            // Extract body content from HTML if it contains full HTML structure
+            let bodyContent = htmlContent;
+            const bodyMatch = htmlContent.match(/<body[^>]*>([\s\S]*)<\/body>/i);
+            if (bodyMatch) {
+                bodyContent = bodyMatch[1].trim();
+            } else if (htmlContent.includes('<!DOCTYPE') || htmlContent.includes('<html')) {
+                // If it has DOCTYPE or html tag but no body, try to extract everything after head
+                const headEndMatch = htmlContent.match(/<\/head>/i);
+                if (headEndMatch) {
+                    bodyContent = htmlContent.substring(headEndMatch.index + 7).replace(/<\/?html>/gi, '').replace(/<\/?body[^>]*>/gi, '').trim();
+                }
+            }
+
+            // Build the merged HTML document
+            mergedContent = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Merged Document</title>`;
+
+            // Add CSS if provided
+            if (cssContent) {
+                mergedContent += `
+    <style>
+${cssContent}
+    </style>`;
+            }
+
+            mergedContent += `
+</head>
+<body>
+${bodyContent}`;
+
+            // Add JavaScript if provided
+            if (jsContent) {
+                mergedContent += `
+    <script>
+${jsContent}
+    </script>`;
+            }
+
+            mergedContent += `
+</body>
+</html>`;
+
+            // Display preview (first 1000 characters)
+            const preview = mergedContent.length > 1000 
+                ? mergedContent.substring(0, 1000) + '\n\n... (truncated for preview)'
+                : mergedContent;
+            
+            document.getElementById('output-preview').textContent = preview;
+
+            // Calculate and display merged file size
+            const mergedSize = new Blob([mergedContent]).size;
+            document.getElementById('merged-size').textContent = formatBytes(mergedSize);
+
+            // Show output section and download button
+            document.getElementById('output-section').classList.add('show');
+            document.getElementById('download-btn').classList.add('show');
+
+            // Scroll to output section
+            document.getElementById('output-section').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // ===== Download Merged File Function =====
+        function downloadMerged() {
+            if (!mergedContent) {
+                alert('Please merge files first before downloading.');
+                return;
+            }
+
+            // Create blob and download link
+            const blob = new Blob([mergedContent], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'merged.html';
+            
+            // Trigger download
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // Clean up the URL object
+            URL.revokeObjectURL(url);
+        }
+
+        // ===== Clear All Function =====
+        function clearAll() {
+            if (!confirm('Are you sure you want to clear all inputs? This cannot be undone.')) {
+                return;
+            }
+
+            // Clear all textareas
+            document.getElementById('html-input').value = '';
+            document.getElementById('css-input').value = '';
+            document.getElementById('js-input').value = '';
+
+            // Clear all file inputs
+            document.getElementById('html-file-input').value = '';
+            document.getElementById('css-file-input').value = '';
+            document.getElementById('js-file-input').value = '';
+
+            // Clear file name displays
+            document.getElementById('html-file-name').textContent = '';
+            document.getElementById('css-file-name').textContent = '';
+            document.getElementById('js-file-name').textContent = '';
+
+            // Update all stats to zero
+            updateStats('html');
+            updateStats('css');
+            updateStats('js');
+
+            // Hide output section and download button
+            document.getElementById('output-section').classList.remove('show');
+            document.getElementById('download-btn').classList.remove('show');
+
+            // Clear merged content
+            mergedContent = '';
+
+            // Switch to first tab
+            switchTab('html');
+        }
+
+        // ===== Initialize stats on page load =====
+        window.addEventListener('DOMContentLoaded', function() {
+            updateStats('html');
+            updateStats('css');
+            updateStats('js');
+        });
+    </script>
+</body>
+</html>

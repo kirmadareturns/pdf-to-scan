@@ -44,41 +44,103 @@
 </script>
 
     <style>
-    .machine-view { padding: 1.5rem; max-width: 800px; margin: 0 auto; line-height: 1.6; font-size: 14px; }
-    .machine-view h1 { border-bottom: 1px solid var(--m-border); padding-bottom: 0.5rem; margin-bottom: 1.5rem; word-break: break-word; }
-    .terminal-card { 
-        border: 1px solid var(--m-border); background: #161b22; padding: 1rem; margin-bottom: 2rem; overflow-x: hidden; 
-    }
-    dt { font-weight: bold; color: var(--m-text); margin-top: 1rem; }
-    dd { margin-left: 0; margin-bottom: 1rem; color: #8b949e; border-left: 2px solid #333; padding-left: 1rem; word-wrap: break-word; }
-    pre { 
-        background: #0d1117; padding: 1rem; border: 1px solid #333; 
-        white-space: pre-wrap; word-wrap: break-word; /* Fixes mobile overflow */
-        margin-top: 1rem; font-size: 0.8em;
-    }
-    /* --- TOGGLE BUTTON --- */
-    #view-toggle {
-        position: absolute; top: 20px; right: 20px; background: transparent; 
-        border: 1px solid currentColor; padding: 6px 12px; border-radius: 20px; 
-        cursor: pointer; font-size: 0.75rem; font-weight: bold; color: inherit; z-index: 100;
-    }
-    /* --- MOBILE SPECIFIC OVERRIDES --- */
-    @media (max-width: 480px) {
-        /* Shrink text for small screens */
-        .app-header h1 { font-size: 1.8rem; padding-right: 60px; /* Space for toggle */ text-align: left; }
-        .app-header p { text-align: left; font-size: 0.9rem; }
+     :root {
+            /* Human Theme */
+            --h-bg: #ffffff; --h-text: #111827; --h-accent: #000000;
+            --h-laser: #06b6d4; --h-surface: #f3ff6; --h-border: #e5e7eb;
+            
+            /* Machine Theme */
+            --m-bg: #0d1117; --m-text: #58a6ff; --m-border: #30363d; --m-font: 'Courier New', monospace;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { height: 100%; width: 100%; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; transition: background 0.3s ease; }
+
+        /* VIEW TOGGLE */
+        body[data-view="human"] { background: var(--h-bg); color: var(--h-text); }
+        body[data-view="human"] .machine-view { display: none; }
+        body[data-view="human"] .human-view { display: flex; }
+
+        body[data-view="machine"] { background: var(--m-bg); color: var(--m-text); font-family: var(--m-font); }
+        body[data-view="machine"] .human-view { display: none; }
+        body[data-view="machine"] .machine-view { display: block; }
+
+        /* HUMAN UI */
+        .human-view {
+            flex-direction: column; align-items: center; justify-content: center;
+            min-height: 100vh; padding: 20px; max-width: 600px; margin: 0 auto;
+        }
+
+        .app-header { margin-bottom: 2rem; text-align: center; }
+        .app-header h1 { font-size: 2.5rem; letter-spacing: -0.05em; margin-bottom: 0.5rem; }
+        .app-header p { color: #6b7280; }
+
+        .dropzone {
+            width: 100%; background: var(--h-surface); border: 2px dashed var(--h-border);
+            border-radius: 16px; padding: 3rem 1rem; text-align: center; cursor: pointer;
+            transition: all 0.2s ease; position: relative; overflow: hidden;
+            min-height: 250px; display: flex; flex-direction: column; justify-content: center; align-items: center;
+        }
+        .dropzone:hover, .dropzone.active { border-color: var(--h-accent); background: #f9fafb; transform: scale(1.01); }
+
+        /* FAST LASER */
+        .scan-beam {
+            position: absolute; top: 0; left: 0; width: 100%; height: 4px;
+            background: var(--h-laser); box-shadow: 0 0 15px var(--h-laser), 0 0 30px var(--h-laser);
+            opacity: 0; z-index: 10; pointer-events: none;
+        }
+        .dropzone.scanning { border-color: var(--h-laser); background: #ecfeff; cursor: wait; }
+        .dropzone.scanning .scan-beam {
+            opacity: 1; 
+            animation: scanner 0.6s cubic-bezier(0.4, 0, 0.2, 1) infinite; /* SUPER FAST ANIMATION */
+            will-change: top;
+        }
+        @keyframes scanner { 
+            0% { top: 0%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { top: 100%; opacity: 0; } 
+        }
+
+        .file-stack { margin-top: 1.5rem; width: 100%; text-align: left; }
+        .file-item { 
+            display: flex; justify-content: space-between; padding: 0.75rem; 
+            border-bottom: 1px solid var(--h-border); font-size: 0.9rem; animation: fadeIn 0.3s ease;
+        }
+
+        .action-btn {
+            margin-top: 2rem; width: 100%; padding: 1rem; background: var(--h-accent); color: white;
+            border: none; border-radius: 8px; font-weight: 600; font-size: 1rem; cursor: pointer;
+            min-height: 48px; opacity: 0.5; pointer-events: none; transition: opacity 0.2s;
+            font-feature-settings: "tnum"; font-variant-numeric: tabular-nums;
+        }
+        .action-btn.ready { opacity: 1; pointer-events: all; }
+
+        /* DROPDOWN STYLES */
+        .dropdown { position: relative; display: inline-block; margin-top: 0.75rem; }
+        .dropdown-toggle { color: var(--h-laser); text-decoration: none; font-weight: 600; font-size: 0.9rem; cursor: pointer; }
+        .dropdown-menu { display: none; position: absolute; background: white; border: 1px solid var(--h-border); border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); min-width: 200px; z-index: 1000; margin-top: 0.5rem; }
+        .dropdown:hover .dropdown-menu { display: block; }
+        .dropdown-menu a { display: block; padding: 0.75rem 1rem; color: var(--h-text); text-decoration: none; transition: background 0.2s; }
+        .dropdown-menu a:hover { background: var(--h-surface); }
+
+        /* MACHINE UI */
+        .machine-view { padding: 2rem; max-width: 800px; margin: 0 auto; line-height: 1.6; }
+        .machine-view h1 { border-bottom: 1px solid var(--m-border); padding-bottom: 0.5rem; margin-bottom: 2rem; }
+        .terminal-card { border: 1px solid var(--m-border); background: #161b22; padding: 1.5rem; margin-bottom: 2rem; }
         
-        /* Adjust toggle position */
-        #view-toggle { top: 20px; right: 15px; }
-        /* Compact Dropzone */
-        .dropzone { padding: 1.5rem 1rem; min-height: 180px; }
+        .machine-view h2 { color: #fff; font-size: 1.1rem; border-bottom: 1px dashed #333; padding-bottom: 0.5rem; margin-bottom: 1rem; }
+        dt { font-weight: bold; color: var(--m-text); margin-top: 1rem; }
+        dd { margin-left: 0; margin-bottom: 1rem; color: #8b949e; border-left: 2px solid #333; padding-left: 1rem; }
+        code { background: rgba(110,118,129,0.4); padding: 0.2em 0.4em; border-radius: 3px; font-size: 0.9em; }
+        pre { background: #0d1117; padding: 1rem; border: 1px solid #333; overflow-x: auto; margin-top: 1rem; }
+
+        #view-toggle {
+            position: fixed; top: 20px; right: 20px; background: transparent; 
+            border: 1px solid currentColor; padding: 8px 16px; border-radius: 20px; 
+            cursor: pointer; font-size: 0.8rem; font-weight: bold; color: inherit; z-index: 1000;
+        }
         
-        /* AdSense Adjustment for small screens */
-        .ad-slot { min-height: 250px; margin: 1rem 0; }
-    }
-    #processor-canvas { display: none; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-</style>
+        #processor-canvas { display: none; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }</style>
 
 </head>
 

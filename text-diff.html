@@ -1,31 +1,172 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Side-by-side Diff (Worker, no-freeze)</title>
 <style>
-    body { font-family: monospace; display: flex; flex-direction: column; gap: 10px; }
-    textarea { width: 48%; height: 180px; }
-    .container { display: flex; gap: 10px; }
-    .panel {
-        width: 50%;
-        border: 1px solid #ccc;
-        padding: 10px;
-        overflow: auto;
-        height: 400px;
-        white-space: pre-wrap;
-        background: #fafafa;
-    }
-    .removed { background: #ffe0e0; color: #900; }
-    .added { background: #e0ffe0; color: #090; }
-    .same { color: #000; }
+  body { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, monospace; margin: 12px; }
+  .top { display:flex; gap:10px; margin-bottom:8px; }
+  textarea { width:48%; height:160px; resize:vertical; padding:8px; font-size:13px; line-height:1.35; }
+  .btn { padding:8px 12px; font-weight:600; cursor:pointer; }
+  .container { display:flex; gap:10px; }
+  .panel {
+    width:50%;
+    border:1px solid #ddd;
+    height:420px;
+    overflow:auto;
+    white-space:pre-wrap;
+    padding:10px;
+    box-sizing:border-box;
+    background:#fff;
+  }
+  .left .removed { background:#ffefef; color:#a00; }
+  .right .added   { background:#efffef; color:#080; }
+  .same { color:#222; }
+  .chunk { display:block; }
+  .meta { font-size:12px; color:#666; margin-bottom:8px; }
 </style>
+</head>
+<body>
+  <h2>Side-by-side Code Diff — Worker (no freeze)</h2>
 
-<div class="container">
-    <textarea id="a" placeholder="OLD code"></textarea>
-    <textarea id="b" placeholder="NEW code"></textarea>
-</div>
+  <div class="top">
+    <textarea id="a" placeholder="Paste OLD / left code here...">function greet(){ console.log('hello'); }</textarea>
+    <textarea id="b" placeholder="Paste NEW / right code here...">function greet(name){ console.log('hello, '+name); }</textarea>
+  </div>
 
-<button onclick="runDiff()">Compare</button>
+  <div style="display:flex; gap:8px; margin-bottom:10px;">
+    <button id="compare" class="btn">Compare</button>
+    <button id="clear" class="btn">Clear</button>
+    <span class="meta">Large inputs OK — diff runs in background thread.</span>
+  </div>
 
-<div class="container">
-    <div id="left" class="panel"></div>
-    <div id="right" class="panel"></div>
-</div>
+  <div class="container">
+    <div id="left" class="panel left"></div>
+    <div id="right" class="panel right"></div>
+  </div>
 
-<script src="main.js"></script>
+<script>
+/*
+ Self-contained side-by-side diff using a Blob worker.
+ No separate worker file needed (avoids path/CORS issues).
+ Uses diff-match-patch inside the worker via CDN.
+*/
+
+const leftPanel = document.getElementById('left');
+const rightPanel = document.getElementById('right');
+const btn = document.getElementById('compare');
+const clearBtn = document.getElementById('clear');
+
+btn.addEventListener('click', runDiff);
+clearBtn.addEventListener('click', () => {
+  document.getElementById('a').value = '';
+  document.getElementById('b').value = '';
+  leftPanel.innerHTML = '';
+  rightPanel.innerHTML = '';
+});
+
+// Build worker source as string (includes importScripts)
+const workerSource = `
+  // inside worker scope
+  self.importScripts('https://cdn.jsdelivr.net/npm/diff-match-patch@1.0.5/index.js');
+
+  const dmp = new diff_match_patch();
+
+  function escapeHtml(t) {
+    return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  onmessage = function(e) {
+    const { a='', b='' } = e.data || {};
+    try {
+      // compute diff (character-level). For extremely large inputs
+      // you can switch to line-level by splitting on '\\n' and joining tokens.
+      const diffs = dmp.diff_main(a, b);
+      dmp.diff_cleanupSemantic(diffs);
+
+      // Build left and right HTML. We wrap each diff chunk in a block so scrolling aligns roughly.
+      let leftHtml = '';
+      let rightHtml = '';
+
+      for (let i=0; i<diffs.length; i++) {
+        const [op, text] = diffs[i];
+        const safe = escapeHtml(text);
+
+        if (op === 0) { // equal
+          leftHtml += '<span class="chunk same">' + safe + '</span>';
+          rightHtml += '<span class="chunk same">' + safe + '</span>';
+        } else if (op === -1) { // removed from a (present on left)
+          leftHtml += '<span class="chunk removed">' + safe + '</span>';
+        } else if (op === 1) { // added in b (present on right)
+          rightHtml += '<span class="chunk added">' + safe + '</span>';
+        }
+      }
+
+      // send back
+      postMessage({ left: leftHtml, right: rightHtml });
+    } catch (err) {
+      postMessage({ error: (err && err.message) || String(err) });
+    }
+  };
+`;
+
+// create blob URL
+const blob = new Blob([workerSource], { type: 'application/javascript' });
+const workerUrl = URL.createObjectURL(blob);
+const worker = new Worker(workerUrl);
+
+// handle responses
+worker.onmessage = (ev) => {
+  const data = ev.data || {};
+  if (data.error) {
+    leftPanel.textContent = 'Worker error: ' + data.error;
+    rightPanel.textContent = 'Worker error: ' + data.error;
+    console.error('Worker error:', data.error);
+    return;
+  }
+  leftPanel.innerHTML = data.left || '';
+  rightPanel.innerHTML = data.right || '';
+};
+
+// scroll sync with small throttle to prevent feedback loop
+let isSyncingLeft = false;
+let isSyncingRight = false;
+let lastSync = 0;
+const SYNC_THROTTLE = 16; // ms
+
+leftPanel.addEventListener('scroll', () => {
+  const now = performance.now();
+  if (isSyncingLeft || now - lastSync < SYNC_THROTTLE) return;
+  isSyncingRight = true;
+  rightPanel.scrollTop = leftPanel.scrollTop;
+  rightPanel.scrollLeft = leftPanel.scrollLeft;
+  lastSync = now;
+  // allow the other handler to complete then clear flags
+  setTimeout(() => isSyncingRight = false, SYNC_THROTTLE);
+});
+
+rightPanel.addEventListener('scroll', () => {
+  const now = performance.now();
+  if (isSyncingRight || now - lastSync < SYNC_THROTTLE) return;
+  isSyncingLeft = true;
+  leftPanel.scrollTop = rightPanel.scrollTop;
+  leftPanel.scrollLeft = rightPanel.scrollLeft;
+  lastSync = now;
+  setTimeout(() => isSyncingLeft = false, SYNC_THROTTLE);
+});
+
+function runDiff() {
+  const a = document.getElementById('a').value || '';
+  const b = document.getElementById('b').value || '';
+
+  // Quick guard for extremely large inputs — we still send to worker,
+  // but you might want to warn users or disable UI while computing.
+  // The worker thread protects the UI though.
+  worker.postMessage({ a, b });
+}
+
+// optional: run initial diff on page load
+// runDiff();
+</script>
+</body>
+</html>

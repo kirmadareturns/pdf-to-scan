@@ -93,6 +93,14 @@
         }
         .action-btn.ready { opacity: 1; pointer-events: all; }
 
+        /* DROPDOWN STYLES */
+        .dropdown { position: relative; display: inline-block; margin-top: 0.75rem; }
+        .dropdown-toggle { color: var(--h-laser); text-decoration: none; font-weight: 600; font-size: 0.9rem; cursor: pointer; }
+        .dropdown-menu { display: none; position: absolute; background: white; border: 1px solid var(--h-border); border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); min-width: 200px; z-index: 1000; margin-top: 0.5rem; }
+        .dropdown:hover .dropdown-menu { display: block; }
+        .dropdown-menu a { display: block; padding: 0.75rem 1rem; color: var(--h-text); text-decoration: none; transition: background 0.2s; }
+        .dropdown-menu a:hover { background: var(--h-surface); }
+
         /* MACHINE UI */
         .machine-view { padding: 2rem; max-width: 800px; margin: 0 auto; line-height: 1.6; }
         .machine-view h1 { border-bottom: 1px solid var(--m-border); padding-bottom: 0.5rem; margin-bottom: 2rem; }
@@ -125,7 +133,24 @@
         <header class="app-header">
             <h1>Make PDF Text Un-Copyable</h1>
             <p>Convert editable documents into secure, read-only images.</p>
-            <a href="https://pdftoscan.online/jpg-to-pdf" style="display: inline-block; margin-top: 0.75rem; color: var(--h-laser); text-decoration: none; font-weight: 600; font-size: 0.9rem;">JPG to PDF</a>
+            <div class="dropdown">
+                <span class="dropdown-toggle">OTHER PDF tools</span>
+                <div class="dropdown-menu">
+                    <a href="https://pdftoscan.online/clean-code.html">Clean Code</a>
+                    <a href="https://pdftoscan.online/code-formatter.html">Code Formatter</a>
+                    <a href="https://pdftoscan.online/code-splitter.html">Code Splitter</a>
+                    <a href="https://pdftoscan.online/compress-pdf.html">Compress PDF</a>
+                    <a href="https://pdftoscan.online/extra-space-remover.html">Extra Space Remover</a>
+                    <a href="https://pdftoscan.online/jpg-to-pdf.html">JPG to PDF</a>
+                    <a href="https://pdftoscan.online/merge-html-css-js.html">Merge HTML CSS JS</a>
+                    <a href="https://pdftoscan.online/merge-pdf.html">Merge PDF</a>
+                    <a href="https://pdftoscan.online/pdf-eraser.html">PDF Eraser</a>
+                    <a href="https://pdftoscan.online/rearrange-pdf.html">Rearrange PDF</a>
+                    <a href="https://pdftoscan.online/rotate-pdf.html">Rotate PDF</a>
+                    <a href="https://pdftoscan.online/split-pdf.html">Split PDF</a>
+                    <a href="https://pdftoscan.online/unlock-pdf.html">Unlock PDF</a>
+                </div>
+            </div>
         </header>
 
         <div class="dropzone" id="dropzone" tabindex="0">

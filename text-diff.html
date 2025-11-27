@@ -1,120 +1,31 @@
-<!DOCTYPE html>
-<html>
-<head>
-	<meta charset="utf-8">
-	<title>Diff</title>
-	<link rel="stylesheet" href="style.css"/>
-</head>
-<body>
+<style>
+    body { font-family: monospace; display: flex; flex-direction: column; gap: 10px; }
+    textarea { width: 48%; height: 180px; }
+    .container { display: flex; gap: 10px; }
+    .panel {
+        width: 50%;
+        border: 1px solid #ccc;
+        padding: 10px;
+        overflow: auto;
+        height: 400px;
+        white-space: pre-wrap;
+        background: #fafafa;
+    }
+    .removed { background: #ffe0e0; color: #900; }
+    .added { background: #e0ffe0; color: #090; }
+    .same { color: #000; }
+</style>
 
-<div id="settings">
-	<h1>Diff</h1>
-	<label><input type="radio" name="diff_type" value="diffChars" checked> Chars</label>
-	<label><input type="radio" name="diff_type" value="diffWords"> Words</label>
-	<label><input type="radio" name="diff_type" value="diffLines"> Lines</label>
-	<label><input type="radio" name="diff_type" value="diffPatch"> Patch</label>
+<div class="container">
+    <textarea id="a" placeholder="OLD code"></textarea>
+    <textarea id="b" placeholder="NEW code"></textarea>
 </div>
 
-<a href="https://github.com/kpdecker/jsdiff" class="source">github.com/kpdecker/jsdiff</a>
+<button onclick="runDiff()">Compare</button>
 
-<table>
-	<tr>
-		<td><textarea id="a">restaurant</textarea></td>
-		<td><textarea id="b">aura</textarea></td>
-		<td><div><pre id="result"></pre></div></td>
-	</tr>
-</table>
+<div class="container">
+    <div id="left" class="panel"></div>
+    <div id="right" class="panel"></div>
+</div>
 
-<script src="diff.js"></script>
-<script defer>
-var a = document.getElementById('a');
-var b = document.getElementById('b');
-var result = document.getElementById('result');
-
-function changed() {
-	var fragment = document.createDocumentFragment();
-	var diff;
-	if (window.diffType === 'diffPatch') {
-		// We contort the patch into a similar data structure to that returned by diffChars,
-		// diffWords, etc so that the same rendering code below can work on both.
-		var pastHunkHeader = false;
-		diff = Diff.createTwoFilesPatch('a.txt', 'b.txt', a.value, b.value)
-			.split('\n')
-			.map(function(entry) {
-				const result = {
-					value: entry + '\n',
-				};
-				if (entry.startsWith('@@')) {
-					result.chunkHeader = true;
-					pastHunkHeader = true;
-				} else if (pastHunkHeader) {
-					if (entry.startsWith('-')) {
-						result.removed = true;
-					} else if (entry.startsWith('+')) {
-						result.added = true;
-					}
-				}
-				return result;
-			});
-	} else {
-		diff = Diff[window.diffType](a.value, b.value);
-	}
-
-	for (var i=0; i < diff.length; i++) {
-
-		if (diff[i].added && diff[i + 1] && diff[i + 1].removed) {
-			var swap = diff[i];
-			diff[i] = diff[i + 1];
-			diff[i + 1] = swap;
-		}
-
-		var node;
-		if (diff[i].removed) {
-			node = document.createElement('del');
-			node.appendChild(document.createTextNode(diff[i].value));
-		} else if (diff[i].added) {
-			node = document.createElement('ins');
-			node.appendChild(document.createTextNode(diff[i].value));
-		} else if (diff[i].chunkHeader) {
-			node = document.createElement('span');
-			node.setAttribute('class', 'chunk-header');
-			node.appendChild(document.createTextNode(diff[i].value));
-		} else {
-			node = document.createTextNode(diff[i].value);
-		}
-		fragment.appendChild(node);
-	}
-
-	result.textContent = '';
-	result.appendChild(fragment);
-}
-
-window.onload = function() {
-	onDiffTypeChange(document.querySelector('#settings [name="diff_type"]:checked'));
-	changed();
-};
-
-a.onpaste = a.onchange =
-b.onpaste = b.onchange = changed;
-
-if ('oninput' in a) {
-	a.oninput = b.oninput = changed;
-} else {
-	a.onkeyup = b.onkeyup = changed;
-}
-
-function onDiffTypeChange(radio) {
-	window.diffType = radio.value;
-	document.title = "Diff " + radio.value.slice(4);
-}
-
-var radio = document.getElementsByName('diff_type');
-for (var i = 0; i < radio.length; i++) {
-	radio[i].onchange = function(e) {
-		onDiffTypeChange(e.target);
-		changed();
-	}
-}
-</script>
-</body>
-</html>
+<script src="main.js"></script>

@@ -276,7 +276,7 @@
         <h2>Drag & Drop or Paste JPG here</h2>
         <p style="color: var(--text-light); margin: 0.5rem 0;">or click to browse files</p>
         <button class="btn" onclick="document.getElementById('fileInput').click()">Select Image</button>
-        <input type="file" id="fileInput" accept="image/jpeg, image/jpg" aria-label="Upload JPG">
+        <input type="file" id="fileInput" accept="image/jpeg, image/jpg, image/png, image/gif, image/bmp, image/webp, image/tiff, image/svg+xml, image/x-icon, image/heic, image/heif, image/avif, .3fr, .ai, .arw, .ari, .art, .avif, .bay, .bmp, .bw, .cap, .cgm, .clip, .cr2, .cr3, .crw, .cur, .dcm, .dcr, .dcs, .dds, .dib, .dng, .drf, .erf, .eps, .exr, .fff, .fit, .fits, .fts, .gif, .hdr, .heic, .heics, .heif, .heifs, .hrz, .icb, .ico, .iiq, .j2k, .jpe, .jpeg, .jpf, .jpg, .jpm, .jng, .jp2, .kra, .k25, .kdc, .mdp, .mef, .mj2, .mos, .mrw, .nef, .nrw, .orf, .ora, .pam, .pbm, .pcx, .pef, .pfm, .pgf, .pgm, .pic, .pix, .png, .pnm, .ppm, .ps, .psb, .psd, .ptx, .pxn, .qmg, .raf, .raw, .r3d, .ras, .reb, .rgb, .rgba, .rw1, .rw2, .rwl, .sgi, .skp, .srf, .sr2, .srw, .svg, .svgz, .tga, .tif, .tiff, .vda, .vst, .webp, .wmf, .x3f, .xcf" aria-label="Upload JPG">
     </div>
 
     <!-- Processing & Preview Area -->
@@ -386,7 +386,7 @@
             if (item.kind === 'file') {
                 const blob = item.getAsFile();
                 if (blob) {
-                    if (blob.type === "image/jpeg" || blob.type === "image/jpg") {
+                    if (blob.type.startsWith("image/")) {
                         processFile(blob);
                     } else {
                         alert("Pasted image must be a JPG. Detected format: " + blob.type + ".\n\nPlease paste a JPG file.");
@@ -399,7 +399,7 @@
 
     function handleFiles(e) {
         const file = e.target.files[0];
-        if (file && (file.type === "image/jpeg" || file.type === "image/jpg")) {
+        if (file && file.type.startsWith("image/")) {
             processFile(file);
         } else {
             alert("Please select a valid JPG image.");
@@ -608,5 +608,6 @@
     }
 </script>
 
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"version":"2024.11.0","token":"41342ae72cae4f17a1b1010d54e26477","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>

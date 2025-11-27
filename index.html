@@ -26,7 +26,7 @@
         :root {
             /* Human Theme */
             --h-bg: #ffffff; --h-text: #111827; --h-accent: #000000;
-            --h-laser: #06b6d4; --h-surface: #f3f4f6; --h-border: #e5e7eb;
+            --h-laser: #06b6d4; --h-surface: #f3ff6; --h-border: #e5e7eb;
             
             /* Machine Theme */
             --m-bg: #0d1117; --m-text: #58a6ff; --m-border: #30363d; --m-font: 'Courier New', monospace;
@@ -114,8 +114,8 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 
 <body data-view="human">
@@ -125,6 +125,7 @@
         <header class="app-header">
             <h1>Make PDF Text Un-Copyable</h1>
             <p>Convert editable documents into secure, read-only images.</p>
+            <a href="https://pdftoscan.online/jpg-to-pdf" style="display: inline-block; margin-top: 0.75rem; color: var(--h-laser); text-decoration: none; font-weight: 600; font-size: 0.9rem;">JPG to PDF</a>
         </header>
 
         <div class="dropzone" id="dropzone" tabindex="0">

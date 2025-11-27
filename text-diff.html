@@ -1,676 +1,209 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fast Code Diff Viewer</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DIFF_ENGINE // TURBO</title>
+    <style>
+        :root {
+            --bg: #1e1e1e;
+            --border: #333;
+            --accent: #ffff00; /* Industrial Yellow */
+            --text: #cccccc;
+        }
 
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #1e1e1e;
-      color: #d4d4d4;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* Prevent body scroll, let editor handle it */
+        }
 
-    body.light-mode {
-      background: #ffffff;
-      color: #333333;
-    }
+        /* HEADER */
+        header {
+            height: 60px;
+            background: #252526;
+            border-bottom: 2px solid var(--accent);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            justify-content: space-between;
+        }
 
-    .header {
-      padding: 16px 24px;
-      background: #252526;
-      border-bottom: 1px solid #3e3e42;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 16px;
-    }
+        h1 {
+            font-family: 'Courier New', monospace;
+            font-weight: 900;
+            color: #fff;
+            text-transform: uppercase;
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+        }
 
-    body.light-mode .header {
-      background: #f3f3f3;
-      border-bottom: 1px solid #e0e0e0;
-    }
+        .badge {
+            background: var(--accent);
+            color: #000;
+            padding: 2px 8px;
+            font-weight: bold;
+            font-size: 0.8rem;
+            margin-left: 10px;
+        }
 
-    .header h1 {
-      font-size: 20px;
-      font-weight: 600;
-    }
+        /* CONTROLS */
+        .controls {
+            display: flex;
+            gap: 10px;
+        }
 
-    .controls {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-    }
+        .btn {
+            background: #000;
+            color: #fff;
+            border: 1px solid #555;
+            padding: 5px 15px;
+            cursor: pointer;
+            font-family: monospace;
+            text-transform: uppercase;
+            font-weight: bold;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        .btn:hover { border-color: var(--accent); color: var(--accent); }
 
-    button {
-      padding: 8px 20px;
-      background: #0e639c;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: 500;
-      transition: background 0.2s;
-    }
+        /* EDITOR CONTAINER */
+        #diff-container {
+            flex-grow: 1;
+            width: 100%;
+            height: calc(100vh - 60px);
+            position: relative;
+        }
 
-    button:hover {
-      background: #1177bb;
-    }
+        /* Loading Overlay */
+        #loader {
+            position: absolute; top:0; left:0; width:100%; height:100%;
+            background: #1e1e1e;
+            display: flex; align-items: center; justify-content: center;
+            z-index: 100;
+            font-family: monospace;
+            color: var(--accent);
+        }
 
-    button:disabled {
-      background: #555;
-      cursor: not-allowed;
-    }
-
-    .toggle-theme {
-      background: #3e3e42;
-      padding: 8px 16px;
-    }
-
-    .toggle-theme:hover {
-      background: #505050;
-    }
-
-    body.light-mode .toggle-theme {
-      background: #e0e0e0;
-      color: #333;
-    }
-
-    body.light-mode .toggle-theme:hover {
-      background: #d0d0d0;
-    }
-
-    .input-container {
-      display: flex;
-      height: 35vh;
-      border-bottom: 1px solid #3e3e42;
-    }
-
-    body.light-mode .input-container {
-      border-bottom: 1px solid #e0e0e0;
-    }
-
-    .input-pane {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      border-right: 1px solid #3e3e42;
-    }
-
-    body.light-mode .input-pane {
-      border-right: 1px solid #e0e0e0;
-    }
-
-    .input-pane:last-child {
-      border-right: none;
-    }
-
-    .input-label {
-      padding: 8px 16px;
-      background: #2d2d30;
-      font-size: 13px;
-      font-weight: 500;
-      border-bottom: 1px solid #3e3e42;
-    }
-
-    body.light-mode .input-label {
-      background: #ebebeb;
-      border-bottom: 1px solid #e0e0e0;
-    }
-
-    textarea {
-      flex: 1;
-      padding: 12px;
-      background: #1e1e1e;
-      color: #d4d4d4;
-      border: none;
-      font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-      font-size: 13px;
-      line-height: 1.6;
-      resize: none;
-      tab-size: 4;
-    }
-
-    body.light-mode textarea {
-      background: #ffffff;
-      color: #333333;
-    }
-
-    textarea:focus {
-      outline: none;
-    }
-
-    .output-container {
-      flex: 1;
-      display: flex;
-      overflow: hidden;
-    }
-
-    .diff-pane {
-      flex: 1;
-      overflow-y: auto;
-      overflow-x: auto;
-      background: #1e1e1e;
-      border-right: 1px solid #3e3e42;
-      position: relative;
-    }
-
-    body.light-mode .diff-pane {
-      background: #ffffff;
-      border-right: 1px solid #e0e0e0;
-    }
-
-    .diff-pane:last-child {
-      border-right: none;
-    }
-
-    pre {
-      margin: 0;
-      padding: 16px;
-      font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-      font-size: 13px;
-      line-height: 1.6;
-      white-space: pre;
-      counter-reset: line;
-    }
-
-    .line {
-      display: block;
-      position: relative;
-      padding-left: 60px;
-    }
-
-    .line::before {
-      content: counter(line);
-      counter-increment: line;
-      position: absolute;
-      left: 0;
-      width: 50px;
-      text-align: right;
-      padding-right: 16px;
-      color: #858585;
-      user-select: none;
-      border-right: 1px solid #3e3e42;
-    }
-
-    body.light-mode .line::before {
-      color: #999999;
-      border-right: 1px solid #e0e0e0;
-    }
-
-    .removed {
-      background: #ffe1e1;
-      color: #333;
-    }
-
-    .added {
-      background: #e1ffe1;
-      color: #333;
-    }
-
-    .unchanged {
-      color: #d4d4d4;
-    }
-
-    body.light-mode .unchanged {
-      color: #333333;
-    }
-
-    .empty-line {
-      background: #2d2d30;
-      opacity: 0.3;
-    }
-
-    body.light-mode .empty-line {
-      background: #f5f5f5;
-    }
-
-    .loading {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 14px;
-      color: #858585;
-    }
-
-    .collapsed {
-      background: #2d2d30;
-      color: #858585;
-      cursor: pointer;
-      text-align: center;
-      padding: 8px;
-      border-top: 1px solid #3e3e42;
-      border-bottom: 1px solid #3e3e42;
-      user-select: none;
-    }
-
-    body.light-mode .collapsed {
-      background: #f5f5f5;
-      border-top: 1px solid #e0e0e0;
-      border-bottom: 1px solid #e0e0e0;
-    }
-
-    .collapsed:hover {
-      background: #3e3e42;
-    }
-
-    body.light-mode .collapsed:hover {
-      background: #ebebeb;
-    }
-
-    .status {
-      font-size: 12px;
-      color: #858585;
-    }
-  </style>
+        /* AD SLOT (Placeholder) */
+        .ad-banner {
+            position: absolute; bottom: 0; right: 20px; z-index: 50;
+            background: rgba(0,0,0,0.8); padding: 5px 10px;
+            font-size: 0.7rem; border: 1px solid #444; color: #666;
+            pointer-events: none;
+        }
+    </style>
 </head>
 <body>
-  <div class="header">
-    <h1>⚡ Fast Code Diff Viewer</h1>
-    <div class="controls">
-      <span class="status" id="status"></span>
-      <button id="compareBtn">Compare (Ctrl+Enter)</button>
-      <button class="toggle-theme" id="themeBtn">☀️ Light</button>
+
+    <header>
+        <div style="display:flex; align-items:center;">
+            <h1>DIFF_ENGINE <span class="badge">V.1.0</span></h1>
+        </div>
+        
+        <div class="controls">
+            <button class="btn" onclick="toggleInline()">TOGGLE_INLINE</button>
+            <button class="btn" onclick="clearAll()">CLEAR_BUFFER</button>
+        </div>
+    </header>
+
+    <div id="diff-container"></div>
+    
+    <div id="loader">
+        [INITIALIZING MONACO KERNEL...]
     </div>
-  </div>
 
-  <div class="input-container">
-    <div class="input-pane">
-      <div class="input-label">Original Code</div>
-      <textarea id="original" placeholder="Paste original code here..." spellcheck="false"></textarea>
-    </div>
-    <div class="input-pane">
-      <div class="input-label">Modified Code</div>
-      <textarea id="modified" placeholder="Paste modified code here..." spellcheck="false"></textarea>
-    </div>
-  </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
 
-  <div class="output-container">
-    <div class="diff-pane" id="leftPane">
-      <pre id="leftDiff"></pre>
-    </div>
-    <div class="diff-pane" id="rightPane">
-      <pre id="rightDiff"></pre>
-    </div>
-  </div>
+    <script>
+        // --- CONFIGURATION ---
+        // We use unpkg or cdnjs to load the heavy Monaco files efficiently
+        require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs' }});
 
-  <script>
-    // Ultra-fast worker with hash-based line matching
-    const workerCode = `
-      // Super fast hash-based line diff
-      function fastHash(str) {
-        let h = 0;
-        for (let i = 0; i < str.length; i++) {
-          h = ((h << 5) - h + str.charCodeAt(i)) | 0;
-        }
-        return h;
-      }
+        let diffEditor = null;
+        let originalModel = null;
+        let modifiedModel = null;
 
-      function fastLineDiff(lines1, lines2) {
-        const n = lines1.length;
-        const m = lines2.length;
-        
-        // Build hash maps for O(1) lookups
-        const hash1 = new Map();
-        const hash2 = new Map();
-        
-        for (let i = 0; i < n; i++) {
-          const h = fastHash(lines1[i]);
-          if (!hash1.has(h)) hash1.set(h, []);
-          hash1.get(h).push(i);
-        }
-        
-        for (let i = 0; i < m; i++) {
-          const h = fastHash(lines2[i]);
-          if (!hash2.has(h)) hash2.set(h, []);
-          hash2.get(h).push(i);
-        }
-        
-        // Find LCS using hash matching
-        const matches = [];
-        for (let i = 0; i < n; i++) {
-          const h = fastHash(lines1[i]);
-          if (hash2.has(h)) {
-            const indices = hash2.get(h);
-            for (const j of indices) {
-              if (lines1[i] === lines2[j]) {
-                matches.push([i, j]);
-                break;
-              }
-            }
-          }
-        }
-        
-        // Filter to longest increasing subsequence
-        const lis = longestIncreasingSubsequence(matches);
-        
-        // Build diff result
-        const result = [];
-        let i = 0, j = 0, k = 0;
-        
-        while (i < n || j < m) {
-          if (k < lis.length && i === lis[k][0] && j === lis[k][1]) {
-            result.push({ type: 'equal', left: lines1[i], right: lines2[j] });
-            i++;
-            j++;
-            k++;
-          } else if (k < lis.length && i < lis[k][0] && j < lis[k][1]) {
-            result.push({ type: 'modify', left: lines1[i], right: lines2[j] });
-            i++;
-            j++;
-          } else if (k >= lis.length || (i < n && (k >= lis.length || i < lis[k][0]))) {
-            result.push({ type: 'delete', left: lines1[i], right: null });
-            i++;
-          } else {
-            result.push({ type: 'insert', left: null, right: lines2[j] });
-            j++;
-          }
-        }
-        
-        return result;
-      }
+        // --- INIT ---
+        require(['vs/editor/editor.main'], function () {
+            
+            // Remove Loader
+            document.getElementById('loader').style.display = 'none';
 
-      function longestIncreasingSubsequence(matches) {
-        if (matches.length === 0) return [];
-        
-        const n = matches.length;
-        const dp = [matches[0]];
-        const parent = new Array(n).fill(-1);
-        
-        for (let i = 1; i < n; i++) {
-          if (matches[i][1] > dp[dp.length - 1][1]) {
-            parent[i] = dp.length - 1;
-            dp.push(matches[i]);
-          } else {
-            let lo = 0, hi = dp.length - 1;
-            while (lo < hi) {
-              const mid = (lo + hi) >> 1;
-              if (dp[mid][1] < matches[i][1]) {
-                lo = mid + 1;
-              } else {
-                hi = mid;
-              }
-            }
-            dp[lo] = matches[i];
-            parent[i] = lo > 0 ? lo - 1 : -1;
-          }
-        }
-        
-        const result = [];
-        let idx = matches.indexOf(dp[dp.length - 1]);
-        while (idx !== -1) {
-          result.unshift(matches[idx]);
-          idx = parent[idx];
-          if (idx >= 0) {
-            idx = matches.findIndex((m, i) => i < idx ? false : m === dp[parent[idx]]);
-          }
-        }
-        
-        return dp;
-      }
+            // 1. Define Defaults (100k Lines placeholder)
+            const txtOriginal = "// PASTE ORIGINAL CODE HERE (LEFT SIDE)\n".repeat(1);
+            const txtModified = "// PASTE MODIFIED CODE HERE (RIGHT SIDE)\n".repeat(1);
 
-      // Ultra-fast character diff using simple algorithm
-      function fastCharDiff(s1, s2) {
-        if (s1 === s2) return [{ type: 'equal', text: s1 }];
-        
-        const result = [];
-        let i = 0, j = 0;
-        
-        // Find common prefix
-        while (i < s1.length && i < s2.length && s1[i] === s2[i]) {
-          i++;
-          j++;
-        }
-        
-        if (i > 0) {
-          result.push({ type: 'equal', text: s1.substring(0, i) });
-        }
-        
-        // Find common suffix
-        let i1 = s1.length - 1;
-        let i2 = s2.length - 1;
-        while (i1 >= i && i2 >= j && s1[i1] === s2[i2]) {
-          i1--;
-          i2--;
-        }
-        
-        // Middle part
-        const mid1 = s1.substring(i, i1 + 1);
-        const mid2 = s2.substring(j, i2 + 1);
-        
-        if (mid1) result.push({ type: 'delete', text: mid1 });
-        if (mid2) result.push({ type: 'insert', text: mid2 });
-        
-        // Suffix
-        if (i1 < s1.length - 1) {
-          result.push({ type: 'equal', text: s1.substring(i1 + 1) });
-        }
-        
-        return result;
-      }
+            // 2. Create Models
+            originalModel = monaco.editor.createModel(txtOriginal, 'javascript');
+            modifiedModel = monaco.editor.createModel(txtModified, 'javascript');
 
-      self.onmessage = function(e) {
-        const start = performance.now();
-        const { original, modified } = e.data;
-        
-        try {
-          const lines1 = original.split('\\n');
-          const lines2 = modified.split('\\n');
-          
-          const lineDiffs = fastLineDiff(lines1, lines2);
-          
-          // Add character diffs for modified lines
-          for (let i = 0; i < lineDiffs.length; i++) {
-            if (lineDiffs[i].type === 'modify') {
-              lineDiffs[i].charDiffs = fastCharDiff(
-                lineDiffs[i].left || '',
-                lineDiffs[i].right || ''
-              );
-            }
-          }
-          
-          const elapsed = performance.now() - start;
-          self.postMessage({ success: true, diffs: lineDiffs, time: elapsed });
-        } catch (error) {
-          self.postMessage({ success: false, error: error.message });
-        }
-      };
-    `;
+            // 3. Create Diff Editor Instance
+            diffEditor = monaco.editor.createDiffEditor(document.getElementById('diff-container'), {
+                // VISUAL SETTINGS
+                theme: 'vs-dark',
+                originalEditable: true, // Allow editing left side
+                readOnly: false,        // Allow editing right side
+                automaticLayout: true,
+                renderSideBySide: true, // Split view default
+                minimap: { enabled: true },
+                
+                // PERFORMANCE SETTINGS (CRITICAL FOR 100k LINES)
+                enableSplitViewResizing: true,
+                renderIndicators: true,
+                scrollBeyondLastLine: false,
+                diffWordWrap: 'off',    // Turn off wrapping for max speed
+                maxComputationTime: 5000 // Allow 5s for massive diffs before fallback
+            });
 
-    const blob = new Blob([workerCode], { type: 'application/javascript' });
-    const workerUrl = URL.createObjectURL(blob);
-    const worker = new Worker(workerUrl);
+            diffEditor.setModel({
+                original: originalModel,
+                modified: modifiedModel
+            });
 
-    const originalTextarea = document.getElementById('original');
-    const modifiedTextarea = document.getElementById('modified');
-    const compareBtn = document.getElementById('compareBtn');
-    const leftPane = document.getElementById('leftPane');
-    const rightPane = document.getElementById('rightPane');
-    const leftDiff = document.getElementById('leftDiff');
-    const rightDiff = document.getElementById('rightDiff');
-    const status = document.getElementById('status');
-    const themeBtn = document.getElementById('themeBtn');
-
-    let isComparing = false;
-    let scrollSyncEnabled = true;
-
-    const escapeMap = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-    function escapeHtml(text) {
-      return text.replace(/[&<>"']/g, m => escapeMap[m]);
-    }
-
-    function renderCharDiffs(charDiffs, isLeft) {
-      const parts = [];
-      
-      for (const diff of charDiffs) {
-        const escaped = escapeHtml(diff.text);
-        
-        if (diff.type === 'equal') {
-          parts.push('<span class="unchanged">' + escaped + '</span>');
-        } else if (diff.type === 'delete' && isLeft) {
-          parts.push('<span class="removed">' + escaped + '</span>');
-        } else if (diff.type === 'insert' && !isLeft) {
-          parts.push('<span class="added">' + escaped + '</span>');
-        }
-      }
-      
-      return parts.join('') || ' ';
-    }
-
-    function renderDiff(diffs) {
-      const leftParts = [];
-      const rightParts = [];
-      
-      let i = 0;
-      while (i < diffs.length) {
-        const diff = diffs[i];
-        
-        if (diff.type === 'equal') {
-          let start = i;
-          while (i < diffs.length && diffs[i].type === 'equal') i++;
-          
-          const count = i - start;
-          if (count > 30) {
-            leftParts.push('<div class="collapsed" data-start="' + start + '" data-end="' + (i-1) + '">⋯ ' + count + ' unchanged lines</div>');
-            rightParts.push('<div class="collapsed" data-start="' + start + '" data-end="' + (i-1) + '">⋯ ' + count + ' unchanged lines</div>');
-          } else {
-            for (let j = start; j < i; j++) {
-              const d = diffs[j];
-              leftParts.push('<span class="line"><span class="unchanged">' + escapeHtml(d.left) + '</span>\\n</span>');
-              rightParts.push('<span class="line"><span class="unchanged">' + escapeHtml(d.right) + '</span>\\n</span>');
-            }
-          }
-        } else if (diff.type === 'modify') {
-          leftParts.push('<span class="line">' + renderCharDiffs(diff.charDiffs, true) + '\\n</span>');
-          rightParts.push('<span class="line">' + renderCharDiffs(diff.charDiffs, false) + '\\n</span>');
-          i++;
-        } else if (diff.type === 'delete') {
-          leftParts.push('<span class="line"><span class="removed">' + escapeHtml(diff.left || ' ') + '</span>\\n</span>');
-          rightParts.push('<span class="line"><span class="empty-line"> </span>\\n</span>');
-          i++;
-        } else if (diff.type === 'insert') {
-          leftParts.push('<span class="line"><span class="empty-line"> </span>\\n</span>');
-          rightParts.push('<span class="line"><span class="added">' + escapeHtml(diff.right || ' ') + '</span>\\n</span>');
-          i++;
-        } else {
-          i++;
-        }
-      }
-
-      leftDiff.innerHTML = leftParts.join('');
-      rightDiff.innerHTML = rightParts.join('');
-
-      document.querySelectorAll('.collapsed').forEach(el => {
-        el.addEventListener('click', function() {
-          const start = parseInt(this.dataset.start);
-          const end = parseInt(this.dataset.end);
-          expandBlock(start, end, diffs, this);
+            // Add Key Listener for Speed
+            window.addEventListener('keydown', (e) => {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'v') {
+                    // Let normal paste happen, Monaco handles it.
+                    // Just visual feedback could be added here.
+                }
+            });
         });
-      });
-    }
 
-    function expandBlock(start, end, diffs, element) {
-      const parts = [];
-      const isLeft = element.parentElement.id === 'leftDiff';
-      
-      for (let i = start; i <= end; i++) {
-        const diff = diffs[i];
-        const content = escapeHtml(isLeft ? diff.left : diff.right);
-        parts.push('<span class="line"><span class="unchanged">' + content + '</span>\\n</span>');
-      }
-      element.outerHTML = parts.join('');
-    }
+        // --- CONTROLS ---
 
-    worker.onmessage = function(e) {
-      const { success, diffs, error, time } = e.data;
-      
-      if (success) {
-        renderDiff(diffs);
-        status.textContent = '✓ ' + diffs.length + ' lines in ' + time.toFixed(1) + 'ms';
-      } else {
-        status.textContent = '✗ Error: ' + error;
-        leftDiff.innerHTML = '<div class="loading">Error</div>';
-        rightDiff.innerHTML = '<div class="loading">Error</div>';
-      }
+        function toggleInline() {
+            if (!diffEditor) return;
+            const current = diffEditor.getOption(monaco.editor.EditorOption.renderSideBySide);
+            diffEditor.updateOptions({
+                renderSideBySide: !current
+            });
+        }
 
-      compareBtn.disabled = false;
-      isComparing = false;
-    };
+        function clearAll() {
+            if (!originalModel || !modifiedModel) return;
+            originalModel.setValue('');
+            modifiedModel.setValue('');
+        }
 
-    function compare() {
-      if (isComparing) return;
-      
-      const original = originalTextarea.value;
-      const modified = modifiedTextarea.value;
+        // --- AUTO-DETECT LANGUAGE ---
+        // Advanced: If user pastes HTML, switch highlighting to HTML
+        function detectLang(text) {
+            if (text.trim().startsWith('<')) return 'html';
+            if (text.includes('function') || text.includes('const')) return 'javascript';
+            if (text.includes('def ') || text.includes('import ')) return 'python';
+            return 'plaintext';
+        }
 
-      if (!original && !modified) {
-        status.textContent = 'Enter code to compare';
-        return;
-      }
+        // Monitor pastes to switch language (Optional optimization)
+        // We stick to JS/Text default for speed.
 
-      isComparing = true;
-      compareBtn.disabled = true;
-      status.textContent = 'Computing...';
-      leftDiff.innerHTML = '<div class="loading">Processing...</div>';
-      rightDiff.innerHTML = '<div class="loading">Processing...</div>';
-
-      worker.postMessage({ original, modified });
-    }
-
-    function syncScroll(source, target) {
-      if (!scrollSyncEnabled) return;
-      scrollSyncEnabled = false;
-      target.scrollTop = source.scrollTop;
-      target.scrollLeft = source.scrollLeft;
-      setTimeout(() => scrollSyncEnabled = true, 50);
-    }
-
-    leftPane.addEventListener('scroll', () => syncScroll(leftPane, rightPane));
-    rightPane.addEventListener('scroll', () => syncScroll(rightPane, leftPane));
-
-    compareBtn.addEventListener('click', compare);
-
-    document.addEventListener('keydown', (e) => {
-      if (e.ctrlKey && e.key === 'Enter') {
-        e.preventDefault();
-        compare();
-      }
-    });
-
-    themeBtn.addEventListener('click', () => {
-      document.body.classList.toggle('light-mode');
-      themeBtn.textContent = document.body.classList.contains('light-mode') ? '🌙 Dark' : '☀️ Light';
-    });
-
-    originalTextarea.value = `function calculateTotal(items) {
-  let total = 0;
-  for (let i = 0; i < items.length; i++) {
-    total += items[i].price;
-  }
-  return total;
-}`;
-
-    modifiedTextarea.value = `function calculateTotal(items, taxRate = 0) {
-  let total = 0;
-  for (const item of items) {
-    total += item.price * (1 + taxRate);
-  }
-  return Math.round(total * 100) / 100;
-}`;
-
-    setTimeout(compare, 100);
-  </script>
+    </script>
 </body>
 </html>

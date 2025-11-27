@@ -307,142 +307,192 @@
   </div>
 
   <script>
-    // Worker code as string
+    // Ultra-fast worker with hash-based line matching
     const workerCode = `
-      // Fast diff implementation using Myers' algorithm
-      function diff(text1, text2) {
-        const n = text1.length;
-        const m = text2.length;
-        const max = n + m;
-        const v = new Array(2 * max + 1);
-        const trace = [];
+      // Super fast hash-based line diff
+      function fastHash(str) {
+        let h = 0;
+        for (let i = 0; i < str.length; i++) {
+          h = ((h << 5) - h + str.charCodeAt(i)) | 0;
+        }
+        return h;
+      }
 
-        for (let d = 0; d <= max; d++) {
-          trace.push(v.slice());
-          for (let k = -d; k <= d; k += 2) {
-            let x;
-            if (k === -d || (k !== d && v[max + k - 1] < v[max + k + 1])) {
-              x = v[max + k + 1];
-            } else {
-              x = v[max + k - 1] + 1;
-            }
-            let y = x - k;
-            while (x < n && y < m && text1[x] === text2[y]) {
-              x++;
-              y++;
-            }
-            v[max + k] = x;
-            if (x >= n && y >= m) {
-              return backtrack(text1, text2, trace, d);
+      function fastLineDiff(lines1, lines2) {
+        const n = lines1.length;
+        const m = lines2.length;
+        
+        // Build hash maps for O(1) lookups
+        const hash1 = new Map();
+        const hash2 = new Map();
+        
+        for (let i = 0; i < n; i++) {
+          const h = fastHash(lines1[i]);
+          if (!hash1.has(h)) hash1.set(h, []);
+          hash1.get(h).push(i);
+        }
+        
+        for (let i = 0; i < m; i++) {
+          const h = fastHash(lines2[i]);
+          if (!hash2.has(h)) hash2.set(h, []);
+          hash2.get(h).push(i);
+        }
+        
+        // Find LCS using hash matching
+        const matches = [];
+        for (let i = 0; i < n; i++) {
+          const h = fastHash(lines1[i]);
+          if (hash2.has(h)) {
+            const indices = hash2.get(h);
+            for (const j of indices) {
+              if (lines1[i] === lines2[j]) {
+                matches.push([i, j]);
+                break;
+              }
             }
           }
         }
-        return [];
-      }
-
-      function backtrack(text1, text2, trace, d) {
-        const diffs = [];
-        let x = text1.length;
-        let y = text2.length;
-        const max = text1.length + text2.length;
-
-        for (let depth = d; depth >= 0; depth--) {
-          const v = trace[depth];
-          const k = x - y;
-          let prevK;
-          if (k === -depth || (k !== depth && v[max + k - 1] < v[max + k + 1])) {
-            prevK = k + 1;
+        
+        // Filter to longest increasing subsequence
+        const lis = longestIncreasingSubsequence(matches);
+        
+        // Build diff result
+        const result = [];
+        let i = 0, j = 0, k = 0;
+        
+        while (i < n || j < m) {
+          if (k < lis.length && i === lis[k][0] && j === lis[k][1]) {
+            result.push({ type: 'equal', left: lines1[i], right: lines2[j] });
+            i++;
+            j++;
+            k++;
+          } else if (k < lis.length && i < lis[k][0] && j < lis[k][1]) {
+            result.push({ type: 'modify', left: lines1[i], right: lines2[j] });
+            i++;
+            j++;
+          } else if (k >= lis.length || (i < n && (k >= lis.length || i < lis[k][0]))) {
+            result.push({ type: 'delete', left: lines1[i], right: null });
+            i++;
           } else {
-            prevK = k - 1;
-          }
-          const prevX = v[max + prevK];
-          const prevY = prevX - prevK;
-
-          while (x > prevX && y > prevY) {
-            diffs.unshift([0, text1[x - 1]]);
-            x--;
-            y--;
-          }
-          if (depth > 0) {
-            if (x > prevX) {
-              diffs.unshift([-1, text1[x - 1]]);
-              x--;
-            } else {
-              diffs.unshift([1, text2[y - 1]]);
-              y--;
-            }
+            result.push({ type: 'insert', left: null, right: lines2[j] });
+            j++;
           }
         }
-        return diffs;
+        
+        return result;
       }
 
-      function semanticCleanup(diffs) {
-        let changes = false;
-        const equalities = [];
-        let lastEquality = null;
-        let pointer = 0;
-        let lengthInsertions1 = 0;
-        let lengthDeletions1 = 0;
-        let lengthInsertions2 = 0;
-        let lengthDeletions2 = 0;
-
-        while (pointer < diffs.length) {
-          if (diffs[pointer][0] === 0) {
-            equalities.push(pointer);
-            lengthInsertions1 = lengthInsertions2;
-            lengthDeletions1 = lengthDeletions2;
-            lengthInsertions2 = 0;
-            lengthDeletions2 = 0;
-            lastEquality = diffs[pointer][1];
+      function longestIncreasingSubsequence(matches) {
+        if (matches.length === 0) return [];
+        
+        const n = matches.length;
+        const dp = [matches[0]];
+        const parent = new Array(n).fill(-1);
+        
+        for (let i = 1; i < n; i++) {
+          if (matches[i][1] > dp[dp.length - 1][1]) {
+            parent[i] = dp.length - 1;
+            dp.push(matches[i]);
           } else {
-            if (diffs[pointer][0] === 1) {
-              lengthInsertions2 += diffs[pointer][1].length;
-            } else {
-              lengthDeletions2 += diffs[pointer][1].length;
+            let lo = 0, hi = dp.length - 1;
+            while (lo < hi) {
+              const mid = (lo + hi) >> 1;
+              if (dp[mid][1] < matches[i][1]) {
+                lo = mid + 1;
+              } else {
+                hi = mid;
+              }
             }
-            if (lastEquality && lastEquality.length <= Math.max(lengthInsertions1, lengthDeletions1) &&
-                lastEquality.length <= Math.max(lengthInsertions2, lengthDeletions2)) {
-              diffs.splice(equalities[equalities.length - 1], 0, [-1, lastEquality]);
-              diffs[equalities[equalities.length - 1] + 1][0] = 1;
-              equalities.pop();
-              equalities.pop();
-              pointer = equalities.length > 0 ? equalities[equalities.length - 1] : -1;
-              lengthInsertions1 = 0;
-              lengthDeletions1 = 0;
-              lengthInsertions2 = 0;
-              lengthDeletions2 = 0;
-              lastEquality = null;
-              changes = true;
-            }
+            dp[lo] = matches[i];
+            parent[i] = lo > 0 ? lo - 1 : -1;
           }
-          pointer++;
         }
-        return diffs;
+        
+        const result = [];
+        let idx = matches.indexOf(dp[dp.length - 1]);
+        while (idx !== -1) {
+          result.unshift(matches[idx]);
+          idx = parent[idx];
+          if (idx >= 0) {
+            idx = matches.findIndex((m, i) => i < idx ? false : m === dp[parent[idx]]);
+          }
+        }
+        
+        return dp;
       }
 
-      function computeDiff(text1, text2) {
-        let diffs = diff(text1, text2);
-        diffs = semanticCleanup(diffs);
-        return diffs;
+      // Ultra-fast character diff using simple algorithm
+      function fastCharDiff(s1, s2) {
+        if (s1 === s2) return [{ type: 'equal', text: s1 }];
+        
+        const result = [];
+        let i = 0, j = 0;
+        
+        // Find common prefix
+        while (i < s1.length && i < s2.length && s1[i] === s2[i]) {
+          i++;
+          j++;
+        }
+        
+        if (i > 0) {
+          result.push({ type: 'equal', text: s1.substring(0, i) });
+        }
+        
+        // Find common suffix
+        let i1 = s1.length - 1;
+        let i2 = s2.length - 1;
+        while (i1 >= i && i2 >= j && s1[i1] === s2[i2]) {
+          i1--;
+          i2--;
+        }
+        
+        // Middle part
+        const mid1 = s1.substring(i, i1 + 1);
+        const mid2 = s2.substring(j, i2 + 1);
+        
+        if (mid1) result.push({ type: 'delete', text: mid1 });
+        if (mid2) result.push({ type: 'insert', text: mid2 });
+        
+        // Suffix
+        if (i1 < s1.length - 1) {
+          result.push({ type: 'equal', text: s1.substring(i1 + 1) });
+        }
+        
+        return result;
       }
 
       self.onmessage = function(e) {
+        const start = performance.now();
         const { original, modified } = e.data;
+        
         try {
-          const diffs = computeDiff(original, modified);
-          self.postMessage({ success: true, diffs });
+          const lines1 = original.split('\\n');
+          const lines2 = modified.split('\\n');
+          
+          const lineDiffs = fastLineDiff(lines1, lines2);
+          
+          // Add character diffs for modified lines
+          for (let i = 0; i < lineDiffs.length; i++) {
+            if (lineDiffs[i].type === 'modify') {
+              lineDiffs[i].charDiffs = fastCharDiff(
+                lineDiffs[i].left || '',
+                lineDiffs[i].right || ''
+              );
+            }
+          }
+          
+          const elapsed = performance.now() - start;
+          self.postMessage({ success: true, diffs: lineDiffs, time: elapsed });
         } catch (error) {
           self.postMessage({ success: false, error: error.message });
         }
       };
     `;
 
-    // Create worker
     const blob = new Blob([workerCode], { type: 'application/javascript' });
     const workerUrl = URL.createObjectURL(blob);
     const worker = new Worker(workerUrl);
 
-    // DOM elements
     const originalTextarea = document.getElementById('original');
     const modifiedTextarea = document.getElementById('modified');
     const compareBtn = document.getElementById('compareBtn');
@@ -456,171 +506,109 @@
     let isComparing = false;
     let scrollSyncEnabled = true;
 
-    // HTML escape
+    const escapeMap = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
     function escapeHtml(text) {
-      const div = document.createElement('div');
-      div.textContent = text;
-      return div.innerHTML;
+      return text.replace(/[&<>"']/g, m => escapeMap[m]);
     }
 
-    // Process diffs into lines
-    function processDiffs(diffs) {
-      const leftLines = [];
-      const rightLines = [];
-      let leftLine = '';
-      let rightLine = '';
-
-      for (const [op, text] of diffs) {
-        const lines = text.split('\n');
-        for (let i = 0; i < lines.length; i++) {
-          const line = lines[i];
-          const isLastSegment = i === lines.length - 1;
-
-          if (op === 0) { // Unchanged
-            leftLine += '<span class="unchanged">' + escapeHtml(line) + '</span>';
-            rightLine += '<span class="unchanged">' + escapeHtml(line) + '</span>';
-          } else if (op === -1) { // Deleted
-            leftLine += '<span class="removed">' + escapeHtml(line) + '</span>';
-          } else if (op === 1) { // Added
-            rightLine += '<span class="added">' + escapeHtml(line) + '</span>';
-          }
-
-          if (!isLastSegment) {
-            leftLines.push(leftLine || ' ');
-            rightLines.push(rightLine || ' ');
-            leftLine = '';
-            rightLine = '';
-          }
-        }
-      }
-
-      if (leftLine || rightLine) {
-        leftLines.push(leftLine || ' ');
-        rightLines.push(rightLine || ' ');
-      }
-
-      // Align lines
-      const maxLines = Math.max(leftLines.length, rightLines.length);
-      while (leftLines.length < maxLines) leftLines.push('');
-      while (rightLines.length < maxLines) rightLines.push('');
-
-      return { leftLines, rightLines };
-    }
-
-    // Collapse unchanged blocks
-    function collapseUnchanged(lines, threshold = 30) {
-      const result = [];
-      let unchangedBlock = [];
+    function renderCharDiffs(charDiffs, isLeft) {
+      const parts = [];
       
-      for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
-        const isUnchanged = !line.includes('class="removed"') && !line.includes('class="added"') && line.trim();
+      for (const diff of charDiffs) {
+        const escaped = escapeHtml(diff.text);
         
-        if (isUnchanged) {
-          unchangedBlock.push({ index: i, content: line });
-        } else {
-          if (unchangedBlock.length > threshold) {
-            const start = unchangedBlock[0].index;
-            const end = unchangedBlock[unchangedBlock.length - 1].index;
-            result.push({
-              type: 'collapsed',
-              start,
-              end,
-              count: unchangedBlock.length,
-              lines: unchangedBlock.map(l => l.content)
-            });
-          } else {
-            unchangedBlock.forEach(l => result.push({ type: 'line', index: l.index, content: l.content }));
-          }
-          unchangedBlock = [];
-          result.push({ type: 'line', index: i, content: line });
+        if (diff.type === 'equal') {
+          parts.push('<span class="unchanged">' + escaped + '</span>');
+        } else if (diff.type === 'delete' && isLeft) {
+          parts.push('<span class="removed">' + escaped + '</span>');
+        } else if (diff.type === 'insert' && !isLeft) {
+          parts.push('<span class="added">' + escaped + '</span>');
         }
       }
-
-      if (unchangedBlock.length > threshold) {
-        const start = unchangedBlock[0].index;
-        const end = unchangedBlock[unchangedBlock.length - 1].index;
-        result.push({
-          type: 'collapsed',
-          start,
-          end,
-          count: unchangedBlock.length,
-          lines: unchangedBlock.map(l => l.content)
-        });
-      } else {
-        unchangedBlock.forEach(l => result.push({ type: 'line', index: l.index, content: l.content }));
-      }
-
-      return result;
+      
+      return parts.join('') || ' ';
     }
 
-    // Render diff
-    function renderDiff(leftLines, rightLines) {
-      const leftCollapsed = collapseUnchanged(leftLines);
-      const rightCollapsed = collapseUnchanged(rightLines);
-
-      let leftHtml = '';
-      let rightHtml = '';
-
-      for (let i = 0; i < leftCollapsed.length; i++) {
-        const leftItem = leftCollapsed[i];
-        const rightItem = rightCollapsed[i];
-
-        if (leftItem.type === 'collapsed') {
-          leftHtml += `<div class="collapsed" data-start="${leftItem.start}" data-end="${leftItem.end}">⋯ ${leftItem.count} unchanged lines (click to expand)</div>`;
+    function renderDiff(diffs) {
+      const leftParts = [];
+      const rightParts = [];
+      
+      let i = 0;
+      while (i < diffs.length) {
+        const diff = diffs[i];
+        
+        if (diff.type === 'equal') {
+          let start = i;
+          while (i < diffs.length && diffs[i].type === 'equal') i++;
+          
+          const count = i - start;
+          if (count > 30) {
+            leftParts.push('<div class="collapsed" data-start="' + start + '" data-end="' + (i-1) + '">⋯ ' + count + ' unchanged lines</div>');
+            rightParts.push('<div class="collapsed" data-start="' + start + '" data-end="' + (i-1) + '">⋯ ' + count + ' unchanged lines</div>');
+          } else {
+            for (let j = start; j < i; j++) {
+              const d = diffs[j];
+              leftParts.push('<span class="line"><span class="unchanged">' + escapeHtml(d.left) + '</span>\\n</span>');
+              rightParts.push('<span class="line"><span class="unchanged">' + escapeHtml(d.right) + '</span>\\n</span>');
+            }
+          }
+        } else if (diff.type === 'modify') {
+          leftParts.push('<span class="line">' + renderCharDiffs(diff.charDiffs, true) + '\\n</span>');
+          rightParts.push('<span class="line">' + renderCharDiffs(diff.charDiffs, false) + '\\n</span>');
+          i++;
+        } else if (diff.type === 'delete') {
+          leftParts.push('<span class="line"><span class="removed">' + escapeHtml(diff.left || ' ') + '</span>\\n</span>');
+          rightParts.push('<span class="line"><span class="empty-line"> </span>\\n</span>');
+          i++;
+        } else if (diff.type === 'insert') {
+          leftParts.push('<span class="line"><span class="empty-line"> </span>\\n</span>');
+          rightParts.push('<span class="line"><span class="added">' + escapeHtml(diff.right || ' ') + '</span>\\n</span>');
+          i++;
         } else {
-          const content = leftItem.content || '<span class="empty-line"> </span>';
-          leftHtml += `<span class="line">${content}\n</span>`;
-        }
-
-        if (rightItem.type === 'collapsed') {
-          rightHtml += `<div class="collapsed" data-start="${rightItem.start}" data-end="${rightItem.end}">⋯ ${rightItem.count} unchanged lines (click to expand)</div>`;
-        } else {
-          const content = rightItem.content || '<span class="empty-line"> </span>';
-          rightHtml += `<span class="line">${content}\n</span>`;
+          i++;
         }
       }
 
-      leftDiff.innerHTML = leftHtml;
-      rightDiff.innerHTML = rightHtml;
+      leftDiff.innerHTML = leftParts.join('');
+      rightDiff.innerHTML = rightParts.join('');
 
-      // Add expand handlers
       document.querySelectorAll('.collapsed').forEach(el => {
         el.addEventListener('click', function() {
           const start = parseInt(this.dataset.start);
           const end = parseInt(this.dataset.end);
-          const isLeft = this.parentElement.id === 'leftDiff';
-          expandBlock(start, end, isLeft ? leftLines : rightLines, this);
+          expandBlock(start, end, diffs, this);
         });
       });
     }
 
-    function expandBlock(start, end, lines, element) {
-      let html = '';
+    function expandBlock(start, end, diffs, element) {
+      const parts = [];
+      const isLeft = element.parentElement.id === 'leftDiff';
+      
       for (let i = start; i <= end; i++) {
-        const content = lines[i] || '<span class="empty-line"> </span>';
-        html += `<span class="line">${content}\n</span>`;
+        const diff = diffs[i];
+        const content = escapeHtml(isLeft ? diff.left : diff.right);
+        parts.push('<span class="line"><span class="unchanged">' + content + '</span>\\n</span>');
       }
-      element.outerHTML = html;
+      element.outerHTML = parts.join('');
     }
 
-    // Worker message handler
     worker.onmessage = function(e) {
-      const { success, diffs, error } = e.data;
+      const { success, diffs, error, time } = e.data;
       
       if (success) {
-        const { leftLines, rightLines } = processDiffs(diffs);
-        renderDiff(leftLines, rightLines);
-        status.textContent = `✓ Compared ${leftLines.length} lines`;
+        renderDiff(diffs);
+        status.textContent = '✓ ' + diffs.length + ' lines in ' + time.toFixed(1) + 'ms';
       } else {
-        status.textContent = `✗ Error: ${error}`;
+        status.textContent = '✗ Error: ' + error;
+        leftDiff.innerHTML = '<div class="loading">Error</div>';
+        rightDiff.innerHTML = '<div class="loading">Error</div>';
       }
 
       compareBtn.disabled = false;
       isComparing = false;
     };
 
-    // Compare function
     function compare() {
       if (isComparing) return;
       
@@ -628,20 +616,19 @@
       const modified = modifiedTextarea.value;
 
       if (!original && !modified) {
-        status.textContent = 'Please enter some code to compare';
+        status.textContent = 'Enter code to compare';
         return;
       }
 
       isComparing = true;
       compareBtn.disabled = true;
-      status.textContent = 'Computing diff...';
+      status.textContent = 'Computing...';
       leftDiff.innerHTML = '<div class="loading">Processing...</div>';
       rightDiff.innerHTML = '<div class="loading">Processing...</div>';
 
       worker.postMessage({ original, modified });
     }
 
-    // Scroll sync
     function syncScroll(source, target) {
       if (!scrollSyncEnabled) return;
       scrollSyncEnabled = false;
@@ -653,7 +640,6 @@
     leftPane.addEventListener('scroll', () => syncScroll(leftPane, rightPane));
     rightPane.addEventListener('scroll', () => syncScroll(rightPane, leftPane));
 
-    // Event listeners
     compareBtn.addEventListener('click', compare);
 
     document.addEventListener('keydown', (e) => {
@@ -663,13 +649,11 @@
       }
     });
 
-    // Theme toggle
     themeBtn.addEventListener('click', () => {
       document.body.classList.toggle('light-mode');
       themeBtn.textContent = document.body.classList.contains('light-mode') ? '🌙 Dark' : '☀️ Light';
     });
 
-    // Sample data for demo
     originalTextarea.value = `function calculateTotal(items) {
   let total = 0;
   for (let i = 0; i < items.length; i++) {
@@ -686,7 +670,6 @@
   return Math.round(total * 100) / 100;
 }`;
 
-    // Auto-compare on load
     setTimeout(compare, 100);
   </script>
 </body>

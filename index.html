@@ -298,7 +298,22 @@
         DOM.dropzone.ondragover = (e) => { e.preventDefault(); DOM.dropzone.classList.add('active'); };
         DOM.dropzone.ondragleave = (e) => { e.preventDefault(); DOM.dropzone.classList.remove('active'); };
         DOM.dropzone.ondrop = (e) => { e.preventDefault(); DOM.dropzone.classList.remove('active'); handleFiles(e.dataTransfer.files); };
-
+      // NEW: PASTE SUPPORT
+        window.addEventListener('paste', e => {
+            const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+            const pdfs = [];
+            for (let i = 0; i < items.length; i++) {
+                if (items[i].kind === 'file' && items[i].type === 'application/pdf') {
+                    pdfs.push(items[i].getAsFile());
+                }
+            }
+            if (pdfs.length > 0) {
+                e.preventDefault(); // Stop default paste (unlikely to matter here but good practice)
+                DOM.dropzone.classList.add('active'); // Quick visual flash
+                setTimeout(() => DOM.dropzone.classList.remove('active'), 200);
+                handleFiles(pdfs);
+            }
+        });
         // TURBO PROCESSING ENGINE
         async function waitForLibraries() {
             if (window.pdfjsLib && window.jspdf) return;

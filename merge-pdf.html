@@ -111,13 +111,9 @@ h1 { text-align:center; margin-bottom:20px; }
     </div>
 </div>
 
-<script>
-let pdfFiles = [];
+<script>let pdfFiles = [];
+const uploadBox = document.querySelector(".upload");const fileInput = document.getElementById("fileInput");const fileList = document.getElementById("fileList");const mergeBtn = document.getElementById("mergeBtn");
 
-const uploadBox = document.querySelector(".upload");
-const fileInput = document.getElementById("fileInput");
-const fileList = document.getElementById("fileList");
-const mergeBtn = document.getElementById("mergeBtn");
 
 // Add a paste listener to the document to handle files from the clipboard (Instruction 3)
 document.addEventListener("paste", function(e) {
@@ -142,11 +138,14 @@ fileInput.addEventListener("change", () => handleFiles(fileInput.files));
 
 // Handle selected files
 function handleFiles(files) {
+     // Accepted file types for both PDF and Images
+    const acceptedTypes = ["application/pdf", "image/jpeg", "image/png"];
     for (const file of files) {
-        if (file.type === "application/pdf") pdfFiles.push(file);
-    }
-    renderFileList();
-    mergeBtn.disabled = pdfFiles.length < 2;
+   if (acceptedTypes.includes(file.type)) pdfFiles.push(file);
+    }
+    renderFileList();
+    // Enable merge button if two or more files are selected
+    mergeBtn.disabled = pdfFiles.length < 2;
 }
 
 // Render list with drag + arrows + delete
@@ -162,8 +161,8 @@ function renderFileList() {
         div.innerHTML = `
             <div class="file-left">
                 <span class="drag-handle">☰</span>
-                <span>${index + 1}. ${file.name}</span>
-            </div>
+                <span>${index + 1}. ${file.name} (${typeIndicator})</span>
+            </div>
 
             <div class="order-buttons">
                 <button onclick="moveUp(${index})">↑</button>
@@ -210,7 +209,28 @@ function removeFile(index) {
 function moveUp(i) { if (i > 0) reorderFiles(i, i - 1); }
 function moveDown(i) { if (i < pdfFiles.length - 1) reorderFiles(i, i + 1); }
 
-// Merge PDFs
+async function imageToPdf(imageFile, mergedPdf) {
+    const imageBytes = await imageFile.arrayBuffer();
+    // Create a temporary document to hold the single image
+    const doc = await PDFLib.PDFDocument.create();
+    const image = imageFile.type === 'image/jpeg' 
+        ? await doc.embedJpg(imageBytes) 
+        : await doc.embedPng(imageBytes);
+    // Calculate page dimensions to fit the image at its original size
+    const imgDims = image.scale(1); 
+    const page = doc.addPage([imgDims.width, imgDims.height]);
+    // Draw the image onto the new page
+    page.drawImage(image, {
+        x: 0,
+        y: 0,
+        width: imgDims.width,
+        height: imgDims.height,
+    });
+    // Copy the single image-page into the main merged PDF
+    const pagesToCopy = await mergedPdf.copyPages(doc, [0]);
+    pagesToCopy.forEach(p => mergedPdf.addPage(p));
+}
+
 mergeBtn.onclick = async function () {
     const progress = document.getElementById("progressSection");
     const fill = document.getElementById("progressFill");
@@ -223,14 +243,26 @@ mergeBtn.onclick = async function () {
     const mergedPdf = await PDFLib.PDFDocument.create();
 
     for (let i = 0; i < pdfFiles.length; i++) {
+         const file = pdfFiles[i];
         fill.style.width = ((i / pdfFiles.length) * 100) + "%";
-        txt.textContent = `Adding: ${pdfFiles[i].name}`;
-
-        const bytes = await pdfFiles[i].arrayBuffer();
-        const pdf = await PDFLib.PDFDocument.load(bytes);
-        const pages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
-        pages.forEach(p => mergedPdf.addPage(p));
-    }
+  txt.textContent = `Processing: ${file.name}`;
+        try {
+            if (file.type === "application/pdf") {
+                // Handle PDF file: Import all pages
+                const bytes = await file.arrayBuffer();
+                const pdf = await PDFLib.PDFDocument.load(bytes);
+                const pages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+                pages.forEach(p => mergedPdf.addPage(p));
+            } else if (file.type.startsWith("image/")) {
+                // Handle Image file: Convert to PDF and add
+                await imageToPdf(file, mergedPdf);
+            }
+        } catch(error) {
+            console.error(`Error processing file ${file.name}:`, error);
+            txt.textContent = `Error processing ${file.name}. Skipping.`;
+            // Optional: You might want to remove the file from the list or stop the merge here
+        }
+    }
 
     fill.style.width = "100%";
     txt.textContent = "Finalizing...";
@@ -254,3 +286,4 @@ mergeBtn.onclick = async function () {
 
 </body>
 </html>
+

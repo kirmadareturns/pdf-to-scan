@@ -43,22 +43,24 @@
 }
 </script>
 
-    <style>
+   <style>
     :root {
-        /* Human Theme (Unchanged) */
+        /* Human Theme (Parallel.ai Homepage Clone) */
         --h-bg: #ffffff;
-        --h-text: #111827;
-        --h-accent: #000000;
-        --h-laser: #06b6d4;
-        --h-surface: #f3f4f6;
-        --h-border: #e5e7eb;
+        --h-text: #000000;      /* Stark Black */
+        --h-subtext: #666666;   /* Muted Grey */
+        --h-accent: #000000;    /* Primary Action Color */
+        --h-border: #e5e5e5;    /* Light Borders */
+        --h-surface: #ffffff;   /* White Surface */
+        --h-laser: #000000;     /* Laser becomes black for this minimal theme */
+        --h-font: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
 
-        /* Machine Theme (Parallel.ai Clone) */
-        --m-bg: #050505;       /* Deep Black */
-        --m-text: #e5e5e5;     /* Off-white text */
-        --m-subtext: #888888;  /* Dimmed text */
-        --m-accent: #ffffff;   /* High contrast */
-        --m-line: #333333;     /* Subtle structure lines */
+        /* Machine Theme (Parallel.ai Terminal Clone - Preserved) */
+        --m-bg: #050505;
+        --m-text: #e5e5e5;
+        --m-subtext: #888888;
+        --m-accent: #ffffff;
+        --m-line: #333333;
         --m-font: 'Courier New', 'Roboto Mono', monospace;
     }
 
@@ -66,8 +68,9 @@
     html, body { height: 100%; width: 100%; }
     
     body { 
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+        font-family: var(--h-font);
         transition: background 0.3s ease, color 0.3s ease; 
+        -webkit-font-smoothing: antialiased;
     }
 
     /* VIEW TOGGLE LOGIC */
@@ -80,34 +83,95 @@
     body[data-view="machine"] .machine-view { display: block; }
     
     /* =========================================
-       HUMAN UI (Preserved) 
+       HUMAN UI (Parallel Homepage Clone) 
        ========================================= */
     .human-view {
-        flex-direction: column; align-items: center; justify-content: center;
-        min-height: 100vh; padding: 20px; max-width: 600px; margin: 0 auto;
+        flex-direction: column; 
+        align-items: flex-start; /* Left Align Everything */
+        justify-content: flex-start;
+        padding: 60px 20px; 
+        max-width: 1000px; 
+        margin: 0 auto;
+        position: relative;
     }
 
-    .app-header { margin-bottom: 2rem; text-align: center; }
-    .app-header h1 { font-size: 2.5rem; letter-spacing: -0.05em; margin-bottom: 0.5rem; }
-    .app-header p { color: #6b7280; }
+    .app-header { 
+        margin-bottom: 4rem; 
+        text-align: left; /* Left Align Header */
+        width: 100%;
+        position: relative;
+        padding-top: 2rem;
+    }
 
+    .app-header h1 { 
+        font-size: 3.5rem; /* Large Hero Text */
+        font-weight: 700; 
+        letter-spacing: -0.04em; 
+        line-height: 1.1;
+        margin-bottom: 1rem;
+        color: var(--h-text);
+        max-width: 800px;
+    }
+    
+    .app-header p { 
+        color: var(--h-subtext); 
+        font-size: 1.2rem;
+        font-weight: 400;
+        max-width: 600px;
+    }
+
+    /* Transform Dropdown into Top-Right Nav Link */
+    .dropdown { 
+        position: absolute; 
+        top: 0; 
+        right: 0; 
+        margin-top: 0; 
+    }
+    
+    .dropdown-toggle { 
+        color: var(--h-subtext); 
+        text-decoration: none; 
+        font-weight: 500; 
+        font-size: 0.9rem; 
+        cursor: pointer; 
+        transition: color 0.2s;
+    }
+    .dropdown-toggle:hover { color: var(--h-text); }
+    
+    /* Dropzone - Minimalist Input Style */
     .dropzone {
-        width: 100%; background: var(--h-surface); border: 2px dashed var(--h-border);
-        border-radius: 16px; padding: 3rem 1rem; text-align: center; cursor: pointer;
-        transition: all 0.2s ease; position: relative; overflow: hidden;
-        min-height: 250px; display: flex; flex-direction: column; justify-content: center; align-items: center;
+        width: 100%; 
+        background: var(--h-surface); 
+        border: 1px solid var(--h-border); /* Subtle thin border */
+        border-radius: 8px; /* Slight rounding */
+        padding: 4rem 2rem; 
+        text-align: center; 
+        cursor: pointer;
+        transition: all 0.2s ease; 
+        position: relative; 
+        overflow: hidden;
+        min-height: 200px; 
+        display: flex; 
+        flex-direction: column; 
+        justify-content: center; 
+        align-items: center;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
     }
-    .dropzone:hover, .dropzone.active { border-color: var(--h-accent); background: #f9fafb; transform: scale(1.01); }
+    .dropzone:hover { 
+        border-color: #a3a3a3; 
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05); 
+    }
 
+    /* Laser - Made Subtle/Black */
     .scan-beam {
-        position: absolute; top: 0; left: 0; width: 100%; height: 4px;
-        background: var(--h-laser); box-shadow: 0 0 15px var(--h-laser), 0 0 30px var(--h-laser);
+        position: absolute; top: 0; left: 0; width: 100%; height: 2px;
+        background: var(--h-text); box-shadow: 0 0 10px rgba(0,0,0,0.2);
         opacity: 0; z-index: 10; pointer-events: none;
     }
-    .dropzone.scanning { border-color: var(--h-laser); background: #ecfeff; cursor: wait; }
+    .dropzone.scanning { border-color: var(--h-text); background: #fafafa; cursor: wait; }
     .dropzone.scanning .scan-beam {
         opacity: 1; 
-        animation: scanner 0.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        animation: scanner 1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
         will-change: top;
     }
     @keyframes scanner { 
@@ -116,135 +180,76 @@
 
     .file-stack { margin-top: 1.5rem; width: 100%; text-align: left; }
     .file-item { 
-        display: flex; justify-content: space-between; padding: 0.75rem; 
+        display: flex; justify-content: space-between; padding: 1rem 0; 
         border-bottom: 1px solid var(--h-border); font-size: 0.9rem; animation: fadeIn 0.3s ease;
+        color: var(--h-subtext);
     }
 
+    /* Action Button - "Get Started" Style */
     .action-btn {
-        margin-top: 2rem; width: 100%; padding: 1rem; background: var(--h-accent); color: white;
-        border: none; border-radius: 8px; font-weight: 600; font-size: 1rem; cursor: pointer;
-        min-height: 48px; opacity: 0.5; pointer-events: none; transition: opacity 0.2s;
-        font-feature-settings: "tnum"; font-variant-numeric: tabular-nums;
+        margin-top: 2rem; width: auto; min-width: 200px; 
+        padding: 0 2rem; height: 50px;
+        background: var(--h-accent); /* Black */
+        color: white;
+        border: none; border-radius: 6px; 
+        font-weight: 600; font-size: 0.9rem; 
+        text-transform: uppercase; letter-spacing: 0.05em;
+        cursor: pointer;
+        opacity: 0.5; pointer-events: none; transition: opacity 0.2s;
     }
     .action-btn.ready { opacity: 1; pointer-events: all; }
 
-    .dropdown { position: relative; display: inline-block; margin-top: 0.75rem; }
-    .dropdown-toggle { color: var(--h-laser); text-decoration: none; font-weight: 600; font-size: 0.9rem; cursor: pointer; }
-    .dropdown-menu { display: none; position: absolute; background: white; border: 1px solid var(--h-border); border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); min-width: 200px; z-index: 1000; margin-top: 0.5rem; }
+    /* Dropdown Menu Styling */
+    .dropdown-menu { display: none; position: absolute; right: 0; background: white; border: 1px solid var(--h-border); border-radius: 8px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); min-width: 200px; z-index: 1000; margin-top: 1rem; padding: 0.5rem 0; }
     .dropdown:hover .dropdown-menu { display: block; }
-    .dropdown-menu a { display: block; padding: 0.75rem 1rem; color: var(--h-text); text-decoration: none; transition: background 0.2s; }
-    .dropdown-menu a:hover { background: var(--h-surface); }
+    .dropdown-menu a { display: block; padding: 0.75rem 1.5rem; color: var(--h-subtext); text-decoration: none; transition: background 0.2s, color 0.2s; font-size: 0.9rem;}
+    .dropdown-menu a:hover { background: #fafafa; color: var(--h-text); }
 
     /* =========================================
-       MACHINE UI (The Parallel.ai Clone) 
+       MACHINE UI (Parallel.ai Terminal Clone) 
        ========================================= */
     .machine-view { 
-        padding: 4rem 2rem; 
-        max-width: 720px; 
-        margin: 0 auto; 
-        line-height: 1.5;
-        font-size: 14px;
-        letter-spacing: 0.02em;
+        padding: 4rem 2rem; max-width: 720px; margin: 0 auto; 
+        line-height: 1.5; font-size: 14px; letter-spacing: 0.02em;
     }
-
-    /* Clean, open layout - Removing the "Card" box look */
     .terminal-card { 
-        border: none; 
-        background: transparent; 
-        padding: 0; 
-        margin-bottom: 3rem; 
-        position: relative;
-        padding-left: 1.5rem; /* Space for the vertical line */
-        border-left: 1px solid var(--m-line); /* The vertical guide line */
+        border: none; background: transparent; padding: 0; 
+        margin-bottom: 3rem; position: relative;
+        padding-left: 1.5rem; border-left: 1px solid var(--m-line);
     }
-
-    /* Headings with Markdown style hashes */
-    .machine-view h1 { 
-        border: none; margin-bottom: 3rem; color: var(--m-text); font-size: 1.1rem; text-transform: uppercase; letter-spacing: 0.1em;
-    }
+    .machine-view h1 { border: none; margin-bottom: 3rem; color: var(--m-text); font-size: 1.1rem; text-transform: uppercase; letter-spacing: 0.1em; }
     .machine-view h1::before { content: "# "; color: var(--m-subtext); }
-
-    .machine-view h2 { 
-        color: var(--m-text); 
-        font-size: 1rem; 
-        border: none; 
-        padding: 0; 
-        margin-bottom: 1.5rem; 
-        font-weight: normal;
-    }
+    .machine-view h2 { color: var(--m-text); font-size: 1rem; border: none; padding: 0; margin-bottom: 1.5rem; font-weight: normal; }
     .machine-view h2::before { content: "## "; color: var(--m-subtext); }
-    
-    /* Sub-headings (DT) as ### */
-    dt { 
-        font-weight: normal; 
-        color: var(--m-text); 
-        margin-top: 1.5rem; 
-        font-size: 0.9rem;
-    }
+    dt { font-weight: normal; color: var(--m-text); margin-top: 1.5rem; font-size: 0.9rem; }
     dt::before { content: "### "; color: var(--m-subtext); }
+    dd { margin-left: 0; margin-bottom: 1rem; color: var(--m-subtext); border: none; padding-left: 0; font-family: var(--m-font); }
+    code { background: transparent; padding: 0; border-radius: 0; font-size: 1em; color: var(--m-accent); }
+    pre { background: transparent; padding: 1rem 0; border: none; border-top: 1px solid var(--m-line); border-bottom: 1px solid var(--m-line); color: var(--m-subtext); font-size: 0.85rem; margin-top: 1rem; }
 
-    /* Content (DD) clean text */
-    dd { 
-        margin-left: 0; 
-        margin-bottom: 1rem; 
-        color: var(--m-subtext); 
-        border: none; 
-        padding-left: 0; 
-        font-family: var(--m-font);
-    }
-
-    /* Code blocks - Minimalist */
-    code { 
-        background: transparent; 
-        padding: 0; 
-        border-radius: 0; 
-        font-size: 1em; 
-        color: var(--m-accent); 
-    }
-    
-    /* JSON Block */
-    pre { 
-        background: transparent; 
-        padding: 1rem 0; 
-        border: none; 
-        border-top: 1px solid var(--m-line);
-        border-bottom: 1px solid var(--m-line);
-        color: var(--m-subtext);
-        font-size: 0.85rem;
-        margin-top: 1rem;
-    }
-
-    /* View Toggle Button Styling */
+    /* View Toggle - "Start Building" Button Style */
     #view-toggle {
         position: fixed; top: 20px; right: 20px; 
-        background: transparent; 
-        border: 1px solid currentColor; 
-        padding: 6px 14px; 
-        border-radius: 4px; 
-        cursor: pointer; 
-        font-size: 0.75rem; 
-        font-weight: bold; 
-        color: inherit; 
-        z-index: 1000;
-        font-family: var(--m-font);
+        background: white; border: 1px solid var(--h-border); 
+        padding: 8px 16px; border-radius: 6px; 
+        cursor: pointer; font-size: 0.8rem; font-weight: 600; 
+        color: var(--h-text); z-index: 1000;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        font-family: var(--h-font);
+    }
+    
+    /* Machine View Toggle Override */
+    body[data-view="machine"] #view-toggle {
+        background: transparent; border: 1px solid var(--m-line);
+        color: var(--m-subtext); box-shadow: none; font-family: var(--m-font);
         text-transform: uppercase;
     }
-    body[data-view="machine"] #view-toggle {
-        border: 1px solid var(--m-line);
-        color: var(--m-subtext);
-    }
-    body[data-view="machine"] #view-toggle:hover {
-        color: var(--m-accent);
-        border-color: var(--m-accent);
-    }
-    /* Simulate the [BUTTON] look */
-    body[data-view="machine"] #view-toggle::before { content: "[ "; color: var(--m-subtext); }
-    body[data-view="machine"] #view-toggle::after { content: " ]"; color: var(--m-subtext); }
+    body[data-view="machine"] #view-toggle::before { content: "[ "; }
+    body[data-view="machine"] #view-toggle::after { content: " ]"; }
 
     #processor-canvas { display: none; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 </style>
-
 </head>
 
 <body data-view="human">

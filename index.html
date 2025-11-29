@@ -44,103 +44,206 @@
 </script>
 
     <style>
-     :root {
-            /* Human Theme */
-            --h-bg: #ffffff; --h-text: #111827; --h-accent: #000000;
-            --h-laser: #06b6d4; --h-surface: #f3ff6; --h-border: #e5e7eb;
-            
-            /* Machine Theme */
-            --m-bg: #0d1117; --m-text: #58a6ff; --m-border: #30363d; --m-font: 'Courier New', monospace;
-        }
+    :root {
+        /* Human Theme (Unchanged) */
+        --h-bg: #ffffff;
+        --h-text: #111827;
+        --h-accent: #000000;
+        --h-laser: #06b6d4;
+        --h-surface: #f3f4f6;
+        --h-border: #e5e7eb;
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        html, body { height: 100%; width: 100%; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; transition: background 0.3s ease; }
+        /* Machine Theme (Parallel.ai Clone) */
+        --m-bg: #050505;       /* Deep Black */
+        --m-text: #e5e5e5;     /* Off-white text */
+        --m-subtext: #888888;  /* Dimmed text */
+        --m-accent: #ffffff;   /* High contrast */
+        --m-line: #333333;     /* Subtle structure lines */
+        --m-font: 'Courier New', 'Roboto Mono', monospace;
+    }
 
-        /* VIEW TOGGLE */
-        body[data-view="human"] { background: var(--h-bg); color: var(--h-text); }
-        body[data-view="human"] .machine-view { display: none; }
-        body[data-view="human"] .human-view { display: flex; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; width: 100%; }
+    
+    body { 
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+        transition: background 0.3s ease, color 0.3s ease; 
+    }
 
-        body[data-view="machine"] { background: var(--m-bg); color: var(--m-text); font-family: var(--m-font); }
-        body[data-view="machine"] .human-view { display: none; }
-        body[data-view="machine"] .machine-view { display: block; }
+    /* VIEW TOGGLE LOGIC */
+    body[data-view="human"] { background: var(--h-bg); color: var(--h-text); }
+    body[data-view="human"] .machine-view { display: none; }
+    body[data-view="human"] .human-view { display: flex; }
 
-        /* HUMAN UI */
-        .human-view {
-            flex-direction: column; align-items: center; justify-content: center;
-            min-height: 100vh; padding: 20px; max-width: 600px; margin: 0 auto;
-        }
+    body[data-view="machine"] { background: var(--m-bg); color: var(--m-text); font-family: var(--m-font); }
+    body[data-view="machine"] .human-view { display: none; }
+    body[data-view="machine"] .machine-view { display: block; }
+    
+    /* =========================================
+       HUMAN UI (Preserved) 
+       ========================================= */
+    .human-view {
+        flex-direction: column; align-items: center; justify-content: center;
+        min-height: 100vh; padding: 20px; max-width: 600px; margin: 0 auto;
+    }
 
-        .app-header { margin-bottom: 2rem; text-align: center; }
-        .app-header h1 { font-size: 2.5rem; letter-spacing: -0.05em; margin-bottom: 0.5rem; }
-        .app-header p { color: #6b7280; }
+    .app-header { margin-bottom: 2rem; text-align: center; }
+    .app-header h1 { font-size: 2.5rem; letter-spacing: -0.05em; margin-bottom: 0.5rem; }
+    .app-header p { color: #6b7280; }
 
-        .dropzone {
-            width: 100%; background: var(--h-surface); border: 2px dashed var(--h-border);
-            border-radius: 16px; padding: 3rem 1rem; text-align: center; cursor: pointer;
-            transition: all 0.2s ease; position: relative; overflow: hidden;
-            min-height: 250px; display: flex; flex-direction: column; justify-content: center; align-items: center;
-        }
-        .dropzone:hover, .dropzone.active { border-color: var(--h-accent); background: #f9fafb; transform: scale(1.01); }
+    .dropzone {
+        width: 100%; background: var(--h-surface); border: 2px dashed var(--h-border);
+        border-radius: 16px; padding: 3rem 1rem; text-align: center; cursor: pointer;
+        transition: all 0.2s ease; position: relative; overflow: hidden;
+        min-height: 250px; display: flex; flex-direction: column; justify-content: center; align-items: center;
+    }
+    .dropzone:hover, .dropzone.active { border-color: var(--h-accent); background: #f9fafb; transform: scale(1.01); }
 
-        /* FAST LASER */
-        .scan-beam {
-            position: absolute; top: 0; left: 0; width: 100%; height: 4px;
-            background: var(--h-laser); box-shadow: 0 0 15px var(--h-laser), 0 0 30px var(--h-laser);
-            opacity: 0; z-index: 10; pointer-events: none;
-        }
-        .dropzone.scanning { border-color: var(--h-laser); background: #ecfeff; cursor: wait; }
-        .dropzone.scanning .scan-beam {
-            opacity: 1; 
-            animation: scanner 0.6s cubic-bezier(0.4, 0, 0.2, 1) infinite; /* SUPER FAST ANIMATION */
-            will-change: top;
-        }
-        @keyframes scanner { 
-            0% { top: 0%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { top: 100%; opacity: 0; } 
-        }
+    .scan-beam {
+        position: absolute; top: 0; left: 0; width: 100%; height: 4px;
+        background: var(--h-laser); box-shadow: 0 0 15px var(--h-laser), 0 0 30px var(--h-laser);
+        opacity: 0; z-index: 10; pointer-events: none;
+    }
+    .dropzone.scanning { border-color: var(--h-laser); background: #ecfeff; cursor: wait; }
+    .dropzone.scanning .scan-beam {
+        opacity: 1; 
+        animation: scanner 0.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        will-change: top;
+    }
+    @keyframes scanner { 
+        0% { top: 0%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { top: 100%; opacity: 0; } 
+    }
 
-        .file-stack { margin-top: 1.5rem; width: 100%; text-align: left; }
-        .file-item { 
-            display: flex; justify-content: space-between; padding: 0.75rem; 
-            border-bottom: 1px solid var(--h-border); font-size: 0.9rem; animation: fadeIn 0.3s ease;
-        }
+    .file-stack { margin-top: 1.5rem; width: 100%; text-align: left; }
+    .file-item { 
+        display: flex; justify-content: space-between; padding: 0.75rem; 
+        border-bottom: 1px solid var(--h-border); font-size: 0.9rem; animation: fadeIn 0.3s ease;
+    }
 
-        .action-btn {
-            margin-top: 2rem; width: 100%; padding: 1rem; background: var(--h-accent); color: white;
-            border: none; border-radius: 8px; font-weight: 600; font-size: 1rem; cursor: pointer;
-            min-height: 48px; opacity: 0.5; pointer-events: none; transition: opacity 0.2s;
-            font-feature-settings: "tnum"; font-variant-numeric: tabular-nums;
-        }
-        .action-btn.ready { opacity: 1; pointer-events: all; }
+    .action-btn {
+        margin-top: 2rem; width: 100%; padding: 1rem; background: var(--h-accent); color: white;
+        border: none; border-radius: 8px; font-weight: 600; font-size: 1rem; cursor: pointer;
+        min-height: 48px; opacity: 0.5; pointer-events: none; transition: opacity 0.2s;
+        font-feature-settings: "tnum"; font-variant-numeric: tabular-nums;
+    }
+    .action-btn.ready { opacity: 1; pointer-events: all; }
 
-        /* DROPDOWN STYLES */
-        .dropdown { position: relative; display: inline-block; margin-top: 0.75rem; }
-        .dropdown-toggle { color: var(--h-laser); text-decoration: none; font-weight: 600; font-size: 0.9rem; cursor: pointer; }
-        .dropdown-menu { display: none; position: absolute; background: white; border: 1px solid var(--h-border); border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); min-width: 200px; z-index: 1000; margin-top: 0.5rem; }
-        .dropdown:hover .dropdown-menu { display: block; }
-        .dropdown-menu a { display: block; padding: 0.75rem 1rem; color: var(--h-text); text-decoration: none; transition: background 0.2s; }
-        .dropdown-menu a:hover { background: var(--h-surface); }
+    .dropdown { position: relative; display: inline-block; margin-top: 0.75rem; }
+    .dropdown-toggle { color: var(--h-laser); text-decoration: none; font-weight: 600; font-size: 0.9rem; cursor: pointer; }
+    .dropdown-menu { display: none; position: absolute; background: white; border: 1px solid var(--h-border); border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); min-width: 200px; z-index: 1000; margin-top: 0.5rem; }
+    .dropdown:hover .dropdown-menu { display: block; }
+    .dropdown-menu a { display: block; padding: 0.75rem 1rem; color: var(--h-text); text-decoration: none; transition: background 0.2s; }
+    .dropdown-menu a:hover { background: var(--h-surface); }
 
-        /* MACHINE UI */
-        .machine-view { padding: 2rem; max-width: 800px; margin: 0 auto; line-height: 1.6; }
-        .machine-view h1 { border-bottom: 1px solid var(--m-border); padding-bottom: 0.5rem; margin-bottom: 2rem; }
-        .terminal-card { border: 1px solid var(--m-border); background: #161b22; padding: 1.5rem; margin-bottom: 2rem; }
-        
-        .machine-view h2 { color: #fff; font-size: 1.1rem; border-bottom: 1px dashed #333; padding-bottom: 0.5rem; margin-bottom: 1rem; }
-        dt { font-weight: bold; color: var(--m-text); margin-top: 1rem; }
-        dd { margin-left: 0; margin-bottom: 1rem; color: #8b949e; border-left: 2px solid #333; padding-left: 1rem; }
-        code { background: rgba(110,118,129,0.4); padding: 0.2em 0.4em; border-radius: 3px; font-size: 0.9em; }
-        pre { background: #0d1117; padding: 1rem; border: 1px solid #333; overflow-x: auto; margin-top: 1rem; }
+    /* =========================================
+       MACHINE UI (The Parallel.ai Clone) 
+       ========================================= */
+    .machine-view { 
+        padding: 4rem 2rem; 
+        max-width: 720px; 
+        margin: 0 auto; 
+        line-height: 1.5;
+        font-size: 14px;
+        letter-spacing: 0.02em;
+    }
 
-        #view-toggle {
-            position: fixed; top: 20px; right: 20px; background: transparent; 
-            border: 1px solid currentColor; padding: 8px 16px; border-radius: 20px; 
-            cursor: pointer; font-size: 0.8rem; font-weight: bold; color: inherit; z-index: 1000;
-        }
-        
-        #processor-canvas { display: none; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }</style>
+    /* Clean, open layout - Removing the "Card" box look */
+    .terminal-card { 
+        border: none; 
+        background: transparent; 
+        padding: 0; 
+        margin-bottom: 3rem; 
+        position: relative;
+        padding-left: 1.5rem; /* Space for the vertical line */
+        border-left: 1px solid var(--m-line); /* The vertical guide line */
+    }
+
+    /* Headings with Markdown style hashes */
+    .machine-view h1 { 
+        border: none; margin-bottom: 3rem; color: var(--m-text); font-size: 1.1rem; text-transform: uppercase; letter-spacing: 0.1em;
+    }
+    .machine-view h1::before { content: "# "; color: var(--m-subtext); }
+
+    .machine-view h2 { 
+        color: var(--m-text); 
+        font-size: 1rem; 
+        border: none; 
+        padding: 0; 
+        margin-bottom: 1.5rem; 
+        font-weight: normal;
+    }
+    .machine-view h2::before { content: "## "; color: var(--m-subtext); }
+    
+    /* Sub-headings (DT) as ### */
+    dt { 
+        font-weight: normal; 
+        color: var(--m-text); 
+        margin-top: 1.5rem; 
+        font-size: 0.9rem;
+    }
+    dt::before { content: "### "; color: var(--m-subtext); }
+
+    /* Content (DD) clean text */
+    dd { 
+        margin-left: 0; 
+        margin-bottom: 1rem; 
+        color: var(--m-subtext); 
+        border: none; 
+        padding-left: 0; 
+        font-family: var(--m-font);
+    }
+
+    /* Code blocks - Minimalist */
+    code { 
+        background: transparent; 
+        padding: 0; 
+        border-radius: 0; 
+        font-size: 1em; 
+        color: var(--m-accent); 
+    }
+    
+    /* JSON Block */
+    pre { 
+        background: transparent; 
+        padding: 1rem 0; 
+        border: none; 
+        border-top: 1px solid var(--m-line);
+        border-bottom: 1px solid var(--m-line);
+        color: var(--m-subtext);
+        font-size: 0.85rem;
+        margin-top: 1rem;
+    }
+
+    /* View Toggle Button Styling */
+    #view-toggle {
+        position: fixed; top: 20px; right: 20px; 
+        background: transparent; 
+        border: 1px solid currentColor; 
+        padding: 6px 14px; 
+        border-radius: 4px; 
+        cursor: pointer; 
+        font-size: 0.75rem; 
+        font-weight: bold; 
+        color: inherit; 
+        z-index: 1000;
+        font-family: var(--m-font);
+        text-transform: uppercase;
+    }
+    body[data-view="machine"] #view-toggle {
+        border: 1px solid var(--m-line);
+        color: var(--m-subtext);
+    }
+    body[data-view="machine"] #view-toggle:hover {
+        color: var(--m-accent);
+        border-color: var(--m-accent);
+    }
+    /* Simulate the [BUTTON] look */
+    body[data-view="machine"] #view-toggle::before { content: "[ "; color: var(--m-subtext); }
+    body[data-view="machine"] #view-toggle::after { content: " ]"; color: var(--m-subtext); }
+
+    #processor-canvas { display: none; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+</style>
 
 </head>
 

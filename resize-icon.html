@@ -1,105 +1,328 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const DOM = {
-        body: document.body,
-        dropzone: document.getElementById('dropzone'),
-        input: document.getElementById('file-input'),
-        btn: document.getElementById('process-btn'),
-        canvas: document.getElementById('processor-canvas'),
-        preview: document.getElementById('resized-img-preview'),
-        // Assuming you have a view toggle like this:
-        toggle: document.getElementById('view-toggle') 
-    };
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure 512x512 Icon Resizer - Client Side</title>
+    <meta name="description" content="Resize any image to a 512x512 PNG icon locally in your browser. No server upload required.">
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="canonical" href="https://pdftoscan.online/icon-resizer.html">
+    <meta name="robots" content="index, follow">
+    <style>
+        /* =========================================
+           ROOT STYLES & THEME VARIABLES (Based on your input)
+           ========================================= */
+        :root {
+            /* Human Theme (Minimalist) */
+            --h-bg: #ffffff;
+            --h-text: #000000;
+            --h-subtext: #666666;
+            --h-accent: #000000;
+            --h-border: #e5e5e5;
+            --h-surface: #ffffff;
+            --h-font: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
 
-    let selectedFile = null;
-    const TARGET_SIZE = 512;
-
-    // --- UI State Management (Reuse your existing view toggle logic) ---
-    function updateButton(ready) {
-        if (ready) {
-            DOM.btn.classList.add('ready');
-            DOM.btn.innerText = 'Resize and Download 512x512 PNG';
-            DOM.btn.disabled = false;
-        } else {
-            DOM.btn.classList.remove('ready');
-            DOM.btn.innerText = 'Resize and Download 512x512';
-            DOM.btn.disabled = true;
-            DOM.preview.style.display = 'none';
-        }
-    }
-    updateButton(false);
-
-    // --- File Ingestion ---
-    function handleFile(file) {
-        if (!file || !file.type.startsWith('image/')) {
-            alert("Please drop a valid image file.");
-            selectedFile = null;
-            updateButton(false);
-            return;
+            /* Machine Theme (Terminal/Dark) */
+            --m-bg: #050505;
+            --m-text: #e5e5e5;
+            --m-subtext: #888888;
+            --m-accent: #ffffff;
+            --m-line: #333333;
+            --m-font: 'Courier New', 'Roboto Mono', monospace;
         }
 
-        selectedFile = file;
-        
-        // Show the original image as a preview (optional, but nice)
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            DOM.preview.src = e.target.result;
-            DOM.preview.style.display = 'block';
-            DOM.preview.width = 128; // Scale down preview size for display
-            DOM.preview.height = 128;
-            DOM.preview.style.margin = '20px';
-        };
-        reader.readAsDataURL(file);
+        /* Base Reset */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { height: 100%; width: 100%; }
 
-        updateButton(true);
-    }
+        /* View Logic */
+        body {
+            font-family: var(--h-font);
+            transition: background 0.3s ease, color 0.3s ease;
+            -webkit-font-smoothing: antialiased;
+        }
+        body[data-view="human"] { background: var(--h-bg); color: var(--h-text); }
+        body[data-view="human"] .machine-view { display: none; }
+        body[data-view="human"] .human-view { display: flex; }
+        body[data-view="machine"] { background: var(--m-bg); color: var(--m-text); font-family: var(--m-font); }
+        body[data-view="machine"] .human-view { display: none; }
+        body[data-view="machine"] .machine-view { display: block; }
 
-    // --- Core Processing Logic ---
-    DOM.btn.onclick = () => {
-        if (!selectedFile) return;
+        /* --- HUMAN UI --- */
+        .human-view {
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: flex-start;
+            padding: 60px 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+        }
+        .app-header {
+            margin-bottom: 4rem;
+            text-align: left;
+            width: 100%;
+            position: relative;
+            padding-top: 2rem;
+        }
+        .app-header h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            letter-spacing: -0.04em;
+            line-height: 1.1;
+            margin-bottom: 1rem;
+            color: var(--h-text);
+            max-width: 800px;
+        }
+        .app-header p {
+            color: var(--h-subtext);
+            font-size: 1.2rem;
+            font-weight: 400;
+            max-width: 600px;
+        }
 
-        // 1. Read the image file as a Data URL
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const img = new Image();
-            img.onload = () => {
-                // 2. Configure Canvas for target size
-                DOM.canvas.width = TARGET_SIZE;
-                DOM.canvas.height = TARGET_SIZE;
-                const ctx = DOM.canvas.getContext('2d');
-                ctx.clearRect(0, 0, TARGET_SIZE, TARGET_SIZE);
-                
-                // 3. Draw the image onto the canvas, forcing the 512x512 size
-                ctx.drawImage(img, 0, 0, TARGET_SIZE, TARGET_SIZE);
-                
-                // 4. Extract the resized PNG data (100% Client-Side)
-                const dataURL = DOM.canvas.toDataURL('image/png');
-                
-                // 5. Trigger Download
-                const link = document.createElement('a');
-                link.href = dataURL;
-                link.download = 'icon-512x512.png';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                
-                DOM.btn.innerText = "Download Complete! Resize Another?";
+        /* Dropzone */
+        .dropzone {
+            width: 100%;
+            background: var(--h-surface);
+            border: 1px solid var(--h-border);
+            border-radius: 8px;
+            padding: 4rem 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+        }
+        .dropzone:hover {
+            border-color: #a3a3a3;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+        }
 
-                // Optional: Update the preview to show the resized image
-                DOM.preview.src = dataURL;
-                DOM.preview.width = TARGET_SIZE; // Set back to full size if desired
-                DOM.preview.height = TARGET_SIZE;
+        /* Action Button */
+        .action-btn {
+            margin-top: 2rem; width: auto; min-width: 280px;
+            padding: 0 2rem; height: 50px;
+            background: var(--h-accent);
+            color: white;
+            border: none; border-radius: 6px;
+            font-weight: 600; font-size: 0.9rem;
+            text-transform: uppercase; letter-spacing: 0.05em;
+            cursor: pointer;
+            opacity: 0.5; pointer-events: none; transition: opacity 0.2s;
+        }
+        .action-btn.ready { opacity: 1; pointer-events: all; }
+
+        /* Image Preview Area */
+        #preview-box {
+            margin-top: 1.5rem;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100px;
+            background: #f7f7f7;
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px dashed var(--h-border);
+        }
+        #resized-img-preview {
+            border: 1px solid var(--h-border);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            display: none;
+            width: 128px; /* Initial display size for user */
+            height: 128px;
+        }
+
+        /* --- MACHINE UI --- */
+        .machine-view {
+            padding: 4rem 2rem; max-width: 720px; margin: 0 auto;
+            line-height: 1.5; font-size: 14px; letter-spacing: 0.02em;
+        }
+        .machine-view h1 { border: none; margin-bottom: 3rem; color: var(--m-text); font-size: 1.1rem; text-transform: uppercase; letter-spacing: 0.1em; }
+        .machine-view h1::before { content: "# "; color: var(--m-subtext); }
+        /* Add other terminal styles (h2, dl, dt, dd, etc.) from your existing code */
+
+        /* View Toggle Button */
+        #view-toggle {
+            position: fixed; top: 20px; right: 20px;
+            background: white; border: 1px solid var(--h-border);
+            padding: 8px 16px; border-radius: 6px;
+            cursor: pointer; font-size: 0.8rem; font-weight: 600;
+            color: var(--h-text); z-index: 1000;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            font-family: var(--h-font);
+        }
+        body[data-view="machine"] #view-toggle {
+            background: transparent; border: 1px solid var(--m-line);
+            color: var(--m-subtext); box-shadow: none; font-family: var(--m-font);
+            text-transform: uppercase;
+        }
+        body[data-view="machine"] #view-toggle::before { content: "[ "; }
+        body[data-view="machine"] #view-toggle::after { content: " ]"; }
+    </style>
+</head>
+
+<body data-view="human">
+    <button id="view-toggle">VIEW: TERMINAL</button>
+
+    <main class="human-view">
+        <header class="app-header">
+            <h1>512x512 Icon Resizer</h1>
+            <p>Resize your logo or image to the PWA standard **512x512 PNG** size. Processing is done **instantly and locally** in your browser.</p>
+            </header>
+
+        <div class="dropzone" id="dropzone" tabindex="0">
+            <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+            </svg>
+            <p style="margin-top:1rem; font-weight: 500;">Drop an Image File (PNG, JPG, SVG)</p>
+            <p style="font-size: 0.85rem; color: #9ca3af;">Processing is 100% client-side</p>
+        </div>
+
+        <div id="preview-box">
+            <img id="resized-img-preview" width="512" height="512" alt="Resized 512x512 Icon Preview">
+        </div>
+
+        <button id="process-btn" class="action-btn">Resize and Download 512x512</button>
+    </main>
+
+    <article class="machine-view">
+        <h1>// ICON-RESIZER MODULE</h1>
+        <p style="color: #00ff41;">// DIRECTIVE: PROCESSING_IS_LOCAL</p>
+        </article>
+
+    <input type="file" id="file-input" accept="image/*" style="display: none;">
+    <canvas id="processor-canvas" style="display: none;"></canvas>
+
+    <script>
+        // =========================================
+        // JAVASCRIPT LOGIC (Client-Side Resizer)
+        // =========================================
+        document.addEventListener('DOMContentLoaded', () => {
+            const DOM = {
+                body: document.body,
+                dropzone: document.getElementById('dropzone'),
+                input: document.getElementById('file-input'),
+                btn: document.getElementById('process-btn'),
+                canvas: document.getElementById('processor-canvas'),
+                preview: document.getElementById('resized-img-preview'),
+                toggle: document.getElementById('view-toggle')
             };
-            img.src = e.target.result;
-        };
-        reader.readAsDataURL(selectedFile);
-    };
 
-    // --- Event Listeners (Drag & Drop) ---
-    DOM.dropzone.onclick = () => DOM.input.click();
-    DOM.input.onchange = (e) => handleFile(e.target.files[0]);
-    DOM.dropzone.ondragover = (e) => { e.preventDefault(); DOM.dropzone.classList.add('active'); };
-    DOM.dropzone.ondragleave = (e) => { e.preventDefault(); DOM.dropzone.classList.remove('active'); };
-    DOM.dropzone.ondrop = (e) => { e.preventDefault(); DOM.dropzone.classList.remove('active'); handleFile(e.dataTransfer.files[0]); };
+            let selectedFile = null;
+            const TARGET_SIZE = 512;
+            const INITIAL_PREVIEW_SIZE = 128; // Small size for initial display
 
-    // --- (Ensure you call your existing updateView() function here) ---
-});
+            // --- UI State Management ---
+            function updateButton(ready) {
+                if (ready) {
+                    DOM.btn.classList.add('ready');
+                    DOM.btn.innerText = 'Resize and Download 512x512 PNG';
+                    DOM.btn.disabled = false;
+                } else {
+                    DOM.btn.classList.remove('ready');
+                    DOM.btn.innerText = 'Resize and Download 512x512';
+                    DOM.btn.disabled = true;
+                    DOM.preview.style.display = 'none';
+                }
+            }
+            updateButton(false);
+
+            // --- View Toggle Logic (Reusing your existing pattern) ---
+            const State = { view: localStorage.getItem('icon_resizer_view') || 'human' };
+            function updateView() {
+                DOM.body.setAttribute('data-view', State.view);
+                DOM.toggle.innerText = State.view === 'human' ? 'VIEW: TERMINAL' : 'VIEW: HUMAN';
+                localStorage.setItem('icon_resizer_view', State.view);
+            }
+            DOM.toggle.onclick = () => { State.view = State.view === 'human' ? 'machine' : 'human'; updateView(); };
+            updateView();
+
+
+            // --- File Ingestion ---
+            function handleFile(file) {
+                if (!file || !file.type.startsWith('image/')) {
+                    alert("Please drop a valid image file (PNG, JPG).");
+                    selectedFile = null;
+                    updateButton(false);
+                    return;
+                }
+
+                selectedFile = file;
+
+                // Show the image in a smaller format for preview
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    DOM.preview.src = e.target.result;
+                    DOM.preview.style.display = 'block';
+                    DOM.preview.width = INITIAL_PREVIEW_SIZE;
+                    DOM.preview.height = INITIAL_PREVIEW_SIZE;
+                };
+                reader.readAsDataURL(file);
+
+                updateButton(true);
+            }
+
+            // --- Core Processing Logic ---
+            DOM.btn.onclick = () => {
+                if (!selectedFile || DOM.btn.disabled) return;
+                
+                DOM.btn.innerText = "Processing...";
+                
+                // 1. Read the image file as a Data URL
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        // 2. Configure Canvas for target 512x512 size
+                        DOM.canvas.width = TARGET_SIZE;
+                        DOM.canvas.height = TARGET_SIZE;
+                        const ctx = DOM.canvas.getContext('2d');
+                        ctx.clearRect(0, 0, TARGET_SIZE, TARGET_SIZE);
+                        
+                        // 3. Draw the image onto the canvas, forcing the 512x512 size
+                        // This resizes the image locally, in memory.
+                        ctx.drawImage(img, 0, 0, TARGET_SIZE, TARGET_SIZE);
+                        
+                        // 4. Extract the resized PNG data (high quality)
+                        // toDataURL will only work on a canvas element that is painted to.
+                        const dataURL = DOM.canvas.toDataURL('image/png');
+                        
+                        // 5. Trigger Download
+                        const link = document.createElement('a');
+                        link.href = dataURL;
+                        link.download = 'icon-512x512.png';
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        
+                        // 6. Final UI Update
+                        DOM.btn.innerText = "DONE! Downloaded icon-512x512.png";
+                        DOM.preview.src = dataURL;
+                        DOM.preview.width = INITIAL_PREVIEW_SIZE;
+                        DOM.preview.height = INITIAL_PREVIEW_SIZE;
+                        
+                        selectedFile = null;
+                        setTimeout(() => updateButton(false), 2000); // Reset button after a delay
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(selectedFile);
+            };
+
+            // --- Event Listeners (Drag & Drop) ---
+            DOM.dropzone.onclick = () => DOM.input.click();
+            DOM.input.onchange = (e) => handleFile(e.target.files[0]);
+            DOM.dropzone.ondragover = (e) => { e.preventDefault(); DOM.dropzone.classList.add('active'); };
+            DOM.dropzone.ondragleave = (e) => { e.preventDefault(); DOM.dropzone.classList.remove('active'); };
+            DOM.dropzone.ondrop = (e) => { e.preventDefault(); DOM.dropzone.classList.remove('active'); handleFile(e.dataTransfer.files[0]); };
+        });
+    </script>
+</body>
+</html>

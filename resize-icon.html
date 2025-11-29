@@ -1,0 +1,105 @@
+document.addEventListener('DOMContentLoaded', () => {
+    const DOM = {
+        body: document.body,
+        dropzone: document.getElementById('dropzone'),
+        input: document.getElementById('file-input'),
+        btn: document.getElementById('process-btn'),
+        canvas: document.getElementById('processor-canvas'),
+        preview: document.getElementById('resized-img-preview'),
+        // Assuming you have a view toggle like this:
+        toggle: document.getElementById('view-toggle') 
+    };
+
+    let selectedFile = null;
+    const TARGET_SIZE = 512;
+
+    // --- UI State Management (Reuse your existing view toggle logic) ---
+    function updateButton(ready) {
+        if (ready) {
+            DOM.btn.classList.add('ready');
+            DOM.btn.innerText = 'Resize and Download 512x512 PNG';
+            DOM.btn.disabled = false;
+        } else {
+            DOM.btn.classList.remove('ready');
+            DOM.btn.innerText = 'Resize and Download 512x512';
+            DOM.btn.disabled = true;
+            DOM.preview.style.display = 'none';
+        }
+    }
+    updateButton(false);
+
+    // --- File Ingestion ---
+    function handleFile(file) {
+        if (!file || !file.type.startsWith('image/')) {
+            alert("Please drop a valid image file.");
+            selectedFile = null;
+            updateButton(false);
+            return;
+        }
+
+        selectedFile = file;
+        
+        // Show the original image as a preview (optional, but nice)
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            DOM.preview.src = e.target.result;
+            DOM.preview.style.display = 'block';
+            DOM.preview.width = 128; // Scale down preview size for display
+            DOM.preview.height = 128;
+            DOM.preview.style.margin = '20px';
+        };
+        reader.readAsDataURL(file);
+
+        updateButton(true);
+    }
+
+    // --- Core Processing Logic ---
+    DOM.btn.onclick = () => {
+        if (!selectedFile) return;
+
+        // 1. Read the image file as a Data URL
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+                // 2. Configure Canvas for target size
+                DOM.canvas.width = TARGET_SIZE;
+                DOM.canvas.height = TARGET_SIZE;
+                const ctx = DOM.canvas.getContext('2d');
+                ctx.clearRect(0, 0, TARGET_SIZE, TARGET_SIZE);
+                
+                // 3. Draw the image onto the canvas, forcing the 512x512 size
+                ctx.drawImage(img, 0, 0, TARGET_SIZE, TARGET_SIZE);
+                
+                // 4. Extract the resized PNG data (100% Client-Side)
+                const dataURL = DOM.canvas.toDataURL('image/png');
+                
+                // 5. Trigger Download
+                const link = document.createElement('a');
+                link.href = dataURL;
+                link.download = 'icon-512x512.png';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                DOM.btn.innerText = "Download Complete! Resize Another?";
+
+                // Optional: Update the preview to show the resized image
+                DOM.preview.src = dataURL;
+                DOM.preview.width = TARGET_SIZE; // Set back to full size if desired
+                DOM.preview.height = TARGET_SIZE;
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(selectedFile);
+    };
+
+    // --- Event Listeners (Drag & Drop) ---
+    DOM.dropzone.onclick = () => DOM.input.click();
+    DOM.input.onchange = (e) => handleFile(e.target.files[0]);
+    DOM.dropzone.ondragover = (e) => { e.preventDefault(); DOM.dropzone.classList.add('active'); };
+    DOM.dropzone.ondragleave = (e) => { e.preventDefault(); DOM.dropzone.classList.remove('active'); };
+    DOM.dropzone.ondrop = (e) => { e.preventDefault(); DOM.dropzone.classList.remove('active'); handleFile(e.dataTransfer.files[0]); };
+
+    // --- (Ensure you call your existing updateView() function here) ---
+});

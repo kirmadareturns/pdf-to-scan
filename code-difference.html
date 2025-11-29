@@ -3,353 +3,260 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Quickly compare code or text differences between two inputted texts 100% client-side. Your code or text is never sent to our server. All processing happens securely in your browser.">
-    <meta name="robots" content="index, follow">
-    <link rel="canonical" href="https://pdftoscan.online/code-difference">
-    <title>Compare Code or Text Differences</title>
+    <title>Universal Client-Side Formatter</title>
     <style>
         :root {
-            --bg: #111;
-            --panel: #1a1a1a;
-            --border: #444;
-            --text: #ccc;
-            --gutter: #555;
-            
-            /* Git-Style Colors */
-            --del-bg: #4b1818;
-            --add-bg: #1c3619; 
-            --mod-bg: #3e3e00;
-
-            --font: 'Menlo', 'Monaco', 'Courier New', monospace;
-            --row-h: 18px; 
+            --bg: #1e1e1e;
+            --panel: #252526;
+            --text: #d4d4d4;
+            --accent: #007acc;
+            --border: #3e3e42;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: var(--bg); color: var(--text); font-family: var(--font); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            height: 100vh;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
 
-        /* HEADER */
         header {
-            height: 45px; background: #222; border-bottom: 1px solid #000;
-            display: flex; align-items: center; justify-content: space-between; padding: 0 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border);
         }
-        h1 { font-size: 0.9rem; font-weight: 800; color: #fff; letter-spacing: 1px; }
-        .controls { display: flex; gap: 10px; }
-        .btn {
-            background: #007acc; color: white; border: none; padding: 6px 16px;
-            font-size: 0.8rem; cursor: pointer; font-weight: bold; border-radius: 2px;
-        }
-        .btn:hover { background: #0098ff; }
-        .btn.secondary { background: #333; }
 
-        /* INPUT STAGE */
-        #input-stage {
-            position: absolute; top: 45px; left: 0; width: 100%; height: calc(100% - 45px);
-            background: var(--bg); z-index: 20; display: flex;
+        h1 { margin: 0; font-size: 20px; }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
         }
-        .pane { flex: 1; display: flex; flex-direction: column; border-right: 1px solid var(--border); }
-        .pane-head { padding: 8px 15px; background: #252526; color: #fff; font-size: 0.75rem; font-weight: bold; border-bottom: 1px solid #000; }
+
+        select, button {
+            padding: 8px 12px;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button.primary {
+            background-color: var(--accent);
+            border-color: var(--accent);
+            font-weight: bold;
+        }
+
+        button.primary:hover { opacity: 0.9; }
+        button:disabled { opacity: 0.5; cursor: wait; }
+
+        .status-text {
+            font-size: 12px;
+            color: #888;
+            margin-right: 10px;
+            font-style: italic;
+        }
+
+        .editor-container {
+            display: flex;
+            gap: 20px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 5px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
         textarea {
-            flex: 1; background: var(--bg); color: var(--text); border: none;
-            padding: 15px; font-family: var(--font); font-size: 12px; resize: none; outline: none;
-            white-space: pre;
+            flex: 1;
+            background-color: var(--panel);
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 15px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+            resize: none;
+            outline: none;
+            
+            /* CHANGED: This now wraps text automatically */
+            white-space: pre-wrap; 
+            word-break: break-word;
+            
+            overflow: auto;
         }
 
-        /* DIFF OUTPUT STAGE */
-        #diff-stage {
-            flex: 1; display: none; position: relative; 
-            overflow-y: auto; overflow-x: hidden;
+        textarea:focus { border-color: var(--accent); }
+
+        .error-msg {
+            color: #ff6b6b;
+            font-size: 13px;
+            margin-top: 10px;
+            display: none;
+            padding: 10px;
+            background: rgba(255, 107, 107, 0.1);
+            border-left: 3px solid #ff6b6b;
         }
-        #phantom { width: 1px; } /* Forces scrollbar */
-        #viewport { position: absolute; top: 0; left: 0; width: 100%; }
-
-        /* ROW STYLES */
-        .row { display: flex; height: var(--row-h); font-size: 12px; line-height: var(--row-h); }
-        .side { flex: 1; display: flex; overflow: hidden; border-right: 1px solid #333; position: relative; }
-        .ln {
-            width: 50px; text-align: right; padding-right: 10px; color: var(--gutter); 
-            user-select: none; background: #1e1e1e; font-size: 11px;
-        }
-        .code { flex: 1; white-space: pre; padding-left: 5px; overflow: hidden; }
-
-        /* DIFF COLORS */
-        .row.del .side.left { background: var(--del-bg); }
-        .row.del .side.right { opacity: 0.2; background: #000; } /* Ghost */
-        
-        .row.add .side.left { opacity: 0.2; background: #000; } /* Ghost */
-        .row.add .side.right { background: var(--add-bg); }
-
-        /* LOADER */
-        #loader {
-            position: fixed; top: 43px; left: 0; width: 100%; height: 3px;
-            background: transparent; z-index: 100;
-        }
-        #bar { width: 0%; height: 100%; background: #00ff41; transition: width 0.3s; box-shadow: 0 0 10px #00ff41; }
-
     </style>
 </head>
 <body>
-
     <header>
-        <h1>GIGADIFF <span style="color:#00ff41">// PRECISION</span></h1>
-        <div id="status" style="font-size:11px; color:#888;">WAITING FOR INPUT</div>
+        <h1>Universal Safe Formatter</h1>
         <div class="controls">
-            <button class="btn secondary" id="reset-btn" onclick="reset()" style="display:none">NEW</button>
-            <button class="btn" id="run-btn" onclick="run()">COMPARE</button>
+            <span id="statusText" class="status-text"></span>
+            
+            <select id="languageSelect" onchange="prefetchParser()">
+                <option value="html">HTML</option>
+                <option value="css">CSS / SCSS</option>
+                <option value="babel">JavaScript</option>
+                <option value="typescript">TypeScript</option>
+                <option value="json">JSON</option>
+                <option value="markdown">Markdown</option>
+                <option value="yaml">YAML</option>
+                <option value="xml">XML / SVG</option>
+            </select>
+            <button class="primary" id="formatBtn" onclick="formatCode()">Format Code</button>
+            <button onclick="copyOutput()">Copy Output</button>
         </div>
     </header>
 
-    <div id="loader"><div id="bar"></div></div>
-
-    <div id="input-stage">
-        <div class="pane">
-            <div class="pane-head">ORIGINAL FILE</div>
-            <textarea id="in1" placeholder="Paste Code A..."></textarea>
+    <div class="editor-container">
+        <div class="panel">
+            <label>Input</label>
+            <textarea id="inputCode" placeholder="Paste code here..." spellcheck="false"></textarea>
         </div>
-        <div class="pane">
-            <div class="pane-head">MODIFIED FILE</div>
-            <textarea id="in2" placeholder="Paste Code B..."></textarea>
+        <div class="panel">
+            <label>Formatted Output</label>
+            <textarea id="outputCode" placeholder="Clean code will appear here..." readonly spellcheck="false"></textarea>
         </div>
     </div>
-
-    <div id="diff-stage">
-        <div id="phantom"></div>
-        <div id="viewport"></div>
-    </div>
+    
+    <div id="errorDisplay" class="error-msg"></div>
 
     <script>
-        // --- PRECISE MYERS DIFF WORKER ---
-        const workerCode = `
-        self.onmessage = function(e) {
-            const { text1, text2 } = e.data;
-            const lines1 = text1.split('\\n');
-            const lines2 = text2.split('\\n');
-            
-            // 1. Pre-processing: Hash lines to integers for speed
-            // String comparison is slow. Int comparison is fast.
-            const lineToHash = new Map();
-            const hashToLine = [];
-            
-            function getHash(line) {
-                if (lineToHash.has(line)) return lineToHash.get(line);
-                const id = hashToLine.length;
-                hashToLine.push(line);
-                lineToHash.set(line, id);
-                return id;
-            }
+        // --- CONFIGURATION ---
+        const BASE_URL = "https://unpkg.com/prettier@2.8.8";
+        const CORE_URL = `${BASE_URL}/standalone.js`;
+        
+        // Map languages to their specific script URLs
+        const parsersMap = {
+            html:       { parser: "html",       url: `${BASE_URL}/parser-html.js` },
+            css:        { parser: "css",        url: `${BASE_URL}/parser-postcss.js` },
+            babel:      { parser: "babel",      url: `${BASE_URL}/parser-babel.js` },
+            typescript: { parser: "typescript", url: `${BASE_URL}/parser-typescript.js` },
+            json:       { parser: "json",       url: `${BASE_URL}/parser-babel.js` },
+            markdown:   { parser: "markdown",   url: `${BASE_URL}/parser-markdown.js` },
+            yaml:       { parser: "yaml",       url: `${BASE_URL}/parser-yaml.js` },
+            xml:        { parser: "xml",        url: "https://unpkg.com/@prettier/plugin-xml@2.2.0/standalone.js" }
+        };
 
-            const hash1 = lines1.map(getHash);
-            const hash2 = lines2.map(getHash);
+        const loadedScripts = new Set();
 
-            // 2. Myers Diff Algorithm (Shortest Edit Script)
-            // Using a simple O(ND) implementation suitable for standard file sizes
-            // For 100k lines, this takes about 1-3 seconds.
-            
-            const n = hash1.length;
-            const m = hash2.length;
-            const max = n + m;
-            const v = new Int32Array(2 * max + 1);
-            v[max] = 0;
-            
-            const history = []; 
+        // --- DYNAMIC LOADER ---
+        function loadScript(src) {
+            return new Promise((resolve, reject) => {
+                if (loadedScripts.has(src)) return resolve(); 
 
-            for (let d = 0; d <= max; d++) {
-                // Optimization: Progress updates
-                if (d % 2000 === 0) self.postMessage({ pct: (d/max)*50 });
-
-                const trace = [];
-                for (let k = -d; k <= d; k += 2) {
-                    let x, y;
-                    if (k === -d || (k !== d && v[max + k - 1] < v[max + k + 1])) {
-                        x = v[max + k + 1];
-                    } else {
-                        x = v[max + k - 1] + 1;
-                    }
-                    y = x - k;
-                    
-                    // Store trace for backtracking
-                    // To save memory, we only store the moves, not the whole grid
-                    // Actually for 100k lines, full trace is too heavy. 
-                    // We switch to linear space if needed, but for this demo, 
-                    // we will use a "Greedy LCS" approach which is faster and 99.9% accurate for code.
-                }
-            }
-
-            // --- PIVOT: Myers is too heavy for a single-file JS blob without memory issues on mobile.
-            // Switching to "LCS Dynamic Programming with optimization"
-            
-            const matrix = []; // We will use a 1D array approach to save memory
-            // Actually, let's use the absolute fastest JS method: 
-            // The "Heckel" algorithm (Unique Line Matching). 
-            // It finds unique lines that exist in both files, anchors them, and diffs the gaps.
-            // This is how VS Code usually does it for large files.
-            
-            // STEP A: Pass 1 - Find unique matches (Anchors)
-            const unique1 = new Map();
-            const unique2 = new Map();
-            
-            hash1.forEach((h, i) => unique1.set(h, (unique1.get(h) || 0) + 1));
-            hash2.forEach((h, i) => unique2.set(h, (unique2.get(h) || 0) + 1));
-            
-            const anchors = []; // { idx1, idx2 }
-            
-            // Map line hashes to their index if they are unique
-            const idxMap1 = new Map();
-            hash1.forEach((h, i) => { if(unique1.get(h) === 1) idxMap1.set(h, i); });
-            
-            hash2.forEach((h, i) => {
-                if(unique2.get(h) === 1 && idxMap1.has(h)) {
-                    anchors.push({ idx1: idxMap1.get(h), idx2: i });
-                }
+                document.getElementById('statusText').textContent = "Loading engine...";
+                const script = document.createElement('script');
+                script.src = src;
+                script.onload = () => {
+                    loadedScripts.add(src);
+                    document.getElementById('statusText').textContent = "";
+                    resolve();
+                };
+                script.onerror = () => {
+                    document.getElementById('statusText').textContent = "Error loading engine.";
+                    reject(new Error(`Failed to load ${src}`));
+                };
+                document.head.appendChild(script);
             });
-            
-            // Add Start/End Sentinels
-            anchors.unshift({ idx1: -1, idx2: -1 });
-            anchors.push({ idx1: n, idx2: m });
-            
-            // Sort anchors by idx1 to ensure order (though usually they are)
-            anchors.sort((a,b) => a.idx1 - b.idx1);
+        }
 
-            // STEP B: Diff the gaps between anchors
-            const finalRows = [];
-            
-            for(let k=0; k < anchors.length - 1; k++) {
-                const curr = anchors[k];
-                const next = anchors[k+1];
-                
-                // 1. Fill the gap (The modified/diff part)
-                let i = curr.idx1 + 1;
-                let j = curr.idx2 + 1;
-                
-                while(i < next.idx1 || j < next.idx2) {
-                    if (i < next.idx1 && j < next.idx2 && hash1[i] === hash2[j]) {
-                        // Coincidental match inside the gap
-                        finalRows.push({ type: 'same', lN: i+1, lT: lines1[i], rN: j+1, rT: lines2[j] });
-                        i++; j++;
-                    } else if (i < next.idx1) {
-                         // Treat as delete
-                         finalRows.push({ type: 'del', lN: i+1, lT: lines1[i], rN: '', rT: '' });
-                         i++;
-                    } else {
-                         // Treat as add
-                         finalRows.push({ type: 'add', lN: '', lT: '', rN: j+1, rT: lines2[j] });
-                         j++;
-                    }
-                }
-                
-                // 2. Add the Anchor itself (The perfect match)
-                if (next.idx1 < n && next.idx2 < m) {
-                    finalRows.push({ type: 'same', lN: next.idx1+1, lT: lines1[next.idx1], rN: next.idx2+1, rT: lines2[next.idx2] });
-                }
+        // --- PRE-FETCH LOGIC ---
+        window.addEventListener('DOMContentLoaded', () => {
+            loadScript(CORE_URL).then(() => {
+                prefetchParser();
+            });
+        });
+
+        async function prefetchParser() {
+            const lang = document.getElementById('languageSelect').value;
+            const config = parsersMap[lang];
+            if(config && config.url) {
+                await loadScript(config.url);
             }
-
-            self.postMessage({ done: true, rows: finalRows });
-        };
-        `;
-
-        const blob = new Blob([workerCode], {type: 'text/javascript'});
-        const worker = new Worker(URL.createObjectURL(blob));
-
-        // --- UI LOGIC ---
-        const UI = {
-            in1: document.getElementById('in1'),
-            in2: document.getElementById('in2'),
-            inputStage: document.getElementById('input-stage'),
-            diffStage: document.getElementById('diff-stage'),
-            phantom: document.getElementById('phantom'),
-            viewport: document.getElementById('viewport'),
-            bar: document.getElementById('bar'),
-            status: document.getElementById('status'),
-            btnRun: document.getElementById('run-btn'),
-            btnReset: document.getElementById('reset-btn')
-        };
-
-        let ROWS = [];
-        const RH = 18;
-        let VISIBLE = 50;
-
-        function run() {
-            const t1 = UI.in1.value;
-            const t2 = UI.in2.value;
-            if(!t1 && !t2) return;
-
-            UI.btnRun.disabled = true;
-            UI.status.innerText = "CALCULATING HASH MAPS...";
-            UI.bar.style.width = "30%";
-            
-            worker.postMessage({ text1: t1, text2: t2 });
         }
 
-        worker.onmessage = (e) => {
-            if(e.data.pct) UI.bar.style.width = e.data.pct + "%";
-            
-            if(e.data.done) {
-                UI.bar.style.width = "100%";
-                ROWS = e.data.rows;
-                UI.status.innerText = `DIFF COMPLETE: ${ROWS.length.toLocaleString()} ROWS`;
-                setTimeout(() => UI.bar.style.width = "0%", 500);
-                initView();
+        // --- MAIN FORMAT FUNCTION ---
+        async function formatCode() {
+            const input = document.getElementById('inputCode').value;
+            const lang = document.getElementById('languageSelect').value;
+            const errorBox = document.getElementById('errorDisplay');
+            const outputBox = document.getElementById('outputCode');
+            const btn = document.getElementById('formatBtn');
+
+            if (!input.trim()) return;
+
+            btn.disabled = true;
+            btn.textContent = "Processing...";
+            errorBox.style.display = 'none';
+
+            try {
+                await loadScript(CORE_URL);
+                const config = parsersMap[lang];
+                await loadScript(config.url);
+
+                const formatted = prettier.format(input, {
+                    parser: config.parser,
+                    plugins: window.prettierPlugins,
+                    printWidth: 80,
+                    tabWidth: 2,
+                    useTabs: false,
+                    semi: true,
+                    singleQuote: false,
+                });
+
+                outputBox.value = formatted;
+
+            } catch (err) {
+                console.error(err);
+                errorBox.style.display = 'block';
+                errorBox.textContent = "Error: " + err.message;
+            } finally {
+                btn.disabled = false;
+                btn.textContent = "Format Code";
             }
-        };
-
-        function initView() {
-            UI.inputStage.style.display = 'none';
-            UI.diffStage.style.display = 'block';
-            UI.btnRun.style.display = 'none';
-            UI.btnReset.style.display = 'inline-block';
-            
-            UI.phantom.style.height = (ROWS.length * RH) + "px";
-            window.onresize(); // Calc visible rows
-            UI.diffStage.onscroll = render;
-            render();
         }
 
-        function reset() {
-            UI.diffStage.style.display = 'none';
-            UI.inputStage.style.display = 'flex';
-            UI.btnRun.style.display = 'inline-block';
-            UI.btnReset.style.display = 'none';
-            UI.btnRun.disabled = false;
-            UI.status.innerText = "WAITING FOR INPUT";
-            ROWS = [];
-            UI.viewport.innerHTML = "";
-        }
-
-        window.onresize = () => {
-            VISIBLE = Math.ceil(window.innerHeight / RH) + 10;
-            if(ROWS.length > 0) render();
-        };
-
-        function render() {
-            const start = Math.floor(UI.diffStage.scrollTop / RH);
-            const end = Math.min(ROWS.length, start + VISIBLE);
-            
-            let html = '';
-            for(let i=start; i<end; i++) {
-                const r = ROWS[i];
-                const escL = escape(r.lT);
-                const escR = escape(r.rT);
-                
-                html += `<div class="row ${r.type}">
-                    <div class="side left">
-                        <div class="ln">${r.lN}</div>
-                        <div class="code">${escL}</div>
-                    </div>
-                    <div class="side right">
-                        <div class="ln">${r.rN}</div>
-                        <div class="code">${escR}</div>
-                    </div>
-                </div>`;
-            }
-            UI.viewport.innerHTML = html;
-            UI.viewport.style.transform = `translateY(${start * RH}px)`;
-        }
-
-        function escape(s) {
-            if(!s) return '';
-            return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        function copyOutput() {
+            const output = document.getElementById('outputCode');
+            if (!output.value) return;
+            output.select();
+            document.execCommand('copy');
+            alert('Copied to clipboard!');
         }
     </script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"version":"2024.11.0","token":"41342ae72cae4f17a1b1010d54e26477","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>
-
-

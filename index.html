@@ -333,7 +333,7 @@ async function startProcessing() {
     DOM.dropzone.classList.remove('scanning');
     State.isProcessing = false;
 }
-    async function processSinglePDF(file, jsPDF, maxWorkers, createProgress) {
+async function processSinglePDF(file, jsPDF, maxWorkers, createProgress) {
     const arrayBuffer = await file.arrayBuffer();
     const pdfDoc = await pdfjsLib.getDocument(arrayBuffer).promise;
     const totalPages = pdfDoc.numPages;
@@ -342,8 +342,37 @@ async function startProcessing() {
 
     const outputPDF = new jsPDF({ unit: 'px', hotfixes: ["px_scaling"] });
 
-    let nextPageToAdd = 1; // Track page order
-    const pageBuffer = {};  // Hold pages that finish out-of-order
+    let nextPageToAdd = 1;  // Track sequential addition
+    const pageBuffer = {};   // Store completed pages temporarily
+
+    // Remove initial blank page before any addition
+    outputPDF.deletePage(1);
+
+    function tryAddPagesInOrder() {
+        while (pageBuffer[nextPageToAdd]) {
+            const dataURL = pageBuffer[nextPageToAdd];
+            delete pageBuffer[nextPageToAdd];
+
+            const img = new Image();
+            img.src = dataURL;
+            img.onload = () => {
+                const pdfW = img.width;
+                const pdfH = img.height;
+                outputPDF.addPage([pdfW, pdfH], pdfW > pdfH ? 'l' : 'p');
+                outputPDF.addImage(dataURL, 'JPEG', 0, 0, pdfW, pdfH);
+
+                createProgress(`Processing ${originalName}: page ${nextPageToAdd}/${totalPages}`);
+
+                if (nextPageToAdd === totalPages) {
+                    outputPDF.save(originalName + '_scanned.pdf');
+                }
+
+                nextPageToAdd++;
+                tryAddPagesInOrder();  // recursively add next pages
+            };
+            break; // wait for this image to load before next iteration
+        }
+    }
 
     function createWorker() {
         const worker = new Worker('pdf-worker.js');
@@ -351,36 +380,14 @@ async function startProcessing() {
             const { dataURL, pageIndex } = e.data;
             pageBuffer[pageIndex] = dataURL;
 
-            // Try adding pages in order
-            while (pageBuffer[nextPageToAdd]) {
-                const dataURLToAdd = pageBuffer[nextPageToAdd];
-                delete pageBuffer[nextPageToAdd];
-
-                const img = new Image();
-                img.src = dataURLToAdd;
-                img.onload = () => {
-                    const pdfW = img.width;
-                    const pdfH = img.height;
-
-                    if (nextPageToAdd === 1) outputPDF.internal.deletePage(1); // Remove default page
-                    outputPDF.addPage([pdfW, pdfH], pdfW > pdfH ? 'l' : 'p');
-                    outputPDF.addImage(dataURLToAdd, 'JPEG', 0, 0, pdfW, pdfH);
-
-                    if (nextPageToAdd === totalPages) {
-                        outputPDF.save(originalName + '_scanned.pdf');
-                        createProgress(`Finished ${originalName}`);
-                    }
-                    nextPageToAdd++;
-                };
-            }
-
-            createProgress(`Processing ${originalName}: page ${pageIndex}/${totalPages}`);
+            tryAddPagesInOrder();
 
             if (pageQueue.length > 0) {
                 const nextPage = pageQueue.shift();
                 worker.postMessage({ arrayBuffer, pageIndex: nextPage });
             } else {
-                worker.terminate();
+                // Don't terminate immediately; let last image load finish
+                setTimeout(() => worker.terminate(), 100);
             }
         };
         return worker;
@@ -395,13 +402,14 @@ async function startProcessing() {
         w.postMessage({ arrayBuffer, pageIndex: page });
     }
 
-    return new Promise(resolve => {
-        const interval = setInterval(() => {
+    // Wait until all pages are added
+    await new Promise(resolve => {
+        const checkInterval = setInterval(() => {
             if (nextPageToAdd > totalPages) {
-                clearInterval(interval);
+                clearInterval(checkInterval);
                 resolve();
             }
-        }, 100);
+        }, 50);
     });
 }
 </script>

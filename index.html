@@ -104,13 +104,8 @@
         });
       }
     </script>
-    
-
-</script>
-
    <style>
     :root {
-        /* Human Theme (Parallel.ai Homepage Clone) */
         --h-bg: #f5f5f7;
         --h-text: #000000;      /* Stark Black */
         --h-subtext: #666666;   /* Muted Grey */
@@ -126,9 +121,6 @@
         -webkit-font-smoothing: antialiased;
         background-color: var(--h-bg);
     }     
-    /* =========================================
-       HUMAN UI (Parallel Homepage Clone) 
-       ========================================= */
     .human-view {
         flex-direction: column; 
         align-items: flex-start; /* Left Align Everything */
@@ -163,24 +155,6 @@
         font-weight: 400;
         max-width: 600px;
     }
-
-    /* Transform Dropdown into Top-Right Nav Link */
-    .dropdown { 
-        position: absolute; 
-        top: 0; 
-        right: 0; 
-        margin-top: 0; 
-    }
-    
-    .dropdown-toggle { 
-        color: var(--h-subtext); 
-        text-decoration: none; 
-        font-weight: 500; 
-        font-size: 0.9rem; 
-        cursor: pointer; 
-        transition: color 0.2s;
-    }
-    .dropdown-toggle:hover { color: var(--h-text); }
     
     /* Dropzone - Minimalist Input Style */
     .dropzone {
@@ -228,26 +202,6 @@
         border-bottom: 1px solid var(--h-border); font-size: 0.9rem; animation: fadeIn 0.3s ease;
         color: var(--h-subtext);
     }
-
-    .action-btn {
-        margin-top: 2rem; width: auto; min-width: 200px; 
-        padding: 0 2rem; height: 50px;
-        background: var(--h-accent); /* Black */
-        color: white;
-        border: none; border-radius: 6px; 
-        font-weight: 600; font-size: 0.9rem; 
-        text-transform: uppercase; letter-spacing: 0.05em;
-        cursor: pointer;
-        opacity: 0.5; pointer-events: none; transition: opacity 0.2s;
-    }
-    .action-btn.ready { opacity: 1; pointer-events: all; }
-
-    /* Dropdown Menu Styling */
-    .dropdown-menu { display: none; position: absolute; right: 0; background: white; border: 1px solid var(--h-border); border-radius: 8px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); min-width: 200px; z-index: 1000; margin-top: 1rem; padding: 0.5rem 0; }
-    .dropdown:hover .dropdown-menu { display: block; }
-    .dropdown-menu a { display: block; padding: 0.75rem 1.5rem; color: var(--h-subtext); text-decoration: none; transition: background 0.2s, color 0.2s; font-size: 0.9rem;}
-    .dropdown-menu a:hover { background: #fafafa; color: var(--h-text); }
-
     #processor-canvas { display: none; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 </style>
@@ -284,13 +238,8 @@
             dropzone: document.getElementById('dropzone'), input: document.getElementById('file-input'),
             list: document.getElementById('file-list'), 
             canvas: document.getElementById('processor-canvas'),progressText: document.getElementById('progress-text'),
-            ctx: document.getElementById('processor-canvas').getContext('2d', { willReadFrequently: true, alpha: false })
+            ctx: document.getElementById('processor-canvas').getContext('2d', { alpha: false })
         };
-        function updateView() {
-            DOM.body.setAttribute('data-view', State.view);
-            document.title = "Convert PDF to Scanned PDF Locally Without Uploading to Server";
-            localStorage.setItem('flatline_view', State.view);
-        }
 
         // FILE HANDLING
         function renderFileList() {

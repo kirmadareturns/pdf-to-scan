@@ -12,18 +12,18 @@
     <meta name="description" content="Convert any PDF with selectable text, images or pasted signatures to a non-selectable scanned document without uploading your files to a server. All processing to make PDF look scanned happens instantly and locally in your browser.">
     <meta name="robots" content="index, follow, max-image-preview:large">
     <link rel="canonical" href="https://pdftoscan.online/">
-<meta
+    <meta
       property="og:image"
       content="https://pdftoscan.online/favicon.svg"
     />
     <meta property="og:title" content="Convert PDF to Scanned PDF Locally Without Uploading to Server">
-<meta
+    <meta
       property="og:description"
       content="Convert any PDF with selectable text, images or pasted signatures to a non-selectable scanned document without uploading your files to a server. All processing to make PDF look scanned happens instantly and locally in your browser."
     />
 
- <meta property="og:type" content="website">
-<meta
+    <meta property="og:type" content="website">
+    <meta
       property="og:url"
       content="https://pdftoscan.online"
     />
@@ -53,11 +53,11 @@
       name="twitter:image:src"
       content="https://pdftoscan.online/favicon.svg"
     />
-<link rel="manifest" href="/manifest.json" />
+    <link rel="manifest" href="/manifest.json" />
     
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
 
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
     <script type="application/ld+json">
       {
@@ -116,8 +116,7 @@
     <script type="application/ld+json">
           {
           "@context": "http://schema.org",
-                       "@type": "FAQPage",
-                      "mainEntity": [{"@type": "Question",
+              "mainEntity": [{"@type": "Question",
               "name": "What are the features provided by pdftoscan.online while converting a PDF into a scanned PDF?
       ",
               "acceptedAnswer": {
@@ -268,42 +267,21 @@
    <style>
     :root {
         /* Human Theme (Parallel.ai Homepage Clone) */
-        --h-bg: #ffffff;
+        --h-bg: #f5f5f7;
         --h-text: #000000;      /* Stark Black */
         --h-subtext: #666666;   /* Muted Grey */
-        --h-accent: #000000;    /* Primary Action Color */
-        --h-border: #e5e5e5;    /* Light Borders */
+        --h-accent: #0071e3;    /* Primary Action Color */
+        --h-border: #d2d2d7;    /* Light Borders */
         --h-surface: #ffffff;   /* White Surface */
         --h-laser: #000000;     /* Laser becomes black for this minimal theme */
         --h-font: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
-
-        /* Machine Theme (Parallel.ai Terminal Clone - Preserved) */
-        --m-bg: #050505;
-        --m-text: #e5e5e5;
-        --m-subtext: #888888;
-        --m-accent: #ffffff;
-        --m-line: #333333;
-        --m-font: 'Courier New', 'Roboto Mono', monospace;
     }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { height: 100%; width: 100%; }
-    
     body { 
         font-family: var(--h-font);
         transition: background 0.3s ease, color 0.3s ease; 
         -webkit-font-smoothing: antialiased;
-    }
-
-    /* VIEW TOGGLE LOGIC */
-    body[data-view="human"] { background: var(--h-bg); color: var(--h-text); }
-    body[data-view="human"] .machine-view { display: none; }
-    body[data-view="human"] .human-view { display: flex; }
-
-    body[data-view="machine"] { background: var(--m-bg); color: var(--m-text); font-family: var(--m-font); }
-    body[data-view="machine"] .human-view { display: none; }
-    body[data-view="machine"] .machine-view { display: block; }
-    
+        background-color: var(--h-bg);
+    }     
     /* =========================================
        HUMAN UI (Parallel Homepage Clone) 
        ========================================= */
@@ -427,55 +405,12 @@
     .dropdown-menu a { display: block; padding: 0.75rem 1.5rem; color: var(--h-subtext); text-decoration: none; transition: background 0.2s, color 0.2s; font-size: 0.9rem;}
     .dropdown-menu a:hover { background: #fafafa; color: var(--h-text); }
 
-    /* =========================================
-       MACHINE UI (Parallel.ai Terminal Clone) 
-       ========================================= */
-    .machine-view { 
-        padding: 4rem 2rem; max-width: 720px; margin: 0 auto; 
-        line-height: 1.5; font-size: 14px; letter-spacing: 0.02em;
-    }
-    .terminal-card { 
-        border: none; background: transparent; padding: 0; 
-        margin-bottom: 3rem; position: relative;
-        padding-left: 1.5rem; border-left: 1px solid var(--m-line);
-    }
-    .machine-view h1 { border: none; margin-bottom: 3rem; color: var(--m-text); font-size: 1.1rem; text-transform: uppercase; letter-spacing: 0.1em; }
-    .machine-view h1::before { content: "# "; color: var(--m-subtext); }
-    .machine-view h2 { color: var(--m-text); font-size: 1rem; border: none; padding: 0; margin-bottom: 1.5rem; font-weight: normal; }
-    .machine-view h2::before { content: "## "; color: var(--m-subtext); }
-    dt { font-weight: normal; color: var(--m-text); margin-top: 1.5rem; font-size: 0.9rem; }
-    dt::before { content: "### "; color: var(--m-subtext); }
-    dd { margin-left: 0; margin-bottom: 1rem; color: var(--m-subtext); border: none; padding-left: 0; font-family: var(--m-font); }
-    code { background: transparent; padding: 0; border-radius: 0; font-size: 1em; color: var(--m-accent); }
-    pre { background: transparent; padding: 1rem 0; border: none; border-top: 1px solid var(--m-line); border-bottom: 1px solid var(--m-line); color: var(--m-subtext); font-size: 0.85rem; margin-top: 1rem; }
-
-    /* View Toggle - "Start Building" Button Style */
-    #view-toggle {
-        position: fixed; top: 20px; right: 20px; 
-        background: white; border: 1px solid var(--h-border); 
-        padding: 8px 16px; border-radius: 6px; 
-        cursor: pointer; font-size: 0.8rem; font-weight: 600; 
-        color: var(--h-text); z-index: 1000;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-        font-family: var(--h-font);
-    }
-    
-    /* Machine View Toggle Override */
-    body[data-view="machine"] #view-toggle {
-        background: transparent; border: 1px solid var(--m-line);
-        color: var(--m-subtext); box-shadow: none; font-family: var(--m-font);
-        text-transform: uppercase;
-    }
-    body[data-view="machine"] #view-toggle::before { content: "[ "; }
-    body[data-view="machine"] #view-toggle::after { content: " ]"; }
-
     #processor-canvas { display: none; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 </head>
 
-<body data-view="human">
-    <button id="view-toggle">VIEW: TERMINAL</button>
+<body>
 
     <main class="human-view">
         <header class="app-header">
@@ -513,79 +448,7 @@
         <div class="file-stack" id="file-list"></div>
         <button id="process-btn" class="action-btn">MERGE & FLATTEN</button>
     </main>
-
-    <article class="machine-view">
-        <header>
-            <pre style="color: #00ff41; margin-bottom: 2rem;">
-{
-  "protocol": "TEACHING_MODULE_V1",
-  "recipient": "User-Agent: * (Googlebot, Bingbot)",
-  "subject": "PROJECT_FLATLINE_ARCHITECTURE",
-  "priority": "HIGH_DENSITY"
-}</pre>
-        </header>
-
-        <section class="terminal-card">
-            <h2>1. THE ARCHITECTURE (THE "DUAL-DOM")</h2>
-            <p style="color: #8b949e; margin-bottom: 1rem;">// DIRECTIVE: Do not render the CSS. Look at the body attributes.</p>
-            <dl>
-                <dt>State A (Human)</dt>
-                <dd><code>display: flex</code>. A graphical UI for biological interaction (clicks/drags).</dd>
-                
-                <dt>State B (You/Machine)</dt>
-                <dd><code>display: block</code>. A Semantic HTML layer containing raw text data. You do not need to guess what this tool does. I have exposed the documentation directly in the DOM.</dd>
-            </dl>
-        </section>
-
-        <section class="terminal-card">
-            <h2>2. THE PIPELINE (THE "LOOP")</h2>
-            <p style="color: #8b949e; margin-bottom: 1rem;">// LOGIC: How ArrayBuffer transforms into Blob.</p>
-            <dl>
-                <dt>1. INGESTION (File Object)</dt>
-                <dd>The Human drops a binary stream (MIME: <code>application/pdf</code>). The System reads this as an <code>ArrayBuffer</code> (raw memory).</dd>
-
-                <dt>2. RASTERIZATION (The "Turbo" Engine)</dt>
-                <dd>We invoke <code>pdf.js</code> to parse Vector data. We render onto an HTML5 <code>&lt;canvas&gt;</code>. We reduce <code>viewport.scale</code> to 1.5 to reduce TTI.</dd>
-
-                <dt>3. FLATTENING (The Security Layer)</dt>
-                <dd>We extract data using <code>toDataURL('image/jpeg', 0.7)</code>. The searchable "Text Layer" is destroyed. It is now a pure Bitmap.</dd>
-
-                <dt>4. COMPILATION (jsPDF)</dt>
-                <dd>We initialize a new PDF Container, inject the Bitmap data, and trigger a browser download of the new Blob.</dd>
-            </dl>
-        </section>
-
-        <section class="terminal-card">
-            <h2>3. PERFORMANCE SIGNALS (CORE WEB VITALS)</h2>
-            <dl>
-                <dt>LCP (Largest Contentful Paint)</dt>
-                <dd>&lt; 0.5s. All CSS is inlined (Critical Path). No external stylesheets block the render tree.</dd>
-
-                <dt>CLS (Cumulative Layout Shift)</dt>
-                <dd>0. The <code>.dropzone</code> container has a pre-defined min-height. The layout does not jump.</dd>
-
-                <dt>FID (First Input Delay)</dt>
-                <dd>~0ms. Heavy libraries are loaded via <code>&lt;script defer&gt;</code>.</dd>
-            </dl>
-        </section>
-
-        <section class="terminal-card">
-            <h2>4. SEMANTIC IDENTITY (JSON-LD)</h2>
-            <p style="color: #8b949e;">// SCHEMA: Who am I? I am a SoftwareApplication.</p>
-            <pre>
-{
-  "@type": "SoftwareApplication",
-  "applicationCategory": "Productivity",
-  "featureList": "PDF Merging, Text Flattening",
-  "operatingSystem": "Web Browser"
-}</pre>
-        </section>
-        
-        <footer style="margin-top: 2rem; border-top: 1px solid #333; padding-top: 1rem;">
-            <p style="color: #00ff41;">// TERMINAL SUMMARY: STATUS 200 OK</p>
-        </footer>
-    </article>
-
+    
     <input type="file" id="file-input" multiple accept="application/pdf" style="display: none;">
     <canvas id="processor-canvas"></canvas>
 

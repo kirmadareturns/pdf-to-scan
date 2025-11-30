@@ -285,17 +285,25 @@
                 handleFiles(pdfs);
             }
         });
-        // TURBO PROCESSING ENGINE
-        async function waitForLibraries() {
-            if (window.pdfjsLib && window.jspdf) return;
-            return new Promise(r => { const i = setInterval(() => { if (window.pdfjsLib && window.jspdf) { clearInterval(i); r(); } }, 50); });
+       async function waitForLibraries() {
+    if (window.pdfjsLib && window.jspdf) return;
+
+    return new Promise(resolve => {
+        function check() {
+            if (window.pdfjsLib && window.jspdf) {
+                resolve(); 
+            } else {
+                requestAnimationFrame(check); 
+            }
         }
+        check(); 
+    });
+}
 
 async function startProcessing() {
             if (State.isProcessing || State.files.length === 0) return;
             State.isProcessing = true;
             DOM.dropzone.classList.add('scanning');
-            window.location.hash = "#!/turbo-mode";
 
             await waitForLibraries();
             pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
@@ -314,18 +322,18 @@ async function startProcessing() {
                         DOM.progressText.innerText = `Processing file ${i + 1}/${State.files.length}, page ${p}/${pdf.numPages}...`;
                         const page = await pdf.getPage(p);
                         
-                        // PERFORMANCE: Scale 1.5, Clear Canvas, Alpha False
-                        const viewport = page.getViewport({ scale: 1.5 });
+
+                        const viewport = page.getViewport({ scale: 1.0 });
                         DOM.canvas.width = viewport.width;
                         DOM.canvas.height = viewport.height;
                         DOM.ctx.clearRect(0,0, DOM.canvas.width, DOM.canvas.height);
 
                         await page.render({ canvasContext: DOM.ctx, viewport: viewport }).promise;
 
-                        // PERFORMANCE: JPEG Quality 0.7
+
                         const imgData = DOM.canvas.toDataURL('image/jpeg', 0.7);
-                        const pdfW = viewport.width / 1.5;
-                        const pdfH = viewport.height / 1.5;
+                        const pdfW = viewport.width / 1.0;
+                        const pdfH = viewport.height / 1.0;
                         
                         outputPDF.addPage([pdfW, pdfH], pdfW > pdfH ? 'l' : 'p');
                         outputPDF.addImage(imgData, 'JPEG', 0, 0, pdfW, pdfH);
@@ -333,7 +341,6 @@ async function startProcessing() {
                 }
                 outputPDF.save(originalName + '_scanned.pdf');
                 DOM.progressText.innerText = "Processing complete! You can upload another PDF.";
-                window.location.hash = "#!/complete";
             } catch (e) {
                 console.error(e);
                 alert("Error. See Console.");

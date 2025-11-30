@@ -1,33 +1,39 @@
-async function startProcessing() {
-    if (State.isProcessing || State.files.length === 0) return;
-    State.isProcessing = true;
-    DOM.dropzone.classList.add('scanning');
+// pdf-worker.js
 
-    await waitForLibraries();
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-    const { jsPDF } = window.jspdf;
+// Import PDF.js (from CDN)
+importScripts('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js');
 
-    const maxWorkers = navigator.hardwareConcurrency || 4;
+self.onmessage = async function(e) {
+    const { arrayBuffer, pageIndex } = e.data;
 
-    const createProgressUpdater = () => {
-        let lastUpdate = 0;
-        return text => {
-            const now = Date.now();
-            if (now - lastUpdate > 100) {
-                DOM.progressText.innerText = text;
-                lastUpdate = now;
-            }
+    try {
+        const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+        const pdfDoc = await loadingTask.promise;
+        const page = await pdfDoc.getPage(pageIndex);
+
+        const viewport = page.getViewport({ scale: 2 }); // You can adjust scale for quality
+        const canvas = new OffscreenCanvas(viewport.width, viewport.height);
+        const ctx = canvas.getContext('2d');
+
+        // Optional: white background for PDF page
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, viewport.width, viewport.height);
+
+        await page.render({ canvasContext: ctx, viewport }).promise;
+
+        const blob = await canvas.convertToBlob({ type: 'image/jpeg', quality: 0.95 });
+        const reader = new FileReader();
+
+        reader.onloadend = function() {
+            const dataURL = reader.result;
+            // Send back to main thread
+            self.postMessage({ dataURL, pageIndex });
         };
-    };
+        reader.readAsDataURL(blob);
 
-    // Process PDFs sequentially to save memory
-    for (const file of State.files) {
-        await processSinglePDF(file, jsPDF, maxWorkers, createProgressUpdater());
+    } catch (err) {
+        console.error('Worker error processing page', pageIndex, err);
+        // Send error back so main thread can handle
+        self.postMessage({ error: err.message, pageIndex });
     }
-
-    // Clean up
-    State.files = [];
-    renderFileList();
-    DOM.dropzone.classList.remove('scanning');
-    State.isProcessing = false;
-}
+};

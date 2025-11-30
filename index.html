@@ -215,14 +215,23 @@
             <p>Convert editable documents into secure, read-only images.</p>
         </header>
 
-        <div class="dropzone" id="dropzone" tabindex="0">
+        <div class="dropzone" 
+             id="dropzone" 
+             tabindex="0"
+             role="button"
+             aria-label="Upload PDF files. Click, press Enter, or drop files here"
+             aria-describedby="dropzone-instructions">
             <div class="scan-beam"></div>
             <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                 <path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
             </svg>
-            <p style="margin-top:1rem; font-weight: 500;">Drop PDFs here</p>
+            <p id="dropzone-instructions" style="margin-top:1rem; font-weight: 500;">Drop PDFs here</p>
             <p style="font-size: 0.85rem; color: #9ca3af;">Optimized for Speed</p>
-            <p id="progress-text" style="margin-top:1rem; font-weight:500;"></p>
+            <p id="progress-text" 
+               style="margin-top:1rem; font-weight:500;"
+               role="status"
+               aria-live="polite"
+               aria-atomic="true"></p>
         </div>
 
         <div class="file-stack" id="file-list"></div>
@@ -265,6 +274,16 @@
             await startProcessing();
         }
         DOM.dropzone.onclick = () => { if(!State.isProcessing) DOM.input.click(); };
+        
+        // NEW: Let people press Enter or Space to upload files
+        DOM.dropzone.onkeydown = (e) => {
+            // If they press Enter (key 13) or Space (key 32)
+            if ((e.key === 'Enter' || e.key === ' ') && !State.isProcessing) {
+                e.preventDefault(); // Stop the space bar from scrolling the page
+                DOM.input.click(); // Open the file picker
+            }
+        };
+        
         DOM.input.onchange = (e) => handleFiles(e.target.files);
         DOM.dropzone.ondragover = (e) => { e.preventDefault(); DOM.dropzone.classList.add('active'); };
         DOM.dropzone.ondragleave = (e) => { e.preventDefault(); DOM.dropzone.classList.remove('active'); };
@@ -301,58 +320,119 @@
 }
 
 async function startProcessing() {
-            if (State.isProcessing || State.files.length === 0) return;
-            State.isProcessing = true;
-            DOM.dropzone.classList.add('scanning');
+    if (State.isProcessing || State.files.length === 0) return;
+    State.isProcessing = true;
+    DOM.dropzone.classList.add('scanning');
 
-            await waitForLibraries();
-            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-            const { jsPDF } = window.jspdf;
-            const outputPDF = new jsPDF({ unit: 'px', hotfixes: ["px_scaling"] });
-            outputPDF.deletePage(1);
+    await waitForLibraries();
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    const { jsPDF } = window.jspdf;
+    const outputPDF = new jsPDF({ unit: 'px', hotfixes: ["px_scaling"] });
+    outputPDF.deletePage(1);
 
-            try {
-                const originalName = State.files[0].name.replace(/\.pdf$/i, '');
-                for (let i = 0; i < State.files.length; i++) {
-                    const file = State.files[i];
-                    const arrayBuffer = await file.arrayBuffer();
-                    const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
+    try {
+        const originalName = State.files[0].name.replace(/\.pdf$/i, '');
+        
+        for (let i = 0; i < State.files.length; i++) {
+            const file = State.files[i];
+            
+            // CHANGE 1: Load file in chunks, not all at once
+            const arrayBuffer = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument({
+                data: arrayBuffer,
+                useSystemFonts: true,  // Use less memory
+                disableFontFace: true   // Don't load fonts we won't use
+            }).promise;
 
-                    for (let p = 1; p <= pdf.numPages; p++) {
-                        DOM.progressText.innerText = `Processing file ${i + 1}/${State.files.length}, page ${p}/${pdf.numPages}...`;
-                        const page = await pdf.getPage(p);
-                        
+            for (let p = 1; p <= pdf.numPages; p++) {
+                DOM.progressText.innerText = `Processing file ${i + 1}/${State.files.length}, page ${p}/${pdf.numPages}...`;
+                
+                const page = await pdf.getPage(p);
+                const viewport = page.getViewport({ scale: 2.0 }); // BETTER QUALITY
+                
+                // CHANGE 2: Resize canvas efficiently
+                DOM.canvas.width = viewport.width;
+                DOM.canvas.height = viewport.height;
+                DOM.ctx.clearRect(0, 0, DOM.canvas.width, DOM.canvas.height);
 
-                        const viewport = page.getViewport({ scale: 1.0 });
-                        DOM.canvas.width = viewport.width;
-                        DOM.canvas.height = viewport.height;
-                        DOM.ctx.clearRect(0,0, DOM.canvas.width, DOM.canvas.height);
+                await page.render({ 
+                    canvasContext: DOM.ctx, 
+                    viewport: viewport 
+                }).promise;
 
-                        await page.render({ canvasContext: DOM.ctx, viewport: viewport }).promise;
+                // CHANGE 3: Convert to image with better quality
+                const imgData = DOM.canvas.toDataURL('image/jpeg', 0.85);
+                const pdfW = viewport.width / 2.0;
+                const pdfH = viewport.height / 2.0;
+                
+                outputPDF.addPage([pdfW, pdfH], pdfW > pdfH ? 'l' : 'p');
+                outputPDF.addImage(imgData, 'JPEG', 0, 0, pdfW, pdfH);
 
-
-                        const imgData = DOM.canvas.toDataURL('image/jpeg', 0.7);
-                        const pdfW = viewport.width / 1.0;
-                        const pdfH = viewport.height / 1.0;
-                        
-                        outputPDF.addPage([pdfW, pdfH], pdfW > pdfH ? 'l' : 'p');
-                        outputPDF.addImage(imgData, 'JPEG', 0, 0, pdfW, pdfH);
-                    }
+                // CHANGE 4: Clean up after each page (throw away the photocopy)
+                page.cleanup();
+                
+                // CHANGE 5: Give browser a break every 5 pages (let it take out trash)
+                if (p % 5 === 0) {
+                    await new Promise(resolve => setTimeout(resolve, 10));
                 }
-                outputPDF.save(originalName + '_scanned.pdf');
-                DOM.progressText.innerText = "Processing complete! You can upload another PDF.";
-            } catch (e) {
-                console.error(e);
-                alert("Error. See Console.");
             }
+            
+            // CHANGE 6: Destroy the PDF object when done with file
+            pdf.destroy();
+        }
+        
+        outputPDF.save(originalName + '_scanned.pdf');
+        DOM.progressText.innerText = "Processing complete! You can upload another PDF.";
+        
+    } catch (e) {
+        console.error(e);
+        // CHANGE 7: Actually helpful error message
+        let errorMsg = "Something went wrong. ";
+        if (e.message.includes('Invalid PDF')) {
+            errorMsg += "The PDF file is corrupted.";
+        } else if (e.message.includes('memory')) {
+            errorMsg += "The file is too large for your browser.";
+        } else {
+            errorMsg += "Please try a different file.";
+        }
+        alert(errorMsg);
+        DOM.progressText.innerText = errorMsg;
+    }
 
-            DOM.dropzone.classList.remove('scanning');
-            State.isProcessing = false;
-            State.files = [];
-            renderFileList();
+    DOM.dropzone.classList.remove('scanning');
+    State.isProcessing = false;
+    State.files = [];
+    renderFileList();
+}
+
+        // NEW: Update screen reader announcements when processing status changes
+        const originalProgressSetter = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'innerText').set;
+        Object.defineProperty(DOM.progressText, 'innerText', {
+            set: function(value) {
+                originalProgressSetter.call(this, value);
+                // Announce to screen readers when processing state changes
+                this.setAttribute('aria-label', value || 'Ready to process files');
+            }
+        });
+
+        // NEW: Announce when dropzone becomes active (file dragged over it)
+        const originalClassListAdd = DOM.dropzone.classList.add.bind(DOM.dropzone.classList);
+        DOM.dropzone.classList.add = function(className) {
+            originalClassListAdd(className);
+            if (className === 'scanning') {
+                DOM.dropzone.setAttribute('aria-busy', 'true');
+                DOM.dropzone.setAttribute('aria-label', 'Processing PDF files, please wait');
+            }
         };
 
-        updateView();
+        const originalClassListRemove = DOM.dropzone.classList.remove.bind(DOM.dropzone.classList);
+        DOM.dropzone.classList.remove = function(className) {
+            originalClassListRemove(className);
+            if (className === 'scanning') {
+                DOM.dropzone.setAttribute('aria-busy', 'false');
+                DOM.dropzone.setAttribute('aria-label', 'Upload PDF files. Click, press Enter, or drop files here');
+            }
+        };
     </script>
 </body>
 </html>

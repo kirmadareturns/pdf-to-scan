@@ -77,162 +77,6 @@
       }
     </script>
     <script type="application/ld+json">
-          {
-          "@context": "http://schema.org",
-          "@type": "HowTo",
-          "name": "How to Convert PDF to Scanned PDF",
-
-            "image": {
-              "@type": "ImageObject",
-              "url": "/favicon.svg"
-            },
-
-          "step": [
-
-            {
-              "@type": "HowToStep",
-              "text": "Upload your PDF file.
-      "
-            },
-
-
-            {
-              "@type": "HowToStep",
-              "text": "Click the 'Proceed' button to begin converting.
-      "
-            },
-
-
-            {
-              "@type": "HowToStep",
-              "text": "Press 'Download' to download your scanned PDF to your device.
-      "
-            }
-
-          ]
-          }
-    </script>
-
-    <script type="application/ld+json">
-          {
-          "@context": "http://schema.org",
-              "mainEntity": [{"@type": "Question",
-              "name": "What are the features provided by pdftoscan.online while converting a PDF into a scanned PDF?
-      ",
-              "acceptedAnswer": {
-                                     "@type": "Answer",
-                                     "text": "Our tool makes it possible to convert PDFs to scanned images instantly.
-      "
-              }
-                                 },{"@type": "Question",
-              "name": "How do I save the final scanned PDF?
-      ",
-              "acceptedAnswer": {
-                                     "@type": "Answer",
-                                     "text": "After being processed, a 'Download' button will show up. Just click on it to download the converted file directly to your device. The download is fast, and the file will be saved in your default download folder.
-      "
-              }
-                                 },{"@type": "Question",
-              "name": "Why should I use pdftoscan.online to convert PDFs?
-      ",
-              "acceptedAnswer": {
-                                     "@type": "Answer",
-                                     "text": "We take your privacy and security very seriously. We convert all the files locally within your browser so that your files are never uploaded to or stored on our servers. This makes our tool probably the safest available.
-      "
-              }
-                                 },{"@type": "Question",
-              "name": "Will my PDF files get corrupted during conversion?
-      ",
-              "acceptedAnswer": {
-                                     "@type": "Answer",
-                                     "text": "No. Our tool employs secure, updated technology to ensure no corruption or data loss occurs. Files are left unscathed, and because the process is not based on server storage, your data is safe.
-      "
-              }
-                                 },{"@type": "Question",
-              "name": "Is the tool free to use?
-      ",
-              "acceptedAnswer": {
-                                     "@type": "Answer",
-                                     "text": "Yes, our PDF to Scanned PDF converter is absolutely free. You can convert as many documents as you need without any fee or registration.
-      "
-              }
-                                 },{"@type": "Question",
-              "name": "How long does the conversion process take?
-      ",
-              "acceptedAnswer": {
-                                     "@type": "Answer",
-                                     "text": "Conversion typically happens within seconds, depending on your PDF file size. It's quick, efficient, and optimized for rapid results.
-      "
-              }
-                                 },{"@type": "Question",
-              "name": "What if I refresh the browser while converting?
-      ",
-              "acceptedAnswer": {
-                                     "@type": "Answer",
-                                     "text": "Because files are not being stored on our server, the ongoing process will be cancelled if you refresh or close the browser. You will have to re-upload your file in order to proceed.
-      "
-              }
-                                 },{"@type": "Question",
-              "name": "Is the tool accessible on mobile devices?
-      ",
-              "acceptedAnswer": {
-                                     "@type": "Answer",
-                                     "text": "Yes, our converter is fully compatible with all smartphones and tablets. Upload your PDF, adjust settings, and download the scanned version straight onto your device.
-      "
-              }
-                                 },{"@type": "Question",
-              "name": "Does it run on both Android and iOS devices?
-      ",
-              "acceptedAnswer": {
-                                     "@type": "Answer",
-                                     "text": "Yes, the tool is available for both Android and iOS devices. You can use it on smartphones, tablets, and laptops running all leading operating systems.
-      "
-              }
-                                 },{"@type": "Question",
-              "name": "What are the supported Windows versions?
-      ",
-              "acceptedAnswer": {
-                                     "@type": "Answer",
-                                     "text": "Because the tool runs in your browser, it supports all Windows, Mac, Linux, and other operating system versions.
-      "
-              }
-                                 },{"@type": "Question",
-              "name": "Is there a file size limit?
-      ",
-              "acceptedAnswer": {
-                                     "@type": "Answer",
-                                     "text": "No. There is no limit to the maximum file size. You can upload and convert any size PDF without limits.
-      "
-              }
-                                 },{"@type": "Question",
-              "name": "Do I have to sign up or log in?
-      ",
-              "acceptedAnswer": {
-                                     "@type": "Answer",
-                                     "text": "No login or registration is needed. The tool is free and usable to everybody.
-      "
-              }
-                                 },{"@type": "Question",
-              "name": "Will the file size be modified after conversion?
-      ",
-              "acceptedAnswer": {
-                                     "@type": "Answer",
-                                     "text": "The difference is insignificant, and the quality is always maintained.
-      "
-              }
-                                 },{"@type": "Question",
-              "name": "Is the file format altered after conversion?
-      ",
-              "acceptedAnswer": {
-                                     "@type": "Answer",
-                                     "text": "No. Your output remains a PDF, with the original format preserved, with the look of scanning.
-      "
-              }
-                                 }]
-          }
-    </script>
-
-    <script type="application/ld+json">
       {
         "@context": "http://schema.org",
         "@type": "WebApplication",
@@ -385,7 +229,6 @@
         color: var(--h-subtext);
     }
 
-    /* Action Button - "Get Started" Style */
     .action-btn {
         margin-top: 2rem; width: auto; min-width: 200px; 
         padding: 0 2rem; height: 50px;
@@ -435,7 +278,7 @@
     <canvas id="processor-canvas"></canvas>
 
     <script>
-        const State = { files: [], view: localStorage.getItem('flatline_view') || 'human', isProcessing: false };
+        const State = { files: [], isProcessing: false };
         const DOM = {
             body: document.body, toggle: document.getElementById('view-toggle'),
             dropzone: document.getElementById('dropzone'), input: document.getElementById('file-input'),
@@ -443,15 +286,11 @@
             canvas: document.getElementById('processor-canvas'),
             ctx: document.getElementById('processor-canvas').getContext('2d', { willReadFrequently: true, alpha: false })
         };
-
-        // UI & TOGGLE
         function updateView() {
             DOM.body.setAttribute('data-view', State.view);
-            DOM.toggle.innerText = State.view === 'human' ? 'VIEW: TERMINAL' : 'VIEW: HUMAN';
-            document.title = State.view === 'human' ? "PDF Flatline | Turbo" : "ROOT_ACCESS // TURBO";
+            document.title = "Convert PDF to Scanned PDF Locally Without Uploading to Server";
             localStorage.setItem('flatline_view', State.view);
         }
-        DOM.toggle.onclick = () => { State.view = State.view === 'human' ? 'machine' : 'human'; updateView(); };
 
         // FILE HANDLING
         function renderFileList() {
@@ -463,10 +302,15 @@
             });
             if (State.files.length > 0) DOM.btn.classList.add('ready');
         }
-        function handleFiles(list) {
-            State.files = [...State.files, ...Array.from(list).filter(f => f.type === 'application/pdf')];
+      async function handleFiles(list) {
+            const newFiles = Array.from(list).filter(f => f.type === 'application/pdf');
+            if (newFiles.length === 0) return;
+
+            State.files = [...State.files, ...newFiles];
             renderFileList();
-            window.location.hash = `#!/queued/${State.files.length}`;
+            
+            // 🚀 AUTO-START TRIGGER
+            await startProcessing();
         }
         DOM.dropzone.onclick = () => { if(!State.isProcessing) DOM.input.click(); };
         DOM.input.onchange = (e) => handleFiles(e.target.files);
@@ -508,6 +352,7 @@
             outputPDF.deletePage(1);
 
             try {
+                const originalName = State.files[0].name.replace(/\.pdf$/i, '');
                 for (let i = 0; i < State.files.length; i++) {
                     const file = State.files[i];
                     const arrayBuffer = await file.arrayBuffer();
@@ -535,7 +380,7 @@
                         outputPDF.addImage(imgData, 'JPEG', 0, 0, pdfW, pdfH);
                     }
                 }
-                outputPDF.save('flattened_turbo.pdf');
+                outputPDF.save(originalName + '_scanned.pdf');
                 DOM.btn.innerText = "DONE! AGAIN?";
                 window.location.hash = "#!/complete";
             } catch (e) {

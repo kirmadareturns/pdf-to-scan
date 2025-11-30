@@ -387,7 +387,28 @@ async function processSinglePDF(file, jsPDF, maxWorkers, createProgress) {
                 worker.postMessage({ arrayBuffer, pageIndex: nextPage });
             } else {
                 // Don't terminate immediately; let last image load finish
-                setTimeout(() => worker.terminate(), 100);
+                worker.onmessage = e => {
+    const { dataURL, pageIndex, error } = e.data;
+    
+    if (error) {
+        console.error(`Error rendering page ${pageIndex}: ${error}`);
+    } else {
+        pageBuffer[pageIndex] = dataURL;
+        tryAddPagesInOrder();
+    }
+
+    // Only post next page if available
+    if (pageQueue.length > 0) {
+        const nextPage = pageQueue.shift();
+        worker.postMessage({ arrayBuffer, pageIndex: nextPage });
+    } else {
+        // Check if all pages are finished
+        if (Object.keys(pageBuffer).length === totalPages) {
+            worker.terminate();
+        }
+    }
+};
+;
             }
         };
         return worker;

@@ -268,10 +268,10 @@
             </svg>
             <p style="margin-top:1rem; font-weight: 500;">Drop PDFs here</p>
             <p style="font-size: 0.85rem; color: #9ca3af;">Optimized for Speed</p>
+            <p id="progress-text" style="margin-top:1rem; font-weight:500;"></p>
         </div>
 
         <div class="file-stack" id="file-list"></div>
-        <button id="process-btn" class="action-btn">MERGE & FLATTEN</button>
     </main>
     
     <input type="file" id="file-input" multiple accept="application/pdf" style="display: none;">
@@ -280,10 +280,10 @@
     <script>
         const State = { files: [], isProcessing: false };
         const DOM = {
-            body: document.body, toggle: document.getElementById('view-toggle'),
+            body: document.body, 
             dropzone: document.getElementById('dropzone'), input: document.getElementById('file-input'),
-            list: document.getElementById('file-list'), btn: document.getElementById('process-btn'),
-            canvas: document.getElementById('processor-canvas'),
+            list: document.getElementById('file-list'), 
+            canvas: document.getElementById('processor-canvas'),progressText: document.getElementById('progress-text'),
             ctx: document.getElementById('processor-canvas').getContext('2d', { willReadFrequently: true, alpha: false })
         };
         function updateView() {
@@ -359,8 +359,7 @@
                     const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
 
                     for (let p = 1; p <= pdf.numPages; p++) {
-                        DOM.btn.innerText = `FILE ${i + 1}/${State.files.length} | PAGE ${p}/${pdf.numPages}`;
-                        
+                        DOM.progressText.innerText = `Processing file ${i + 1}/${State.files.length}, page ${p}/${pdf.numPages}...`;
                         const page = await pdf.getPage(p);
                         
                         // PERFORMANCE: Scale 1.5, Clear Canvas, Alpha False
@@ -381,12 +380,11 @@
                     }
                 }
                 outputPDF.save(originalName + '_scanned.pdf');
-                DOM.btn.innerText = "DONE! AGAIN?";
+                DOM.progressText.innerText = "Processing complete! You can upload another PDF.";
                 window.location.hash = "#!/complete";
             } catch (e) {
                 console.error(e);
                 alert("Error. See Console.");
-                DOM.btn.innerText = "RETRY";
             }
 
             DOM.dropzone.classList.remove('scanning');

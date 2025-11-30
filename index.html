@@ -251,13 +251,17 @@
             });
         }
       async function handleFiles(list) {
-            const newFiles = Array.from(list).filter(f => f.type === 'application/pdf');
+            const newFiles = [];
+          for (let i = 0; i < list.length; i++) {
+        if (list[i].type === 'application/pdf') {
+            newFiles.push(list[i]);
+        }
+    }
             if (newFiles.length === 0) return;
 
             State.files = [...State.files, ...newFiles];
             renderFileList();
             
-            // 🚀 AUTO-START TRIGGER
             await startProcessing();
         }
         DOM.dropzone.onclick = () => { if(!State.isProcessing) DOM.input.click(); };

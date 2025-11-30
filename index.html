@@ -376,18 +376,7 @@ async function processSinglePDF(file, jsPDF, maxWorkers, createProgress) {
 
     function createWorker() {
         const worker = new Worker('pdf-worker.js');
-        worker.onmessage = e => {
-            const { dataURL, pageIndex } = e.data;
-            pageBuffer[pageIndex] = dataURL;
-
-            tryAddPagesInOrder();
-
-            if (pageQueue.length > 0) {
-                const nextPage = pageQueue.shift();
-                worker.postMessage({ arrayBuffer, pageIndex: nextPage });
-            } else {
-                // Don't terminate immediately; let last image load finish
-                worker.onmessage = e => {
+       worker.onmessage = e => {
     const { dataURL, pageIndex, error } = e.data;
     
     if (error) {
@@ -397,21 +386,11 @@ async function processSinglePDF(file, jsPDF, maxWorkers, createProgress) {
         tryAddPagesInOrder();
     }
 
-    // Only post next page if available
     if (pageQueue.length > 0) {
         const nextPage = pageQueue.shift();
         worker.postMessage({ arrayBuffer, pageIndex: nextPage });
-    } else {
-        // Check if all pages are finished
-        if (Object.keys(pageBuffer).length === totalPages) {
-            worker.terminate();
-        }
     }
-};
-;
-            }
-        };
-        return worker;
+};        return worker;
     }
 
     // Start workers
@@ -424,14 +403,15 @@ async function processSinglePDF(file, jsPDF, maxWorkers, createProgress) {
     }
 
     // Wait until all pages are added
-    await new Promise(resolve => {
-        const checkInterval = setInterval(() => {
-            if (nextPageToAdd > totalPages) {
-                clearInterval(checkInterval);
-                resolve();
-            }
-        }, 50);
-    });
+await new Promise(resolve => {
+    const checkInterval = setInterval(() => {
+        if (nextPageToAdd > totalPages) {
+            clearInterval(checkInterval);
+            workers.forEach(w => w.terminate());
+            resolve();
+        }
+    }, 50);
+});
 }
 </script>
 </body>

@@ -301,82 +301,109 @@
 }
 
 async function startProcessing() {
-            if (State.isProcessing || State.files.length === 0) return;
-            State.isProcessing = true;
-            DOM.dropzone.classList.add('scanning');
+    if (State.isProcessing || State.files.length === 0) return;
+    State.isProcessing = true;
+    DOM.dropzone.classList.add('scanning');
 
-            await waitForLibraries();
-            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-            const { jsPDF } = window.jspdf;
-            const outputPDF = new jsPDF({ unit: 'px', hotfixes: ["px_scaling"] });
+    await waitForLibraries();
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    const { jsPDF } = window.jspdf;
 
-            try {
-                const file = State.files[0];
-                    const arrayBuffer = await file.arrayBuffer();
-                    const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
-const totalPages = pdf.numPages;
-        const originalName = file.name.replace(/\.pdf$/i, '');
+    const maxWorkers = navigator.hardwareConcurrency || 4;
 
-        const maxWorkers = navigator.hardwareConcurrency || 4; 
-        const pageQueue = Array.from({ length: totalPages }, (_, i) => i + 1); 
-        const pageResults = new Array(totalPages);
+    const createProgressUpdater = () => {
+        let lastUpdate = 0;
+        return text => {
+            const now = Date.now();
+            if (now - lastUpdate > 100) {
+                DOM.progressText.innerText = text;
+                lastUpdate = now;
+            }
+        };
+    };
 
-        function createWorker() {
-            const worker = new Worker('pdf-worker.js');
-            worker.onmessage = e => {
-                const { blob, pageIndex } = e.data;
-                pageResults[pageIndex - 1] = blob;
-                DOM.progressText.innerText = `Processed page ${pageIndex}/${totalPages}...`;
+    // Process PDFs sequentially to save memory
+    for (const file of State.files) {
+        await processSinglePDF(file, jsPDF, maxWorkers, createProgressUpdater());
+    }
 
-                if (pageQueue.length > 0) {
-                    const nextPage = pageQueue.shift();
-                    worker.postMessage({ arrayBuffer, pageIndex: nextPage });
-                } else {
-                    worker.terminate();
-                    if (pageResults.filter(Boolean).length === totalPages) finishPDF();
-                }
-            };
-            return worker;
-        }
+    // Clean up
+    State.files = [];
+    renderFileList();
+    DOM.dropzone.classList.remove('scanning');
+    State.isProcessing = false;
+}
+    async function processSinglePDF(file, jsPDF, maxWorkers, createProgress) {
+    const arrayBuffer = await file.arrayBuffer();
+    const pdfDoc = await pdfjsLib.getDocument(arrayBuffer).promise;
+    const totalPages = pdfDoc.numPages;
+    const originalName = file.name.replace(/\.pdf$/i, '');
+    const pageQueue = Array.from({ length: totalPages }, (_, i) => i + 1);
 
-        function finishPDF() {
-            pageResults.forEach((blob, i) => {
-                const url = URL.createObjectURL(blob);
+    const outputPDF = new jsPDF({ unit: 'px', hotfixes: ["px_scaling"] });
+
+    let nextPageToAdd = 1; // Track page order
+    const pageBuffer = {};  // Hold pages that finish out-of-order
+
+    function createWorker() {
+        const worker = new Worker('pdf-worker.js');
+        worker.onmessage = e => {
+            const { dataURL, pageIndex } = e.data;
+            pageBuffer[pageIndex] = dataURL;
+
+            // Try adding pages in order
+            while (pageBuffer[nextPageToAdd]) {
+                const dataURLToAdd = pageBuffer[nextPageToAdd];
+                delete pageBuffer[nextPageToAdd];
+
                 const img = new Image();
+                img.src = dataURLToAdd;
                 img.onload = () => {
                     const pdfW = img.width;
                     const pdfH = img.height;
+
+                    if (nextPageToAdd === 1) outputPDF.internal.deletePage(1); // Remove default page
                     outputPDF.addPage([pdfW, pdfH], pdfW > pdfH ? 'l' : 'p');
-                    outputPDF.addImage(img, 'JPEG', 0, 0, pdfW, pdfH);
-                    URL.revokeObjectURL(url);
+                    outputPDF.addImage(dataURLToAdd, 'JPEG', 0, 0, pdfW, pdfH);
 
-                    if (i === totalPages - 1) {
+                    if (nextPageToAdd === totalPages) {
                         outputPDF.save(originalName + '_scanned.pdf');
-                        DOM.progressText.innerText = "Processing complete!";
-                        DOM.dropzone.classList.remove('scanning');
-                        State.isProcessing = false;
-                        State.files = [];
-                        renderFileList();
+                        createProgress(`Finished ${originalName}`);
                     }
+                    nextPageToAdd++;
                 };
-                img.src = url;
-            });
-        }
+            }
 
-        // Start workers
-        for (let i = 0; i < Math.min(maxWorkers, totalPages); i++) {
-            const w = createWorker();
-            const page = pageQueue.shift();
-            w.postMessage({ arrayBuffer, pageIndex: page });
-        }
+            createProgress(`Processing ${originalName}: page ${pageIndex}/${totalPages}`);
 
-    } catch (e) {
-        console.error(e);
-        alert("Error. See Console.");
-        DOM.dropzone.classList.remove('scanning');
-        State.isProcessing = false;
+            if (pageQueue.length > 0) {
+                const nextPage = pageQueue.shift();
+                worker.postMessage({ arrayBuffer, pageIndex: nextPage });
+            } else {
+                worker.terminate();
+            }
+        };
+        return worker;
     }
+
+    // Start workers
+    const workers = [];
+    for (let i = 0; i < Math.min(maxWorkers, totalPages); i++) {
+        const w = createWorker();
+        workers.push(w);
+        const page = pageQueue.shift();
+        w.postMessage({ arrayBuffer, pageIndex: page });
+    }
+
+    return new Promise(resolve => {
+        const interval = setInterval(() => {
+            if (nextPageToAdd > totalPages) {
+                clearInterval(interval);
+                resolve();
+            }
+        }, 100);
+    });
 }
-    </script>
+</script>
 </body>
 </html>

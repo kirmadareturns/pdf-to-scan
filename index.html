@@ -300,7 +300,6 @@
                 el.innerHTML = `<span>${f.name}</span> <span style="font-family:monospace; color:#6b7280;">${(f.size/1024/1024).toFixed(1)}MB</span>`;
                 DOM.list.appendChild(el);
             });
-            if (State.files.length > 0) DOM.btn.classList.add('ready');
         }
       async function handleFiles(list) {
             const newFiles = Array.from(list).filter(f => f.type === 'application/pdf');
@@ -339,7 +338,7 @@
             return new Promise(r => { const i = setInterval(() => { if (window.pdfjsLib && window.jspdf) { clearInterval(i); r(); } }, 50); });
         }
 
-        DOM.btn.onclick = async () => {
+async function startProcessing() {
             if (State.isProcessing || State.files.length === 0) return;
             State.isProcessing = true;
             DOM.dropzone.classList.add('scanning');

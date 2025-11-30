@@ -202,10 +202,10 @@
                 els.statusBadge.className = "text-green-400";
                 return true;
             } catch (e) {
-                console.error(e);
+                console.error("FFmpeg or AI Engine failed to load:", e);
                 els.statusBadge.textContent = "ERROR - See Console";
                 els.statusBadge.className = "text-red-500";
-                alert("Failed to load engines. If running locally, use a local server (http-server).");
+                alert("Failed to load processing engines. Check the browser console for Cross-Origin Isolation (COOP/COEP) errors.");
                 return false;
             }
         }
@@ -213,7 +213,13 @@
         // --- File Handling ---
         els.fileInput.addEventListener('change', async (e) => {
             const file = e.target.files[0];
-            if (!file) return;
+            
+            if (!file) {
+                console.warn('File input change event fired, but no file was selected.');
+                return;
+            }
+            console.log(`File selected: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB). Starting process...`);
+
 
             els.video.src = URL.createObjectURL(file);
             els.uploadOverlay.classList.add('hidden');
@@ -223,7 +229,8 @@
             // Start Process
             try {
                 updateProgress("Loading Engines...", 10);
-                await initEngines();
+                // Ensure engines are loaded (important if they failed on initial load)
+                if (!await initEngines()) throw new Error("Engines failed to initialize.");
 
                 updateProgress("Extracting Audio...", 30);
                 const audioData = await extractAudio(file);
@@ -244,10 +251,14 @@
                 els.processingOverlay.classList.add('hidden');
 
             } catch (err) {
-                console.error(err);
-                alert("Processing failed. Please check console.");
+                console.error("Critical Processing Error:", err);
+                alert("Processing failed. Please check the console for details.");
+                
+                // --- Reset UI on Failure ---
                 els.processingOverlay.classList.add('hidden');
                 els.uploadOverlay.classList.remove('hidden');
+                els.video.src = ""; // Clear the video element
+                els.transcript.innerHTML = '<div class="h-full flex flex-col items-center justify-center text-red-400 space-y-3"><p class="italic">ERROR: Could not process file. Check console for details. Re-upload to try again.</p></div>';
             }
         });
 
@@ -268,6 +279,8 @@
             transcriptData = [];
             let globalIdx = 0;
             const chunks = output.chunks || [];
+
+            els.transcript.innerHTML = ''; // Clear the initial "Waiting for media..." message
 
             chunks.forEach(chunk => {
                 const text = chunk.text.trim();

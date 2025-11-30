@@ -309,49 +309,74 @@ async function startProcessing() {
             pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
             const { jsPDF } = window.jspdf;
             const outputPDF = new jsPDF({ unit: 'px', hotfixes: ["px_scaling"] });
-            outputPDF.deletePage(1);
 
             try {
-                const originalName = State.files[0].name.replace(/\.pdf$/i, '');
-                for (let i = 0; i < State.files.length; i++) {
-                    const file = State.files[i];
+                const file = State.files[0];
                     const arrayBuffer = await file.arrayBuffer();
                     const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
+const totalPages = pdf.numPages;
+        const originalName = file.name.replace(/\.pdf$/i, '');
 
-                    for (let p = 1; p <= pdf.numPages; p++) {
-                        DOM.progressText.innerText = `Processing file ${i + 1}/${State.files.length}, page ${p}/${pdf.numPages}...`;
-                        const page = await pdf.getPage(p);
-                        
+        const maxWorkers = navigator.hardwareConcurrency || 4; 
+        const pageQueue = Array.from({ length: totalPages }, (_, i) => i + 1); 
+        const pageResults = new Array(totalPages);
 
-                        const viewport = page.getViewport({ scale: 1.0 });
-                        DOM.canvas.width = viewport.width;
-                        DOM.canvas.height = viewport.height;
-                        DOM.ctx.clearRect(0,0, DOM.canvas.width, DOM.canvas.height);
+        function createWorker() {
+            const worker = new Worker('pdf-worker.js');
+            worker.onmessage = e => {
+                const { blob, pageIndex } = e.data;
+                pageResults[pageIndex - 1] = blob;
+                DOM.progressText.innerText = `Processed page ${pageIndex}/${totalPages}...`;
 
-                        await page.render({ canvasContext: DOM.ctx, viewport: viewport }).promise;
-
-
-                        const imgData = DOM.canvas.toDataURL('image/jpeg', 0.7);
-                        const pdfW = viewport.width / 1.0;
-                        const pdfH = viewport.height / 1.0;
-                        
-                        outputPDF.addPage([pdfW, pdfH], pdfW > pdfH ? 'l' : 'p');
-                        outputPDF.addImage(imgData, 'JPEG', 0, 0, pdfW, pdfH);
-                    }
+                if (pageQueue.length > 0) {
+                    const nextPage = pageQueue.shift();
+                    worker.postMessage({ arrayBuffer, pageIndex: nextPage });
+                } else {
+                    worker.terminate();
+                    if (pageResults.filter(Boolean).length === totalPages) finishPDF();
                 }
-                outputPDF.save(originalName + '_scanned.pdf');
-                DOM.progressText.innerText = "Processing complete! You can upload another PDF.";
-            } catch (e) {
-                console.error(e);
-                alert("Error. See Console.");
-            }
+            };
+            return worker;
+        }
 
-            DOM.dropzone.classList.remove('scanning');
-            State.isProcessing = false;
-            State.files = [];
-            renderFileList();
-        };
+        function finishPDF() {
+            pageResults.forEach((blob, i) => {
+                const url = URL.createObjectURL(blob);
+                const img = new Image();
+                img.onload = () => {
+                    const pdfW = img.width;
+                    const pdfH = img.height;
+                    outputPDF.addPage([pdfW, pdfH], pdfW > pdfH ? 'l' : 'p');
+                    outputPDF.addImage(img, 'JPEG', 0, 0, pdfW, pdfH);
+                    URL.revokeObjectURL(url);
 
+                    if (i === totalPages - 1) {
+                        outputPDF.save(originalName + '_scanned.pdf');
+                        DOM.progressText.innerText = "Processing complete!";
+                        DOM.dropzone.classList.remove('scanning');
+                        State.isProcessing = false;
+                        State.files = [];
+                        renderFileList();
+                    }
+                };
+                img.src = url;
+            });
+        }
+
+        // Start workers
+        for (let i = 0; i < Math.min(maxWorkers, totalPages); i++) {
+            const w = createWorker();
+            const page = pageQueue.shift();
+            w.postMessage({ arrayBuffer, pageIndex: page });
+        }
+
+    } catch (e) {
+        console.error(e);
+        alert("Error. See Console.");
+        DOM.dropzone.classList.remove('scanning');
+        State.isProcessing = false;
+    }
+}
         updateView();
     </script>
 </body>

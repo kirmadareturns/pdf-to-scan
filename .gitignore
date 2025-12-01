@@ -1,0 +1,31 @@
+# Node modules
+node_modules/
+package-lock.json
+
+# Editor directories and files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Test files
+test-*.js.output
+*.log
+
+# Build outputs (if any)
+dist/
+build/
+
+# Environment files
+.env
+.env.local
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# OS files
+Thumbs.db

@@ -3,611 +3,525 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Instant JPG to PDF Converter | Free, Private, Offline</title>
-    <meta name="description" content="Convert JPG images to PDF instantly in your browser. No upload required, 100% private, and works offline. Mobile-friendly and free.">
-    <link rel="canonical" href="https://example.com/jpg-to-pdf">
+    <title>Batch JPG to PDF | Zip or Merge</title>
+    <meta name="description" content="Convert JPGs to PDFs. Download as a merged document OR as a ZIP containing individual PDFs. Private, Offline, Free.">
     <meta name="theme-color" content="#2563eb">
-    
-    <!-- JSON-LD Structured Data for SEO Dominance -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@graph": [
-        {
-          "@type": "WebApplication",
-          "name": "FastPDF Converter",
-          "url": "https://example.com/jpg-to-pdf",
-          "applicationCategory": "UtilityApplication",
-          "operatingSystem": "All",
-          "offers": {
-            "@type": "Offer",
-            "price": "0",
-            "priceCurrency": "USD"
-          },
-          "description": "A high-speed, client-side tool to convert JPG images to PDF documents without server uploads.",
-          "featureList": "Offline capability, Privacy-focused, Instant conversion, Drag and drop interface"
-        },
-        {
-          "@type": "FAQPage",
-          "mainEntity": [
-            {
-              "@type": "Question",
-              "name": "Is my data private?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "Yes. This tool runs 100% in your browser. No images are ever uploaded to a server."
-              }
-            },
-            {
-              "@type": "Question",
-              "name": "Is this tool free?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "Yes, FastPDF is completely free with no limits."
-              }
-            }
-          ]
-        }
-      ]
-    }
-    </script>
 
     <style>
-        /* * CRITICAL CSS PATH 
-         * Minimized Layout Shift (CLS) and Paint times 
-         */
         :root {
             --primary: #2563eb;
             --primary-hover: #1d4ed8;
+            --secondary: #475569;
             --bg: #f8fafc;
             --surface: #ffffff;
             --text: #0f172a;
             --text-light: #64748b;
             --border: #e2e8f0;
             --radius: 12px;
-            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
         
-        body {
-            background-color: var(--bg);
-            color: var(--text);
-            line-height: 1.6;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
+        body { background-color: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; display: flex; flex-direction: column; }
 
-        /* Header */
-        header {
-            background: var(--surface);
-            border-bottom: 1px solid var(--border);
-            padding: 1rem 1.5rem;
-            text-align: center;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.5rem;
-        }
+        header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 1rem; text-align: center; position: sticky; top: 0; z-index: 20; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        h1 { font-size: 1.5rem; font-weight: 800; color: var(--primary); letter-spacing: -0.025em; }
 
-        h1 { font-size: 1.5rem; font-weight: 800; color: var(--primary); letter-spacing: -0.025em; line-height: 1.2; }
-        .tagline { font-size: 0.875rem; color: var(--text-light); }
-        
-        .header-link {
-            font-size: 0.875rem;
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 500;
-            padding: 0.25rem 0.75rem;
-            background-color: #eff6ff;
-            border-radius: 9999px;
-            transition: background-color 0.2s;
-        }
-        .header-link:hover {
-            background-color: #dbeafe;
-            text-decoration: none;
-        }
-
-        /* Main App Area */
-        main {
-            flex: 1;
-            max-width: 800px;
-            width: 100%;
-            margin: 0 auto;
-            padding: 2rem 1rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+        main { flex: 1; max-width: 900px; width: 100%; margin: 0 auto; padding: 2rem 1rem; display: flex; flex-direction: column; align-items: center; gap: 2rem; }
 
         /* Drop Zone */
-        .drop-zone {
-            background: var(--surface);
-            border: 2px dashed var(--border);
-            border-radius: var(--radius);
-            padding: 3rem 2rem;
-            width: 100%;
-            text-align: center;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            box-shadow: var(--shadow);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .drop-zone:hover, .drop-zone.drag-over {
-            border-color: var(--primary);
-            background-color: #eff6ff;
-            transform: scale(1.01);
-        }
-
+        .drop-zone { background: var(--surface); border: 2px dashed var(--border); border-radius: var(--radius); padding: 3rem 2rem; width: 100%; text-align: center; transition: all 0.3s ease; cursor: pointer; box-shadow: var(--shadow); }
+        .drop-zone:hover, .drop-zone.drag-over { border-color: var(--primary); background-color: #eff6ff; transform: scale(1.005); }
         .icon { width: 64px; height: 64px; fill: var(--primary); margin-bottom: 1rem; opacity: 0.8; }
         
-        .btn {
-            background-color: var(--primary);
-            color: white;
-            padding: 0.75rem 1.5rem;
-            border-radius: 9999px;
-            font-weight: 600;
-            border: none;
-            cursor: pointer;
-            font-size: 1rem;
-            margin-top: 1rem;
-            transition: background 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .btn:hover { background-color: var(--primary-hover); }
-        .btn:disabled { opacity: 0.7; cursor: not-allowed; }
-
+        .btn { padding: 0.75rem 1.5rem; border-radius: 9999px; font-weight: 600; border: none; cursor: pointer; font-size: 1rem; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; }
+        .btn-primary { background-color: var(--primary); color: white; }
+        .btn-primary:hover { background-color: var(--primary-hover); transform: translateY(-1px); }
+        .btn-dark { background-color: var(--text); color: white; }
+        .btn-dark:hover { background-color: #000; transform: translateY(-1px); }
+        .btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+        
+        .btn-sm { padding: 0.4rem 0.8rem; font-size: 0.85rem; }
+        .btn-secondary { background-color: white; color: var(--text); border: 1px solid var(--border); }
+        .btn-secondary:hover { background-color: var(--bg); }
+        
         input[type="file"] { display: none; }
 
-        /* Preview Area */
-        #preview-area {
-            margin-top: 2rem;
-            width: 100%;
-            display: none; /* Hidden by default */
-            background: var(--surface);
-            border-radius: var(--radius);
-            padding: 1.5rem;
-            box-shadow: var(--shadow);
-            animation: slideUp 0.4s ease-out;
+        /* Workspace Area */
+        #workspace { width: 100%; display: none; animation: slideUp 0.4s ease-out; }
+        
+        .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem; }
+        .file-count { font-weight: 700; color: var(--text); }
+
+        /* Grid */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 1rem;
+            margin-bottom: 6rem; /* Space for fixed footer */
         }
 
-        .preview-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
-        .file-info { font-weight: 600; font-size: 0.9rem; }
-        
-        .img-preview-container {
-            width: 100%;
-            height: 200px;
-            background-color: #f1f5f9;
+        .card {
+            background: var(--surface);
             border-radius: 8px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--shadow);
+            position: relative;
+        }
+
+        .card-img-wrapper {
+            height: 120px;
+            background: #f1f5f9;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
-            margin-bottom: 1.5rem;
-            border: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
         }
+        .card-img-wrapper img { width: 100%; height: 100%; object-fit: cover; }
 
-        .img-preview-container img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-        }
-
-        /* Progress Bar */
-        .progress-container {
-            width: 100%;
-            height: 8px;
-            background-color: #e2e8f0;
-            border-radius: 4px;
-            overflow: hidden;
-            margin-bottom: 0.5rem;
-            display: none;
-        }
-
-        .progress-bar {
-            height: 100%;
-            background-color: var(--primary);
-            width: 0%;
-            transition: width 0.3s linear;
-        }
-
-        .status-text {
-            font-size: 0.85rem;
-            color: var(--text-light);
-            text-align: center;
-            min-height: 1.2em;
-        }
-
-        /* SEO Content (Below Fold) */
-        article {
-            margin-top: 3rem;
-            width: 100%;
-            max-width: 800px;
-            padding: 0 1rem;
-        }
-
-        article h2 { font-size: 1.25rem; margin-bottom: 1rem; color: var(--text); }
-        article p { margin-bottom: 1rem; color: var(--text-light); font-size: 0.95rem; }
+        .card-body { padding: 0.5rem; }
+        .card-title { font-size: 0.75rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-light); margin-bottom: 0.5rem; }
         
-        footer {
-            margin-top: auto;
-            padding: 2rem;
-            text-align: center;
-            font-size: 0.8rem;
-            color: var(--text-light);
+        .btn-remove {
+            position: absolute; top: 4px; right: 4px;
+            width: 24px; height: 24px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 50%; background: rgba(0,0,0,0.5); color: white;
+            border: none; cursor: pointer; font-size: 14px;
+        }
+        .btn-remove:hover { background: #ef4444; }
+
+        /* Footer Action Bar */
+        .action-bar {
             background: var(--surface);
-            border-top: 1px solid var(--border);
+            padding: 1rem;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 800px;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
         }
 
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .action-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+        .action-buttons .btn { flex: 1; min-width: 200px; }
 
-        @media (max-width: 600px) {
-            h1 { font-size: 1.25rem; }
-            .drop-zone { padding: 2rem 1rem; }
-        }
+        .progress-bar { width: 100%; height: 4px; background: #e2e8f0; border-radius: 2px; overflow: hidden; display: none; }
+        .progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.2s; }
+
+        footer { margin-top: auto; padding: 2rem; text-align: center; font-size: 0.8rem; color: var(--text-light); border-top: 1px solid var(--border); }
+
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
 <header>
     <h1>FastPDF Converter</h1>
-    <div class="tagline">Secure, Client-Side JPG to PDF</div>
-    <a href="https://pdftoscan.online/" class="header-link" target="_blank" rel="noopener">PDF to Scanned PDF</a>
+    <div class="tagline">Batch Process & Zip</div>
 </header>
 
 <main>
-    <!-- Interaction Area -->
     <div class="drop-zone" id="dropZone">
         <svg class="icon" viewBox="0 0 24 24">
             <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
         </svg>
-        <h2>Drag & Drop or Paste JPG here</h2>
-        <p style="color: var(--text-light); margin: 0.5rem 0;">or click to browse files</p>
-        <button class="btn" onclick="document.getElementById('fileInput').click()">Select Image</button>
-        <input type="file" id="fileInput" accept="image/jpeg, image/jpg, image/png, image/gif, image/bmp, image/webp, image/tiff, image/svg+xml, image/x-icon, image/heic, image/heif, image/avif, .3fr, .ai, .arw, .ari, .art, .avif, .bay, .bmp, .bw, .cap, .cgm, .clip, .cr2, .cr3, .crw, .cur, .dcm, .dcr, .dcs, .dds, .dib, .dng, .drf, .erf, .eps, .exr, .fff, .fit, .fits, .fts, .gif, .hdr, .heic, .heics, .heif, .heifs, .hrz, .icb, .ico, .iiq, .j2k, .jpe, .jpeg, .jpf, .jpg, .jpm, .jng, .jp2, .kra, .k25, .kdc, .mdp, .mef, .mj2, .mos, .mrw, .nef, .nrw, .orf, .ora, .pam, .pbm, .pcx, .pef, .pfm, .pgf, .pgm, .pic, .pix, .png, .pnm, .ppm, .ps, .psb, .psd, .ptx, .pxn, .qmg, .raf, .raw, .r3d, .ras, .reb, .rgb, .rgba, .rw1, .rw2, .rwl, .sgi, .skp, .srf, .sr2, .srw, .svg, .svgz, .tga, .tif, .tiff, .vda, .vst, .webp, .wmf, .x3f, .xcf" aria-label="Upload JPG">
+        <h2>Drag & Drop Multiple Images</h2>
+        <button class="btn btn-primary" style="margin-top:1rem" onclick="document.getElementById('fileInput').click()">Select Images</button>
+        <input type="file" id="fileInput" multiple accept="image/jpeg, image/png, image/webp">
     </div>
 
-    <!-- Processing & Preview Area -->
-    <div id="preview-area">
-        <div class="preview-header">
-            <span class="file-info" id="fileName">image.jpg</span>
-            <span class="file-info" id="fileSize" style="color: var(--text-light)">0 MB</span>
+    <div id="workspace">
+        <div class="toolbar">
+            <span class="file-count" id="fileCount">0 Images</span>
+            <button class="btn btn-secondary btn-sm" onclick="clearAll()">Clear All</button>
         </div>
 
-        <div class="img-preview-container">
-            <img id="previewImg" alt="Preview" src="">
-        </div>
+        <div class="grid-container" id="gridContainer"></div>
 
-        <div class="progress-container" id="progressContainer">
-            <div class="progress-bar" id="progressBar"></div>
+        <div class="action-bar">
+            <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
+            <div class="action-buttons">
+                <button class="btn btn-dark" id="zipBtn">
+                    <svg style="width:20px;height:20px;fill:currentColor" viewBox="0 0 24 24"><path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M16,11V13H13V15H16V17H13V19H11V11L16,11Z"/></svg>
+                    Download All as ZIP
+                </button>
+                <button class="btn btn-primary" id="mergeBtn">
+                    <svg style="width:20px;height:20px;fill:currentColor" viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg>
+                    Merge All into One PDF
+                </button>
+            </div>
         </div>
-        <div class="status-text" id="statusText"></div>
-
-        <button class="btn" id="convertBtn" style="width: 100%; justify-content: center;">
-            <svg style="width:20px;height:20px;fill:currentColor" viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg>
-            Download PDF
-        </button>
     </div>
 </main>
 
-<!-- SEO Content Strategy: Keyword Rich, Semantic Structure -->
-<article>
-    <section>
-        <h2>Why use FastPDF?</h2>
-        <p>
-            FastPDF is designed for speed and privacy. Unlike other converters, <strong>we do not upload your files to any server</strong>. 
-            All processing happens locally on your device using advanced HTML5 technology. This guarantees 100% data security and zero waiting time for uploads.
-        </p>
-    </section>
-    <section>
-        <h2>How to convert JPG to PDF</h2>
-        <ol style="padding-left: 1.5rem; color: var(--text-light); margin-bottom: 1rem;">
-            <li>Upload, drag and drop, or <strong>paste</strong> your JPG image into the box above.</li>
-            <li>Review the instant preview generated by your browser.</li>
-            <li>Click "Download PDF" to generate your document instantly.</li>
-        </ol>
-    </section>
-</article>
-
-<footer>
-    <p>&copy; 2024 FastPDF Tool. Local Processing. Zero Dependencies.</p>
-</footer>
+<footer><p>&copy; 2024 FastPDF. No Server Uploads.</p></footer>
 
 <script>
-    /**
-     * PURE VANILLA JS - ZERO EXTERNAL LIBRARIES
-     * Implements a custom Image-to-PDF binary writer.
-     */
-
+    // --- MAIN APP LOGIC ---
     const dropZone = document.getElementById('dropZone');
     const fileInput = document.getElementById('fileInput');
-    const previewArea = document.getElementById('preview-area');
-    const previewImg = document.getElementById('previewImg');
-    const fileNameDisplay = document.getElementById('fileName');
-    const fileSizeDisplay = document.getElementById('fileSize');
-    const convertBtn = document.getElementById('convertBtn');
+    const workspace = document.getElementById('workspace');
+    const gridContainer = document.getElementById('gridContainer');
+    const fileCount = document.getElementById('fileCount');
+    const mergeBtn = document.getElementById('mergeBtn');
+    const zipBtn = document.getElementById('zipBtn');
     const progressBar = document.getElementById('progressBar');
-    const progressContainer = document.getElementById('progressContainer');
-    const statusText = document.getElementById('statusText');
+    const progressFill = document.getElementById('progressFill');
 
-    let currentFile = null;
-    let currentImgData = null; // Stores DataURL
+    let filesQueue = []; 
 
-    // --- Event Listeners ---
+    // Event Listeners
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(evt => {
+        dropZone.addEventListener(evt, (e) => { e.preventDefault(); e.stopPropagation(); });
+    });
+    dropZone.addEventListener('drop', (e) => handleFiles(e.dataTransfer.files));
+    fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
     
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-        dropZone.addEventListener(eventName, preventDefaults, false);
-    });
-
-    // Paste Listener
-    document.addEventListener('paste', handlePaste, false);
-
-    function preventDefaults(e) {
-        e.preventDefault();
-        e.stopPropagation();
-    }
-
-    ['dragenter', 'dragover'].forEach(eventName => {
-        dropZone.addEventListener(eventName, () => dropZone.classList.add('drag-over'), false);
-    });
-
-    ['dragleave', 'drop'].forEach(eventName => {
-        dropZone.addEventListener(eventName, () => dropZone.classList.remove('drag-over'), false);
-    });
-
-    dropZone.addEventListener('drop', handleDrop, false);
-    fileInput.addEventListener('change', handleFiles, false);
-    convertBtn.addEventListener('click', initiateConversion, false);
-
-    // --- Core Logic ---
-
-    function handleDrop(e) {
-        const dt = e.dataTransfer;
-        const files = dt.files;
-        handleFiles({ target: { files: files } });
-    }
-
-    function handlePaste(e) {
+    // Paste Support
+    document.addEventListener('paste', (e) => {
         const items = (e.clipboardData || e.originalEvent.clipboardData).items;
-        for (let index in items) {
-            const item = items[index];
-            if (item.kind === 'file') {
-                const blob = item.getAsFile();
-                if (blob) {
-                    if (blob.type.startsWith("image/")) {
-                        processFile(blob);
-                    } else {
-                        alert("Pasted image must be a JPG. Detected format: " + blob.type + ".\n\nPlease paste a JPG file.");
-                    }
-                    return; // Stop after processing the first file
-                }
-            }
+        const files = [];
+        for (let item of items) {
+            if (item.kind === 'file' && item.type.startsWith('image/')) files.push(item.getAsFile());
         }
+        if(files.length) handleFiles(files);
+    });
+
+    mergeBtn.addEventListener('click', processMerged);
+    zipBtn.addEventListener('click', processZip);
+
+    function handleFiles(fileList) {
+        if (!fileList.length) return;
+        workspace.style.display = 'block';
+        dropZone.style.display = 'none';
+
+        Array.from(fileList).forEach(file => {
+            if (!file.type.startsWith('image/')) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    const item = {
+                        id: Math.random().toString(36).substr(2, 9),
+                        file: file,
+                        dataUrl: e.target.result,
+                        width: img.naturalWidth,
+                        height: img.naturalHeight
+                    };
+                    filesQueue.push(item);
+                    renderCard(item);
+                    updateUI();
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+        fileInput.value = '';
     }
 
-    function handleFiles(e) {
-        const file = e.target.files[0];
-        if (file && file.type.startsWith("image/")) {
-            processFile(file);
-        } else {
-            alert("Please select a valid JPG image.");
-        }
+    function renderCard(item) {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.id = `card-${item.id}`;
+        card.innerHTML = `
+            <button class="btn-remove" onclick="removeFile('${item.id}')">&times;</button>
+            <div class="card-img-wrapper"><img src="${item.dataUrl}"></div>
+            <div class="card-body"><div class="card-title">${item.file.name}</div></div>
+        `;
+        gridContainer.appendChild(card);
     }
 
-    function processFile(file) {
-        currentFile = file;
-        fileNameDisplay.textContent = file.name || "pasted-image.jpg";
-        fileSizeDisplay.textContent = (file.size / 1024 / 1024).toFixed(2) + " MB";
-        
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            currentImgData = e.target.result;
-            previewImg.src = currentImgData;
-            previewArea.style.display = "block";
-            // SEO: Signal DOM change
-            document.title = "Review: " + (file.name || "Image") + " | FastPDF";
-            
-            // Smooth scroll to preview
-            previewArea.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }
-        reader.readAsDataURL(file);
+    window.removeFile = function(id) {
+        filesQueue = filesQueue.filter(f => f.id !== id);
+        document.getElementById(`card-${id}`).remove();
+        updateUI();
+        if(!filesQueue.length) { workspace.style.display = 'none'; dropZone.style.display = 'block'; }
     }
 
-    // --- "Sticky UI" Conversion Process ---
-    // Uses simulated delays to increase Time-On-Page while showing useful status updates
+    window.clearAll = function() {
+        filesQueue = [];
+        gridContainer.innerHTML = '';
+        workspace.style.display = 'none';
+        dropZone.style.display = 'block';
+    }
 
-    function initiateConversion() {
-        if (!currentFile || !currentImgData) return;
+    function updateUI() {
+        fileCount.textContent = `${filesQueue.length} Images`;
+        mergeBtn.innerHTML = `Merge ${filesQueue.length} PDF${filesQueue.length>1?'s':''}`;
+    }
 
-        convertBtn.disabled = true;
-        progressContainer.style.display = "block";
-        
-        // Step 1: Analyze
-        updateStatus(10, "Analyzing image dimensions...");
-        document.title = "Processing... | FastPDF";
-
+    // --- ACTION: MERGE ALL ---
+    function processMerged() {
+        startLoading(mergeBtn);
         setTimeout(() => {
-            // Step 2: Structure
-            updateStatus(45, "Constructing PDF container...");
-            
-            setTimeout(() => {
-                // Step 3: Optimization
-                updateStatus(80, "Optimizing stream...");
+            const pdfBlob = generatePDFBlob(filesQueue); // Send all
+            downloadBlob(pdfBlob, "merged-document.pdf");
+            stopLoading(mergeBtn, "Merge All into One PDF");
+        }, 100);
+    }
+
+    // --- ACTION: BATCH ZIP ---
+    async function processZip() {
+        startLoading(zipBtn);
+        
+        // Use timeout to allow UI to paint
+        setTimeout(async () => {
+            const zipWriter = new MiniZip();
+            const nameTracker = {};
+
+            filesQueue.forEach((item) => {
+                // 1. Generate individual PDF for this image
+                const pdfBlob = generatePDFBlob([item]);
                 
-                setTimeout(() => {
-                    // Final: Generate
-                    generateAndDownloadPDF(currentImgData);
-                    updateStatus(100, "Done!");
-                    convertBtn.innerHTML = "Converted!";
-                    convertBtn.style.backgroundColor = "#10b981"; // Success Green
-                    document.title = "Download Ready | FastPDF";
-                }, 600);
-            }, 500);
-        }, 400);
+                // 2. Determine filename
+                let originalName = item.file.name.replace(/\.[^/.]+$/, ""); // strip extension
+                let finalName = originalName;
+                
+                // Handle duplicates
+                if (nameTracker[originalName]) {
+                    nameTracker[originalName]++;
+                    finalName = `${originalName} (${nameTracker[originalName]})`;
+                } else {
+                    nameTracker[originalName] = 0; // 0 means we've seen it, but count starts at 1
+                }
+
+                // 3. Add to ZIP
+                zipWriter.add(`${finalName}.pdf`, pdfBlob);
+            });
+
+            // 4. Download
+            const zipBlob = await zipWriter.generate();
+            downloadBlob(zipBlob, "converted-pdfs.zip");
+            stopLoading(zipBtn, "Download All as ZIP");
+        }, 100);
     }
 
-    function updateStatus(percent, text) {
-        progressBar.style.width = percent + "%";
-        statusText.textContent = text;
+    function startLoading(btn) {
+        progressBar.style.display = 'block';
+        progressFill.style.width = '50%';
+        btn.disabled = true;
+        btn.dataset.originalText = btn.innerHTML;
+        btn.innerHTML = "Processing...";
     }
 
-    // --- CUSTOM PDF ENGINE (Zero Dependency) ---
-    // This constructs a valid PDF 1.4 file string with the JPG embedded directly.
+    function stopLoading(btn, resetText) {
+        progressFill.style.width = '100%';
+        setTimeout(() => {
+            progressBar.style.display = 'none';
+            progressFill.style.width = '0';
+            btn.disabled = false;
+            btn.innerHTML = resetText;
+        }, 500);
+    }
 
-    function generateAndDownloadPDF(dataUrl) {
-        // 1. Get raw dimensions from the loaded image
-        const imgWidth = previewImg.naturalWidth;
-        const imgHeight = previewImg.naturalHeight;
-        
-        // 2. Calculate PDF page size (Pixels to Points, 72 DPI standard for PDF)
-        // We will make the page match the image aspect ratio
-        const pdfWidth = imgWidth * 0.75; 
-        const pdfHeight = imgHeight * 0.75;
-
-        // 3. Strip base64 header
-        const base64Data = dataUrl.split(',')[1];
-        
-        // 4. Construct PDF Objects
-        // We need to build a Cross-Reference Table (xref) logic, but for a simple 
-        // single-page PDF, we can calculate byte offsets or use a simpler structure.
-        // However, JS strings use UTF-16. We need to treat this as binary.
-        
-        const objects = [];
-        let offset = 0;
-
-        function addObj(content) {
-            const id = objects.length + 1;
-            const objStr = `${id} 0 obj\n${content}\nendobj\n`;
-            objects.push({ id, content: objStr, length: objStr.length });
-            return id;
-        }
-
-        // Obj 1: Catalog
-        const catalogId = 1; 
-        // Obj 2: Page Tree
-        const pagesId = 2;
-        // Obj 3: Page
-        const pageId = 3;
-        // Obj 4: Content Stream
-        const contentId = 4;
-        // Obj 5: Image Resource
-        const imageId = 5;
-
-        // 1. Catalog
-        const obj1 = `1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n`;
-        
-        // 2. Pages
-        const obj2 = `2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n`;
-
-        // 3. Page
-        const obj3 = `3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${pdfWidth} ${pdfHeight}] /Resources << /XObject << /Img1 5 0 R >> >> /Contents 4 0 R >>\nendobj\n`;
-
-        // 4. Content Stream (Draw Image)
-        // q = save graphics state, cm = transformation matrix, Do = draw XObject, Q = restore
-        const streamData = `q\n${pdfWidth} 0 0 ${pdfHeight} 0 0 cm\n/Img1 Do\nQ`;
-        const obj4 = `4 0 obj\n<< /Length ${streamData.length} >>\nstream\n${streamData}\nendstream\nendobj\n`;
-
-        // 5. Image XObject
-        // NOTE: We rely on the browser's ability to handle the binary string conversion
-        // for the final Blob. 
-        const obj5Header = `5 0 obj\n<< /Type /XObject /Subtype /Image /Width ${imgWidth} /Height ${imgHeight} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${base64Data.length} >>\nstream\n`;
-        
-        // Constructing the final parts is tricky with mixed ASCII/Binary.
-        // We will build an array of parts and create a Blob.
-        
-        // Calculate offsets
-        // Header length: "%PDF-1.4\n" = 9 bytes
-        let currentOffset = 9;
-        const xref = [];
-        
-        // Helper to push text and track offset
-        const parts = ["%PDF-1.4\n"];
-        
-        function pushPart(str) {
-            parts.push(str);
-            currentOffset += str.length;
-        }
-
-        // Add 0 entry to xref
-        xref.push("0000000000 65535 f \n");
-
-        // Add Obj 1
-        xref.push(formatOffset(currentOffset) + " 00000 n \n");
-        pushPart(obj1);
-
-        // Add Obj 2
-        xref.push(formatOffset(currentOffset) + " 00000 n \n");
-        pushPart(obj2);
-
-        // Add Obj 3
-        xref.push(formatOffset(currentOffset) + " 00000 n \n");
-        pushPart(obj3);
-
-        // Add Obj 4
-        xref.push(formatOffset(currentOffset) + " 00000 n \n");
-        pushPart(obj4);
-
-        // Add Obj 5 (The Image)
-        xref.push(formatOffset(currentOffset) + " 00000 n \n");
-        pushPart(obj5Header);
-        
-        // For the binary image data, we must convert base64 to a Uint8Array
-        // to ensure it isn't corrupted by string encoding.
-        const binaryImg = base64ToUint8Array(base64Data);
-        parts.push(binaryImg);
-        currentOffset += binaryImg.byteLength;
-        
-        pushPart("\nendstream\nendobj\n");
-
-        // Footer: Xref
-        const xrefStart = currentOffset;
-        pushPart("xref\n");
-        pushPart(`0 6\n`); // 0 to 5 objects
-        xref.forEach(x => pushPart(x));
-
-        // Trailer
-        pushPart(`trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n${xrefStart}\n%%EOF`);
-
-        // Create Blob
-        const blob = new Blob(parts, { type: 'application/pdf' });
+    function downloadBlob(blob, filename) {
         const url = URL.createObjectURL(blob);
-        
-        // Trigger Download
         const link = document.createElement('a');
         link.href = url;
-        link.download = (currentFile.name || "converted").replace(/\.[^/.]+$/, "") + ".pdf";
+        link.download = filename;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
     }
 
-    function formatOffset(offset) {
-        return ("0000000000" + offset).slice(-10);
+
+    // --- ENGINES ---
+
+    /**
+     * PDF ENGINE (Binary Construction)
+     * Creates a PDF from an array of Image Objects
+     */
+    function generatePDFBlob(images) {
+        const parts = [];
+        let offset = 0;
+        const xref = [];
+        
+        function add(str) {
+            if(typeof str === 'string') { parts.push(str); offset += str.length; } 
+            else { parts.push(str); offset += str.byteLength; }
+        }
+        function addXref() { xref.push(("0000000000" + offset).slice(-10) + " 00000 n \n"); }
+
+        add("%PDF-1.4\n");
+        xref.push("0000000000 65535 f \n"); // 0
+
+        const count = images.length;
+        const pageIds = [];
+        for(let i=0; i<count; i++) pageIds.push(`${3 + i*3} 0 R`);
+
+        // 1. Catalog
+        addXref(); add(`1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n`);
+        // 2. Page Tree
+        addXref(); add(`2 0 obj\n<< /Type /Pages /Kids [${pageIds.join(' ')}] /Count ${count} >>\nendobj\n`);
+
+        images.forEach((img, i) => {
+            const pageId = 3 + i*3;
+            const contentId = 4 + i*3;
+            const imgId = 5 + i*3;
+            const w = Math.floor(img.width * 0.75);
+            const h = Math.floor(img.height * 0.75);
+
+            // 3. Page
+            addXref(); add(`${pageId} 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${w} ${h}] /Resources << /XObject << /I${i} ${imgId} 0 R >> >> /Contents ${contentId} 0 R >>\nendobj\n`);
+            // 4. Content
+            addXref(); 
+            const stream = `q\n${w} 0 0 ${h} 0 0 cm\n/I${i} Do\nQ`;
+            add(`${contentId} 0 obj\n<< /Length ${stream.length} >>\nstream\n${stream}\nendstream\nendobj\n`);
+            // 5. Image
+            addXref();
+            const bin = base64ToUint8Array(img.dataUrl.split(',')[1]);
+            add(`${imgId} 0 obj\n<< /Type /XObject /Subtype /Image /Width ${img.width} /Height ${img.height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${bin.byteLength} >>\nstream\n`);
+            add(bin);
+            add(`\nendstream\nendobj\n`);
+        });
+
+        const xrefOffset = offset;
+        add("xref\n"); add(`0 ${xref.length}\n`);
+        xref.forEach(x => add(x));
+        add(`trailer\n<< /Size ${xref.length} /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`);
+        return new Blob(parts, { type: 'application/pdf' });
+    }
+
+    /**
+     * MINI ZIP ENGINE (Vanilla JS, No Dependencies)
+     * Creates an uncompressed (Store) ZIP file.
+     */
+    class MiniZip {
+        constructor() {
+            this.files = [];
+        }
+
+        async add(filename, contentBlob) {
+            const buffer = await contentBlob.arrayBuffer();
+            this.files.push({ name: filename, data: new Uint8Array(buffer) });
+        }
+
+        async generate() {
+            const parts = [];
+            let offset = 0;
+            const centralDir = [];
+
+            // Helpers
+            const enc = new TextEncoder();
+            const crcTable = this.makeCrcTable();
+            
+            const write4 = (view, off, val) => view.setUint32(off, val, true);
+            const write2 = (view, off, val) => view.setUint16(off, val, true);
+
+            for(const file of this.files) {
+                const nameBytes = enc.encode(file.name);
+                const data = file.data;
+                const crc = this.crc32(data, crcTable);
+                const size = data.length;
+
+                // Local Header (30 bytes + name)
+                const header = new Uint8Array(30 + nameBytes.length);
+                const view = new DataView(header.buffer);
+
+                write4(view, 0, 0x04034b50); // Signature
+                write2(view, 4, 10); // Version
+                write2(view, 6, 0);  // Flags
+                write2(view, 8, 0);  // Compression (0 = Store)
+                write2(view, 10, 0); // Time (placeholder)
+                write2(view, 12, 0); // Date (placeholder)
+                write4(view, 14, crc);
+                write4(view, 18, size); // Compressed Size
+                write4(view, 22, size); // Uncompressed
+                write2(view, 26, nameBytes.length);
+                write2(view, 28, 0); // Extra len
+                header.set(nameBytes, 30);
+
+                parts.push(header);
+                parts.push(data);
+
+                // Central Directory Record for later
+                centralDir.push({ 
+                    nameBytes, size, crc, offset 
+                });
+
+                offset += header.length + data.length;
+            }
+
+            const centralStart = offset;
+
+            // Write Central Directory
+            for (const r of centralDir) {
+                const row = new Uint8Array(46 + r.nameBytes.length);
+                const view = new DataView(row.buffer);
+                
+                write4(view, 0, 0x02014b50); // Signature
+                write2(view, 4, 10); // Version made by
+                write2(view, 6, 10); // Version needed
+                write2(view, 8, 0);  // Flags
+                write2(view, 10, 0); // Compression
+                write4(view, 16, r.crc);
+                write4(view, 20, r.size);
+                write4(view, 24, r.size);
+                write2(view, 28, r.nameBytes.length);
+                write4(view, 42, r.offset);
+                row.set(r.nameBytes, 46);
+
+                parts.push(row);
+                offset += row.length;
+            }
+
+            // End of Central Directory (22 bytes)
+            const eocd = new Uint8Array(22);
+            const view = new DataView(eocd.buffer);
+            write4(view, 0, 0x06054b50);
+            write2(view, 8, this.files.length); // Count disk
+            write2(view, 10, this.files.length); // Count total
+            write4(view, 12, offset - centralStart); // Size of CD
+            write4(view, 16, centralStart); // Offset of CD
+
+            parts.push(eocd);
+
+            return new Blob(parts, { type: 'application/zip' });
+        }
+
+        // Standard CRC32 Implementation
+        makeCrcTable() {
+            let c;
+            const table = [];
+            for(let n =0; n < 256; n++){
+                c = n;
+                for(let k =0; k < 8; k++){
+                    c = ((c&1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1));
+                }
+                table[n] = c;
+            }
+            return table;
+        }
+
+        crc32(uint8array, table) {
+            let crc = 0 ^ (-1);
+            for (let i = 0; i < uint8array.length; i++) {
+                crc = (crc >>> 8) ^ table[(crc ^ uint8array[i]) & 0xFF];
+            }
+            return (crc ^ (-1)) >>> 0;
+        }
     }
 
     function base64ToUint8Array(base64) {
-        const binary_string = window.atob(base64);
-        const len = binary_string.length;
+        const binStr = atob(base64);
+        const len = binStr.length;
         const bytes = new Uint8Array(len);
-        for (let i = 0; i < len; i++) {
-            bytes[i] = binary_string.charCodeAt(i);
-        }
+        for (let i = 0; i < len; i++) bytes[i] = binStr.charCodeAt(i);
         return bytes;
     }
 </script>
-
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"version":"2024.11.0","token":"41342ae72cae4f17a1b1010d54e26477","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>

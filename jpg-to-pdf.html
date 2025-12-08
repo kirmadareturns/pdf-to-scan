@@ -7,6 +7,8 @@
     <meta name="description" content="Convert JPGs to PDFs. Download as a merged document OR as a ZIP containing individual PDFs. Private, Offline, Free.">
     <meta name="theme-color" content="#2563eb">
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
     <style>
         :root {
             --primary: #2563eb;
@@ -59,7 +61,7 @@
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
             gap: 1rem;
-            margin-bottom: 6rem; /* Space for fixed footer */
+            margin-bottom: 6rem;
         }
 
         .card {
@@ -167,7 +169,7 @@
     </div>
 </main>
 
-<footer><p>&copy; 2024 FastPDF. No Server Uploads.</p></footer>
+<footer><p>&copy; 2024 FastPDF. Uses JSZip for reliable zipping.</p></footer>
 
 <script>
     // --- MAIN APP LOGIC ---
@@ -205,6 +207,12 @@
 
     function handleFiles(fileList) {
         if (!fileList.length) return;
+        // Check if JSZip is loaded before proceeding
+        if (typeof JSZip === 'undefined') {
+            alert('Error: JSZip library failed to load. Please check your internet connection or try again.');
+            return;
+        }
+
         workspace.style.display = 'block';
         dropZone.style.display = 'none';
 
@@ -260,7 +268,7 @@
 
     function updateUI() {
         fileCount.textContent = `${filesQueue.length} Images`;
-        mergeBtn.innerHTML = `Merge ${filesQueue.length} PDF${filesQueue.length>1?'s':''}`;
+        mergeBtn.innerHTML = `Merge ${filesQueue.length} PDF${filesQueue.length!==1?'s':''}`;
     }
 
     // --- ACTION: MERGE ALL ---
@@ -274,13 +282,13 @@
         }, 100);
     }
 
-    // --- ACTION: BATCH ZIP ---
+    // --- ACTION: BATCH ZIP (Now using JSZip) ---
     async function processZip() {
         if (filesQueue.length === 0) return;
         startLoading(zipBtn);
         
         setTimeout(async () => {
-            const zipWriter = new MiniZip();
+            const zip = new JSZip();
             const nameTracker = {};
 
             filesQueue.forEach((item) => {
@@ -299,13 +307,16 @@
                     nameTracker[originalName] = 0;
                 }
 
-                // 4. Add to ZIP using the final PDF name
-                zipWriter.add(`${finalName}.pdf`, pdfBlob);
+                // 4. Add the PDF Blob's ArrayBuffer to the ZIP file
+                // JSZip handles the binary structure correctly.
+                const pdfArrayBuffer = pdfBlob.arrayBuffer(); 
+                zip.file(`${finalName}.pdf`, pdfArrayBuffer);
             });
 
-            // 5. Download
-            const zipBlob = await zipWriter.generate();
+            // 5. Generate and Download the ZIP
+            const zipBlob = await zip.generateAsync({type:"blob"});
             downloadBlob(zipBlob, "converted-pdfs.zip");
+
             stopLoading(zipBtn, "Download All as ZIP");
         }, 100);
     }
@@ -339,12 +350,8 @@
     }
 
 
-    // --- ENGINES ---
+    // --- PDF ENGINE (UNMODIFIED) ---
 
-    /**
-     * PDF ENGINE (Binary Construction)
-     * Creates a PDF from an array of Image Objects
-     */
     function generatePDFBlob(images) {
         const parts = [];
         let offset = 0;
@@ -394,126 +401,6 @@
         xref.forEach(x => add(x));
         add(`trailer\n<< /Size ${xref.length} /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`);
         return new Blob(parts, { type: 'application/pdf' });
-    }
-
-    /**
-     * MINI ZIP ENGINE (Vanilla JS, No Dependencies)
-     * Creates an uncompressed (Store) ZIP file.
-     */
-    class MiniZip {
-        constructor() {
-            this.files = [];
-        }
-
-        async add(filename, contentBlob) {
-            const buffer = await contentBlob.arrayBuffer();
-            this.files.push({ name: filename, data: new Uint8Array(buffer) });
-        }
-
-        async generate() {
-            const parts = [];
-            let offset = 0;
-            const centralDir = [];
-
-            // Helpers
-            const enc = new TextEncoder();
-            const crcTable = this.makeCrcTable();
-            
-            const write4 = (view, off, val) => view.setUint32(off, val, true);
-            const write2 = (view, off, val) => view.setUint16(off, val, true);
-
-            for(const file of this.files) {
-                const nameBytes = enc.encode(file.name);
-                const data = file.data;
-                const crc = this.crc32(data, crcTable);
-                const size = data.length;
-
-                // Local Header (30 bytes + name)
-                const header = new Uint8Array(30 + nameBytes.length);
-                const view = new DataView(header.buffer);
-
-                write4(view, 0, 0x04034b50); // Signature
-                write2(view, 4, 10); // Version
-                write2(view, 6, 0);  // Flags
-                write2(view, 8, 0);  // Compression (0 = Store)
-                write2(view, 10, 0); // Time (placeholder)
-                write2(view, 12, 0); // Date (placeholder)
-                write4(view, 14, crc);
-                write4(view, 18, size); // Compressed Size
-                write4(view, 22, size); // Uncompressed
-                write2(view, 26, nameBytes.length);
-                write2(view, 28, 0); // Extra len
-                header.set(nameBytes, 30);
-
-                parts.push(header);
-                parts.push(data);
-
-                // Central Directory Record for later
-                centralDir.push({ 
-                    nameBytes, size, crc, offset 
-                });
-
-                offset += header.length + data.length;
-            }
-
-            const centralStart = offset;
-
-            // Write Central Directory
-            for (const r of centralDir) {
-                const row = new Uint8Array(46 + r.nameBytes.length);
-                const view = new DataView(row.buffer);
-                
-                write4(view, 0, 0x02014b50); // Signature
-                write2(view, 4, 10); // Version made by
-                write2(view, 6, 10); // Version needed
-                write2(view, 8, 0);  // Flags
-                write2(view, 10, 0); // Compression
-                write4(view, 16, r.crc);
-                write4(view, 20, r.size);
-                write4(view, 24, r.size);
-                write2(view, 28, r.nameBytes.length);
-                write4(view, 42, r.offset);
-                row.set(r.nameBytes, 46);
-
-                parts.push(row);
-                offset += row.length;
-            }
-
-            // End of Central Directory (22 bytes)
-            const eocd = new Uint8Array(22);
-            const view = new DataView(eocd.buffer);
-            write4(view, 0, 0x06054b50);
-            write2(view, 8, this.files.length); // Count disk
-            write2(view, 10, this.files.length); // Count total
-            write4(view, 12, offset - centralStart); // Size of CD
-            write4(view, 16, centralStart); // Offset of CD
-
-            parts.push(eocd);
-
-            return new Blob(parts, { type: 'application/zip' });
-        }
-
-        // Standard CRC32 Implementation
-        makeCrcTable() {
-            let c;
-            const table = [];
-            for(let n =0; n < 256; n++){
-                c = n;
-                for(let k =0; k < 8; k++){
-                    c = ((c&1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1));
-                }
-                table[n] = c;
-            }
-            return table;
-        }
-
-        crc32(uint8array, table) {
-            let crc = 0 ^ (-1);
-            for (let i = 0; i < uint8array.length; i++) {
-                crc = (crc >>> 8) ^ table[(crc ^ uint8array[i]) & 0xFF];
-            }
-            return (crc ^ (-1)) >>> 0;
-        }
     }
 
     function base64ToUint8Array(base64) {

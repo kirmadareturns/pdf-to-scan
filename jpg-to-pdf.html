@@ -291,7 +291,7 @@
             const zip = new JSZip();
             const nameTracker = {};
 
-            filesQueue.forEach((item) => {
+            for (const item of filesQueue) {
                 // 1. Generate individual PDF for this image
                 const pdfBlob = generatePDFBlob([item]);
                 
@@ -309,9 +309,9 @@
 
                 // 4. Add the PDF Blob's ArrayBuffer to the ZIP file
                 // JSZip handles the binary structure correctly.
-                const pdfArrayBuffer = pdfBlob.arrayBuffer(); 
+                const pdfArrayBuffer = await pdfBlob.arrayBuffer(); 
                 zip.file(`${finalName}.pdf`, pdfArrayBuffer);
-            });
+            }
 
             // 5. Generate and Download the ZIP
             const zipBlob = await zip.generateAsync({type:"blob"});

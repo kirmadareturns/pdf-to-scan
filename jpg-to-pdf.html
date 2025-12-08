@@ -265,9 +265,10 @@
 
     // --- ACTION: MERGE ALL ---
     function processMerged() {
+        if (filesQueue.length === 0) return;
         startLoading(mergeBtn);
         setTimeout(() => {
-            const pdfBlob = generatePDFBlob(filesQueue); // Send all
+            const pdfBlob = generatePDFBlob(filesQueue);
             downloadBlob(pdfBlob, "merged-document.pdf");
             stopLoading(mergeBtn, "Merge All into One PDF");
         }, 100);
@@ -275,9 +276,9 @@
 
     // --- ACTION: BATCH ZIP ---
     async function processZip() {
+        if (filesQueue.length === 0) return;
         startLoading(zipBtn);
         
-        // Use timeout to allow UI to paint
         setTimeout(async () => {
             const zipWriter = new MiniZip();
             const nameTracker = {};
@@ -286,23 +287,23 @@
                 // 1. Generate individual PDF for this image
                 const pdfBlob = generatePDFBlob([item]);
                 
-                // 2. Determine filename
-                let originalName = item.file.name.replace(/\.[^/.]+$/, ""); // strip extension
+                // 2. Determine cleaned filename (name without extension)
+                let originalName = item.file.name.replace(/\.[^/.]+$/, "");
                 let finalName = originalName;
                 
-                // Handle duplicates
-                if (nameTracker[originalName]) {
+                // 3. Handle duplicates
+                if (nameTracker[originalName] !== undefined) {
                     nameTracker[originalName]++;
                     finalName = `${originalName} (${nameTracker[originalName]})`;
                 } else {
-                    nameTracker[originalName] = 0; // 0 means we've seen it, but count starts at 1
+                    nameTracker[originalName] = 0;
                 }
 
-                // 3. Add to ZIP
+                // 4. Add to ZIP using the final PDF name
                 zipWriter.add(`${finalName}.pdf`, pdfBlob);
             });
 
-            // 4. Download
+            // 5. Download
             const zipBlob = await zipWriter.generate();
             downloadBlob(zipBlob, "converted-pdfs.zip");
             stopLoading(zipBtn, "Download All as ZIP");

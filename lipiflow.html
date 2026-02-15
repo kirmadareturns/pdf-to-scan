@@ -99,15 +99,40 @@
     const convertBtn = document.getElementById('convertBtn');
     const clearBtn = document.getElementById('clearBtn');
 
-    function transliterate() {
+    function convertToHinglish() {
       const text = input.value.trim();
-      if (!text) return;
-      output.value = transliterate(text);
+      if (!text) {
+        output.value = '';
+        return;
+      }
+      // Check if the library is loaded
+      if (typeof transliterate === 'undefined') {
+        output.value = 'Error: Transliteration library not loaded. Please refresh.';
+        return;
+      }
+      try {
+        // Use the global transliterate function from the library
+        const result = transliterate(text);
+        output.value = result;
+      } catch (error) {
+        output.value = 'Error during transliteration.';
+        console.error(error);
+      }
     }
 
-    convertBtn.addEventListener('click', transliterate);
-    clearBtn.addEventListener('click', () => { input.value = ''; output.value = ''; });
-    input.addEventListener('keydown', (e) => { if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') transliterate(); });
+    convertBtn.addEventListener('click', convertToHinglish);
+
+    clearBtn.addEventListener('click', () => {
+      input.value = '';
+      output.value = '';
+    });
+
+    // Ctrl+Enter (or Cmd+Enter on Mac) to convert
+    input.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        convertToHinglish();
+      }
+    });
   </script>
 </body>
 </html>

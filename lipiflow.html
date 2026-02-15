@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Hindi to Hinglish Converter</title>
+  <script src="https://cdn.jsdelivr.net/npm/@indic-transliteration/sanscript@latest/sanscript.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -72,6 +73,16 @@
     button:disabled { opacity: 0.5; cursor: not-allowed; }
     .clear-btn { background: transparent; border: 1px solid #475569; color: #94a3b8; }
     .clear-btn:hover:not(:disabled) { color: #e2e8f0; border-color: #64748b; }
+    .footer {
+      text-align: center;
+      margin-top: 20px;
+      color: #64748b;
+      font-size: 0.85rem;
+    }
+    .footer a {
+      color: #818cf8;
+      text-decoration: none;
+    }
   </style>
 </head>
 <body>
@@ -91,44 +102,16 @@
         <textarea id="output" placeholder="Result will appear here..." readonly></textarea>
       </div>
     </div>
+    <div class="footer">
+      Powered by <a href="https://github.com/sanskrit/sanscript.js" target="_blank">Sanscript.js</a> • Free & Open Source
+    </div>
   </div>
+
   <script>
     const input = document.getElementById('input');
     const output = document.getElementById('output');
     const convertBtn = document.getElementById('convertBtn');
     const clearBtn = document.getElementById('clearBtn');
-
-    // Comprehensive Devanagari to Roman transliteration map
-    const transliterationMap = {
-      // Vowels
-      'अ': 'a', 'आ': 'aa', 'इ': 'i', 'ई': 'ee', 'उ': 'u', 'ऊ': 'oo',
-      'ए': 'e', 'ऐ': 'ai', 'ओ': 'o', 'औ': 'au',
-      'ऋ': 'ri', 'ॠ': 'ree',
-      
-      // Consonants
-      'क': 'k', 'ख': 'kh', 'ग': 'g', 'घ': 'gh', 'ङ': 'ng',
-      'च': 'ch', 'छ': 'chh', 'ज': 'j', 'झ': 'jh', 'ञ': 'ny',
-      'ट': 't', 'ठ': 'th', 'ड': 'd', 'ढ': 'dh', 'ण': 'n',
-      'त': 't', 'थ': 'th', 'द': 'd', 'ध': 'dh', 'न': 'n',
-      'प': 'p', 'फ': 'ph', 'ब': 'b', 'भ': 'bh', 'म': 'm',
-      'य': 'y', 'र': 'r', 'ल': 'l', 'व': 'v', 'श': 'sh',
-      'ष': 'sh', 'स': 's', 'ह': 'h',
-      'क़': 'q', 'ख़': 'kh', 'ग़': 'gh', 'ज़': 'z', 'ड़': 'r', 'ढ़': 'rh',
-      'फ़': 'f', 'य़': 'y',
-      
-      // Vowel signs (matras)
-      'ा': 'aa', 'ि': 'i', 'ी': 'ee', 'ु': 'u', 'ू': 'oo',
-      'े': 'e', 'ै': 'ai', 'ो': 'o', 'ौ': 'au',
-      'ृ': 'ri', 'ॄ': 'ree',
-      
-      // Special characters
-      'ं': 'n', 'ः': 'h', 'ँ': 'n', '़': '', '्': '',
-      'ॐ': 'om',
-      
-      // Numbers
-      '०': '0', '१': '1', '२': '2', '३': '3', '४': '4',
-      '५': '5', '६': '6', '७': '7', '८': '8', '९': '9'
-    };
 
     function convertToHinglish() {
       const text = input.value.trim();
@@ -138,56 +121,19 @@
       }
 
       try {
-        let result = '';
-        let i = 0;
-        
-        while (i < text.length) {
-          let char = text[i];
-          let matched = false;
-          
-          // Check for two-character combinations first
-          if (i < text.length - 1) {
-            let twoChar = text[i] + text[i + 1];
-            if (transliterationMap[twoChar]) {
-              result += transliterationMap[twoChar];
-              i += 2;
-              matched = true;
-            }
-          }
-          
-          // If no two-char match, try single character
-          if (!matched) {
-            if (transliterationMap[char]) {
-              // Handle halant (virama) - it removes the implicit 'a'
-              if (char === '्') {
-                result += transliterationMap[char];
-              } else if (i < text.length - 1 && text[i + 1] === '्') {
-                // Consonant followed by halant
-                result += transliterationMap[char];
-              } else if (/[क-ह]/.test(char)) {
-                // Consonant without halant - add implicit 'a'
-                result += transliterationMap[char] + 'a';
-              } else {
-                result += transliterationMap[char];
-              }
-            } else {
-              // Keep non-Devanagari characters as-is (spaces, punctuation, etc.)
-              result += char;
-            }
-            i++;
-          }
+        // Check if Sanscript is loaded
+        if (typeof Sanscript === 'undefined') {
+          output.value = 'Error: Library not loaded. Please refresh the page.';
+          return;
         }
-        
-        // Clean up the result
-        result = result
-          .replace(/a([aeiou])/g, '$1')  // Remove 'a' before vowel matras
-          .replace(/aa/g, 'a')            // Simplify double 'a'
-          .replace(/([^aeiou])a\s/g, '$1 '); // Keep 'a' at word end
-        
+
+        // Convert Devanagari to ITRANS (Roman script)
+        // You can also use 'iast' for more academic transliteration
+        const result = Sanscript.t(text, 'devanagari', 'itrans');
         output.value = result;
       } catch (error) {
-        output.value = 'Error during transliteration.';
-        console.error(error);
+        output.value = 'Error during conversion: ' + error.message;
+        console.error('Conversion error:', error);
       }
     }
 
@@ -205,11 +151,21 @@
       }
     });
 
-    // Optional: Auto-convert as user types (with debounce)
+    // Auto-convert as user types (with debounce)
     let timeout;
     input.addEventListener('input', () => {
       clearTimeout(timeout);
       timeout = setTimeout(convertToHinglish, 300);
+    });
+
+    // Verify library is loaded on page load
+    window.addEventListener('load', () => {
+      if (typeof Sanscript === 'undefined') {
+        console.error('Sanscript library failed to load');
+        alert('Failed to load transliteration library. Please check your internet connection and refresh.');
+      } else {
+        console.log('Sanscript library loaded successfully');
+      }
     });
   </script>
 </body>

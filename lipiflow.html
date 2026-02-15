@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hindi to Hinglish Converter</title>
+  <script src="https://unpkg.com/transliteration/dist/browser/transliteration.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .container { width: 100%; max-width: 900px; }
+    h1 { color: #e2e8f0; text-align: center; margin-bottom: 30px; font-size: 1.8rem; }
+    .converter { display: flex; gap: 20px; flex-direction: column; }
+    @media (min-width: 768px) { .converter { flex-direction: row; } }
+    .box {
+      flex: 1;
+      background: rgba(30, 41, 59, 0.7);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(71, 85, 105, 0.5);
+      border-radius: 16px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .box-header {
+      background: rgba(15, 23, 42, 0.5);
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(71, 85, 105, 0.3);
+      color: #e2e8f0;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .dot { width: 8px; height: 8px; border-radius: 50%; }
+    .input-box .dot { background: #ec4899; }
+    .output-box .dot { background: #6366f1; }
+    textarea {
+      flex: 1;
+      min-height: 200px;
+      background: transparent;
+      border: none;
+      padding: 20px;
+      color: #fff;
+      font-size: 1.2rem;
+      resize: none;
+      outline: none;
+    }
+    textarea::placeholder { color: #64748b; }
+    .output-box textarea { color: #c7d2fe; }
+    .btn-container { display: flex; justify-content: center; align-items: center; padding: 10px 0; gap: 10px; }
+    @media (min-width: 768px) { .btn-container { flex-direction: column; } }
+    button {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: white;
+      border: none;
+      padding: 16px 32px;
+      border-radius: 50px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    button:hover:not(:disabled) { transform: scale(1.05); }
+    button:active:not(:disabled) { transform: scale(0.95); }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .clear-btn { background: transparent; border: 1px solid #475569; color: #94a3b8; }
+    .clear-btn:hover:not(:disabled) { color: #e2e8f0; border-color: #64748b; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Hindi to Hinglish Converter</h1>
+    <div class="converter">
+      <div class="box input-box">
+        <div class="box-header"><span class="dot"></span>Hindi (Devanagari)</div>
+        <textarea id="input" placeholder="यहाँ टाइप करें... (Type here)"></textarea>
+      </div>
+      <div class="btn-container">
+        <button id="convertBtn">Convert →</button>
+        <button id="clearBtn" class="clear-btn">Clear</button>
+      </div>
+      <div class="box output-box">
+        <div class="box-header"><span class="dot"></span>Hinglish (Roman)</div>
+        <textarea id="output" placeholder="Result will appear here..." readonly></textarea>
+      </div>
+    </div>
+  </div>
+  <script>
+    const input = document.getElementById('input');
+    const output = document.getElementById('output');
+    const convertBtn = document.getElementById('convertBtn');
+    const clearBtn = document.getElementById('clearBtn');
+
+    function transliterate() {
+      const text = input.value.trim();
+      if (!text) return;
+      output.value = transliterateText(text, 'hi');
+    }
+
+    convertBtn.addEventListener('click', transliterate);
+    clearBtn.addEventListener('click', () => { input.value = ''; output.value = ''; });
+    input.addEventListener('keydown', (e) => { if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') transliterate(); });
+  </script>
+</body>
+</html>

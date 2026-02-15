@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Hindi to Hinglish Converter</title>
-  <script src="https://cdn.jsdelivr.net/npm/transliteration@2/dist/browser/bundle.umd.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -99,20 +98,92 @@
     const convertBtn = document.getElementById('convertBtn');
     const clearBtn = document.getElementById('clearBtn');
 
+    // Comprehensive Devanagari to Roman transliteration map
+    const transliterationMap = {
+      // Vowels
+      'अ': 'a', 'आ': 'aa', 'इ': 'i', 'ई': 'ee', 'उ': 'u', 'ऊ': 'oo',
+      'ए': 'e', 'ऐ': 'ai', 'ओ': 'o', 'औ': 'au',
+      'ऋ': 'ri', 'ॠ': 'ree',
+      
+      // Consonants
+      'क': 'k', 'ख': 'kh', 'ग': 'g', 'घ': 'gh', 'ङ': 'ng',
+      'च': 'ch', 'छ': 'chh', 'ज': 'j', 'झ': 'jh', 'ञ': 'ny',
+      'ट': 't', 'ठ': 'th', 'ड': 'd', 'ढ': 'dh', 'ण': 'n',
+      'त': 't', 'थ': 'th', 'द': 'd', 'ध': 'dh', 'न': 'n',
+      'प': 'p', 'फ': 'ph', 'ब': 'b', 'भ': 'bh', 'म': 'm',
+      'य': 'y', 'र': 'r', 'ल': 'l', 'व': 'v', 'श': 'sh',
+      'ष': 'sh', 'स': 's', 'ह': 'h',
+      'क़': 'q', 'ख़': 'kh', 'ग़': 'gh', 'ज़': 'z', 'ड़': 'r', 'ढ़': 'rh',
+      'फ़': 'f', 'य़': 'y',
+      
+      // Vowel signs (matras)
+      'ा': 'aa', 'ि': 'i', 'ी': 'ee', 'ु': 'u', 'ू': 'oo',
+      'े': 'e', 'ै': 'ai', 'ो': 'o', 'ौ': 'au',
+      'ृ': 'ri', 'ॄ': 'ree',
+      
+      // Special characters
+      'ं': 'n', 'ः': 'h', 'ँ': 'n', '़': '', '्': '',
+      'ॐ': 'om',
+      
+      // Numbers
+      '०': '0', '१': '1', '२': '2', '३': '3', '४': '4',
+      '५': '5', '६': '6', '७': '7', '८': '8', '९': '9'
+    };
+
     function convertToHinglish() {
       const text = input.value.trim();
       if (!text) {
         output.value = '';
         return;
       }
-      // Check if the library is loaded
-      if (typeof transliterate === 'undefined') {
-        output.value = 'Error: Transliteration library not loaded. Please refresh.';
-        return;
-      }
+
       try {
-        // Use the global transliterate function from the library
-        const result = transliterate(text);
+        let result = '';
+        let i = 0;
+        
+        while (i < text.length) {
+          let char = text[i];
+          let matched = false;
+          
+          // Check for two-character combinations first
+          if (i < text.length - 1) {
+            let twoChar = text[i] + text[i + 1];
+            if (transliterationMap[twoChar]) {
+              result += transliterationMap[twoChar];
+              i += 2;
+              matched = true;
+            }
+          }
+          
+          // If no two-char match, try single character
+          if (!matched) {
+            if (transliterationMap[char]) {
+              // Handle halant (virama) - it removes the implicit 'a'
+              if (char === '्') {
+                result += transliterationMap[char];
+              } else if (i < text.length - 1 && text[i + 1] === '्') {
+                // Consonant followed by halant
+                result += transliterationMap[char];
+              } else if (/[क-ह]/.test(char)) {
+                // Consonant without halant - add implicit 'a'
+                result += transliterationMap[char] + 'a';
+              } else {
+                result += transliterationMap[char];
+              }
+            } else {
+              // Keep non-Devanagari characters as-is (spaces, punctuation, etc.)
+              result += char;
+            }
+            i++;
+          }
+        }
+        
+        // Clean up the result
+        result = result
+          .replace(/a([aeiou])/g, '$1')  // Remove 'a' before vowel matras
+          .replace(/aa/g, 'a')            // Simplify double 'a'
+          .replace(/([^aeiou])a\s/g, '$1 '); // Keep 'a' at word end
+        
         output.value = result;
       } catch (error) {
         output.value = 'Error during transliteration.';
@@ -132,6 +203,13 @@
       if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
         convertToHinglish();
       }
+    });
+
+    // Optional: Auto-convert as user types (with debounce)
+    let timeout;
+    input.addEventListener('input', () => {
+      clearTimeout(timeout);
+      timeout = setTimeout(convertToHinglish, 300);
     });
   </script>
 </body>

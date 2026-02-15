@@ -127,9 +127,50 @@
           return;
         }
 
-        // Convert Devanagari to ITRANS (Roman script)
-        // You can also use 'iast' for more academic transliteration
-        const result = Sanscript.t(text, 'devanagari', 'itrans');
+        // Convert Devanagari to ITRANS first
+        let result = Sanscript.t(text, 'devanagari', 'itrans');
+        
+        // Post-process to make it more natural Hinglish
+        result = result
+          // Remove tilde for nasalization - make it simpler
+          .replace(/~N/g, 'n')
+          .replace(/~n/g, 'n')
+          .replace(/N/g, 'n')
+          
+          // Fix double letters and make more readable
+          .replace(/aa/g, 'a')
+          .replace(/ii/g, 'i')
+          .replace(/uu/g, 'u')
+          .replace(/ee/g, 'i')
+          .replace(/oo/g, 'u')
+          
+          // Convert special characters to simpler forms
+          .replace(/R\^i/g, 'ri')
+          .replace(/R\^I/g, 'ri')
+          .replace(/L\^i/g, 'li')
+          
+          // Fix halant issues
+          .replace(/\\/g, '')
+          
+          // Convert sh sounds
+          .replace(/z/g, 'z')
+          .replace(/jh/g, 'jh')
+          
+          // Handle common patterns
+          .replace(/aM/g, 'am')
+          .replace(/aH/g, 'ah')
+          .replace(/M/g, 'm')
+          .replace(/H/g, 'h')
+          
+          // Clean up any remaining special chars
+          .replace(/\{/g, '')
+          .replace(/\}/g, '')
+          .replace(/\|/g, '')
+          .replace(/\^/g, '')
+          
+          // Capitalize first letter of sentences
+          .replace(/(^\w|\.\s+\w)/gm, letter => letter.toUpperCase());
+
         output.value = result;
       } catch (error) {
         output.value = 'Error during conversion: ' + error.message;

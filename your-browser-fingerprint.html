@@ -47,20 +47,17 @@
         .data-table td { color: #e2e8f0; font-family: monospace; }
         .loader { color: #fbbf24; font-size: 1.2rem; font-weight: bold; }
     </style>
-
-    <!-- 🔥 JUGAD: dynamic import ki jagah standard script tag thok diya -->
-    <script src="https://openfpcdn.io/fingerprintjs/v4/umd.js"></script>
 </head>
 <body>
 
     <div class="container">
         <h1>🔍 Website Tracking Test</h1>
-        <p class="subtitle">This page shows the hidden details websites collect to identify you without cookies.</p>
+        <p class="subtitle">Bypassed Shield! This page shows the hidden details websites collect to identify you without cookies.</p>
 
-        <div id="loading" class="loader">Please wait. Analyzing your browser fingerprint...</div>
+        <div id="loading" class="loader">Analyzing your fingerprint locally...</div>
         
         <div id="result" style="display: none;">
-            <h3>Your Unique Browser ID:</h3>
+            <h3>Your Unique Browser ID (Bypassed):</h3>
             <div class="hash-box" id="fp-id"></div>
 
             <h3>Data Collected From Your Device:</h3>
@@ -82,41 +79,81 @@
                     <td id="data-lang">Loading...</td>
                 </tr>
                 <tr>
-                    <th>Touch Screen Support</th>
-                    <td id="data-touch">Loading...</td>
+                    <th>Canvas Raw Hash</th>
+                    <td id="data-canvas">Loading...</td>
                 </tr>
             </table>
         </div>
     </div>
 
     <script>
-        // Naya aur asan tareeka library chalane ka
-        function initFingerprint() {
-            if (typeof FingerprintJS === 'undefined') {
-                document.getElementById('loading').innerText = "Error: FingerprintJS blocked by your Ad-Blocker/Browser Shield! Turn it off to test.";
-                return;
+        // 🔥 JUGAD: Bina kisi external script ke, khud ka hashing aur canvas logic!
+        // Ad-blocker isko kabhi nahi pakad paayega kyunki yo tairay domain se chal rha h
+
+        // 1. Chhota sa hashing algorithm (MurmurHash3 jaisa) unique ID banane khatir
+        function cyrb128(str) {
+            let h1 = 1779033703, h2 = 3024734485, h3 = 3362625948, h4 = 502494325;
+            for (let i = 0, k; i < str.length; i++) {
+                k = str.charCodeAt(i);
+                h1 = h2 ^ Math.imul(h1 ^ k, 597399067);
+                h2 = h3 ^ Math.imul(h2 ^ k, 2869860233);
+                h3 = h4 ^ Math.imul(h3 ^ k, 951274213);
+                h4 = h1 ^ Math.imul(h4 ^ k, 2716044179);
             }
-
-            FingerprintJS.load()
-                .then(fp => fp.get())
-                .then(result => {
-                    document.getElementById('loading').style.display = 'none';
-                    document.getElementById('result').style.display = 'block';
-
-                    document.getElementById('fp-id').innerText = result.visitorId;
-                    document.getElementById('data-ua').innerText = navigator.userAgent;
-                    document.getElementById('data-screen').innerText = `${screen.width}x${screen.height} (${screen.colorDepth}-bit)`;
-                    document.getElementById('data-timezone').innerText = Intl.DateTimeFormat().resolvedOptions().timeZone;
-                    document.getElementById('data-lang').innerText = navigator.language;
-                    document.getElementById('data-touch').innerText = ('ontouchstart' in window) ? "Yes (Touch Screen Device)" : "No (Desktop/Laptop)";
-                })
-                .catch(error => {
-                    document.getElementById('loading').innerText = "An error occurred: " + error;
-                });
+            h1 = Math.imul(h3 ^ (h1 >>> 18), 597399067);
+            h2 = Math.imul(h4 ^ (h2 >>> 22), 2869860233);
+            h3 = Math.imul(h1 ^ (h3 >>> 17), 951274213);
+            h4 = Math.imul(h2 ^ (h4 >>> 19), 2716044179);
+            return [(h1^h2^h3^h4)>>>0, (h2^h1)>>>0, (h3^h1)>>>0, (h4^h1)>>>0].map(x => x.toString(16)).join('');
         }
 
-        // Page load hote hi chala do
-        window.onload = initFingerprint;
+        function getCanvasFingerprint() {
+            try {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                ctx.textBaseline = "top";
+                ctx.font = "14px 'Arial'";
+                ctx.textBaseline = "alphabetic";
+                ctx.fillStyle = "#f60";
+                ctx.fillRect(125,1,62,20);
+                ctx.fillStyle = "#069";
+                ctx.fillText("NakulDhull_Bypass_999", 2, 15);
+                ctx.fillStyle = "rgba(102, 204, 0, 0.7)";
+                ctx.fillText("NakulDhull_Bypass_999", 4, 17);
+                return canvas.toDataURL();
+            } catch(e) {
+                return "Blocked_Canvas";
+            }
+        }
+
+        function runBypassScanner() {
+            // Saara raw data ik इकट्ठा karo
+            const ua = navigator.userAgent;
+            const screenData = `${screen.width}x${screen.height}x${screen.colorDepth}`;
+            const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            const lang = navigator.language;
+            const canvasData = getCanvasFingerprint();
+
+            // Quark software ki tarah saari baatan ko ek sath rassa baandh do
+            const rawString = [ua, screenData, tz, lang, canvasData].join('|');
+            
+            // Apne ghasu hasher se unique ID dhar do
+            const visitorId = cyrb128(rawString);
+
+            // Screen pe maal chipkao
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('result').style.display = 'block';
+
+            document.getElementById('fp-id').innerText = visitorId;
+            document.getElementById('data-ua').innerText = ua;
+            document.getElementById('data-screen').innerText = screenData + " bits";
+            document.getElementById('data-timezone').innerText = tz;
+            document.getElementById('data-lang').innerText = lang;
+            document.getElementById('data-canvas').innerText = cyrb128(canvasData).substring(0, 16) + "... (Hashed)";
+        }
+
+        // Page load hote hi chalao bina kisi dariye ke
+        window.onload = runBypassScanner;
     </script>
 </body>
 </html>

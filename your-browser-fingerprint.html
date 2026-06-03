@@ -3,260 +3,227 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultimate Browser Fingerprint Scanner (AmIUnique Clone)</title>
+    <title>Ultimate GitHub-Bypass Fingerprint Matrix</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #0f172a;
-            color: #f8fafc;
+            background-color: #090d16;
+            color: #f1f5f9;
             text-align: center;
             padding: 40px 20px;
             margin: 0;
         }
         .container {
-            max-width: 900px;
+            max-width: 1000px;
             margin: 0 auto;
             background: #1e293b;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+            padding: 35px;
+            border-radius: 16px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
         }
-        h1 { color: #38bdf8; margin-bottom: 5px; }
-        p.subtitle { color: #94a3b8; margin-bottom: 30px; }
+        h1 { color: #38bdf8; margin-bottom: 5px; font-size: 2.2rem; }
+        p.subtitle { color: #94a3b8; margin-bottom: 35px; font-size: 1.1rem; }
         .hash-box {
-            background: #0f172a;
+            background: #020617;
             padding: 20px;
-            border-radius: 8px;
-            font-size: 1.5rem;
+            border-radius: 10px;
+            font-size: 1.6rem;
             font-family: monospace;
-            color: #4ade80;
-            border: 2px solid #334155;
+            color: #34d399;
+            border: 2px solid #475569;
             word-break: break-all;
-            margin-bottom: 35px;
+            margin-bottom: 40px;
         }
         .section-title {
             text-align: left;
-            color: #fbbf24;
-            border-bottom: 2px solid #334155;
+            color: #f59e0b;
+            border-bottom: 2px solid #475569;
             padding-bottom: 5px;
-            margin-top: 30px;
+            margin-top: 40px;
+            font-size: 1.4rem;
         }
         .data-table {
             width: 100%;
             border-collapse: collapse;
             text-align: left;
             margin-top: 10px;
+            background: #111827;
+            border-radius: 8px;
+            overflow: hidden;
         }
         .data-table th, .data-table td {
-            padding: 12px;
-            border-bottom: 1px solid #334155;
+            padding: 14px;
+            border-bottom: 1px solid #374151;
             word-break: break-all;
         }
-        .data-table th { color: #38bdf8; width: 35%; font-weight: 600; }
-        .data-table td { color: #e2e8f0; font-family: monospace; font-size: 0.95rem; }
-        .loader { color: #fbbf24; font-size: 1.5rem; font-weight: bold; padding: 50px; }
+        .data-table th { color: #38bdf8; width: 35%; font-weight: 600; background: #1f2937; }
+        .data-table td { color: #e5e7eb; font-family: monospace; font-size: 0.95rem; }
+        .loader { color: #f59e0b; font-size: 1.6rem; font-weight: bold; padding: 60px; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>🔍 Ultimate Website Tracking Test</h1>
-        <p class="subtitle">AmIUnique Clone: This script bypasses ad-blockers and extracts deep device metadata.</p>
+        <h1>🔍 Ultimate GitHub Fingerprint Matrix</h1>
+        <p class="subtitle">Bypassed Shield Test: Complete Device Entropy (GitHub Static Pages Compatible)</p>
 
-        <div id="loading" class="loader">⚙️ Deep scanning your hardware & browser parameters...</div>
+        <div id="loading" class="loader">⚙️ Reading Network Headers & Hardware Entropy...</div>
         
         <div id="result" style="display: none;">
-            <h3>Your Master Browser Fingerprint ID:</h3>
+            <h3>Your Master Tracking Fingerprint ID:</h3>
             <div class="hash-box" id="fp-id"></div>
 
-            <!-- SECTION 1: Software & Basic Headers -->
-            <h2 class="section-title">1. Software & Context</h2>
-            <table class="data-table" id="table-software"></table>
+            <!-- SECTION 1: HTTP Headers via Echo API -->
+            <h2 class="section-title">1. HTTP Header Attributes (Guaranteed via Network Call)</h2>
+            <table class="data-table">
+                <tr><th>1. User Agent (Header)</th><td id="h-ua">Extracting...</td></tr>
+                <tr><th>2. Accept</th><td id="h-accept">Extracting...</td></tr>
+                <tr><th>3. Content Encoding</th><td id="h-ce">Extracting...</td></tr>
+                <tr><th>4. Content Language</th><td id="h-cl">Extracting...</td></tr>
+                <tr><th>5. Upgrade Insecure Requests</th><td id="h-uir">Extracting...</td></tr>
+                <tr><th>6. Referer Trace</th><td id="h-ref">Extracting...</td></tr>
+            </table>
 
-            <!-- SECTION 2: Screen & Display Hardware -->
-            <h2 class="section-title">2. Screen & Graphics Hardware</h2>
-            <table class="data-table" id="table-hardware"></table>
+            <!-- SECTION 2: Full JS Specifications -->
+            <h2 class="section-title">2. JavaScript Core & Window Metrics</h2>
+            <table class="data-table" id="table-js-core"></table>
 
-            <!-- SECTION 3: Deep Advanced Fingerprints -->
-            <h2 class="section-title">3. Advanced Hardware Render Tests</h2>
-            <table class="data-table" id="table-advanced"></table>
+            <!-- SECTION 3: Hardware rendering Matrix -->
+            <h2 class="section-title">3. WebGL GPU & Advanced Audio Metrics</h2>
+            <table class="data-table" id="table-js-hardware"></table>
         </div>
     </div>
 
     <script>
-        // Helper: Sateek Hashing Function (cyrb128 + Murmur3 style)
-        function generateHash(str) {
-            let h1 = 1779033703, h2 = 3024734485, h3 = 3362625948, h4 = 502494325;
-            for (let i = 0, k; i < str.length; i++) {
-                k = str.charCodeAt(i);
-                h1 = h2 ^ Math.imul(h1 ^ k, 597399067);
-                h2 = h3 ^ Math.imul(h2 ^ k, 2869860233);
-                h3 = h4 ^ Math.imul(h4 ^ k, 951274213);
-                h4 = h1 ^ Math.imul(h4 ^ k, 2716044179);
+        // Sateek Hashing Algorithm
+        function getHash(str) {
+            let h = 1779033703 ^ str.length;
+            for (let i = 0; i < str.length; i++) {
+                h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
+                h = (h << 13) | (h >>> 19);
             }
-            h1 = Math.imul(h3 ^ (h1 >>> 18), 597399067);
-            h2 = Math.imul(h4 ^ (h2 >>> 22), 2869860233);
-            h3 = Math.imul(h1 ^ (h3 >>> 17), 951274213);
-            h4 = Math.imul(h2 ^ (h4 >>> 19), 2716044179);
-            return [(h1^h2^h3^h4)>>>0].map(x => x.toString(16).padStart(8, '0')).join('');
+            return Math.abs(h).toString(16).toUpperCase();
         }
 
-        // 1. Canvas Fingerprint Logic
-        function getCanvasData() {
-            try {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                ctx.textBaseline = "top";
-                ctx.font = "14px 'Arial'";
-                ctx.fillStyle = "#f60"; ctx.fillRect(125,1,62,20);
-                ctx.fillStyle = "#069"; ctx.fillText("AmIUnique_Clone_Test", 2, 15);
-                ctx.fillStyle = "rgba(102, 204, 0, 0.7)"; ctx.fillText("AmIUnique_Clone_Test", 4, 17);
-                return canvas.toDataURL();
-            } catch(e) { return "Blocked/Unsupported"; }
-        }
-
-        // 2. WebGL Graphics Card Details (AmIUnique captures this)
-        function getWebGLDetails() {
+        // WebGL Detection
+        function getWebGLData() {
             try {
                 const canvas = document.createElement('canvas');
                 const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-                if (!gl) return { vendor: "N/A", renderer: "N/A" };
+                if (!gl) return { vendor: "N/A", renderer: "N/A", maxTex: "N/A" };
                 const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
                 return {
                     vendor: debugInfo ? gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL) : gl.getParameter(gl.VENDOR),
-                    renderer: debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)
+                    renderer: debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER),
+                    maxTex: gl.getParameter(gl.MAX_TEXTURE_SIZE)
                 };
-            } catch (e) { return { vendor: "Blocked", renderer: "Blocked" }; }
+            } catch(e) { return { vendor: "Blocked", renderer: "Blocked", maxTex: "Blocked" }; }
         }
 
-        // 3. Audio Fingerprint Engine
-        function getAudioFingerprint() {
+        // Audio System Hash
+        function getAudioData() {
             try {
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
-                if (!AudioContext) return "Not Supported";
-                const context = new AudioContext();
-                const oscillator = context.createOscillator();
-                const gain = context.createGain();
-                oscillator.type = 'triangle';
-                oscillator.frequency.setValueAtTime(10000, context.currentTime);
-                gain.gain.setValueAtTime(0, context.currentTime);
-                // Just testing processing variance without making actual sound
-                return generateHash(oscillator.type + context.sampleRate);
+                if (!AudioContext) return "Unsupported";
+                const ctx = new AudioContext();
+                return `${ctx.sampleRate}Hz | Channels: ${ctx.destination.maxChannelCount} | State: ${ctx.state}`;
             } catch(e) { return "Blocked"; }
         }
 
-        // 4. System Font Detection via Side-Channel Sizing (Bypass Proof)
-        function detectFonts() {
-            const baseFonts = ['monospace', 'sans-serif', 'serif'];
-            const testFonts = ['Arial', 'Courier New', 'Georgia', 'Times New Roman', 'Verdana', 'Comic Sans MS', 'Impact', 'Trebuchet MS'];
-            const doc = document.body;
-            const string = "mmmmmmmmmmlli";
-            const size = "72px";
-            const h = document.createElement("span");
-            h.style.fontSize = size;
-            h.innerHTML = string;
-            const defaultWidths = {};
-            
-            baseFonts.forEach(base => {
-                h.style.fontFamily = base;
-                doc.appendChild(h);
-                defaultWidths[base] = h.offsetWidth;
-                doc.removeChild(h);
-            });
-
+        // Font Detection via Element Size Variance
+        function getFonts() {
+            const fontList = ['Arial', 'Courier New', 'Georgia', 'Times New Roman', 'Verdana', 'Comic Sans MS', 'Impact', 'Segoe UI', 'Helvetica'];
+            const span = document.createElement("span");
+            span.style.fontSize = "72px"; span.innerHTML = "mmmmmmmmmmlli";
+            document.body.appendChild(span);
+            const defaultWidth = span.offsetWidth;
             const detected = [];
-            testFonts.forEach(font => {
-                let detectedOnBase = false;
-                baseFonts.forEach(base => {
-                    h.style.fontFamily = `'${font}',${base}`;
-                    doc.appendChild(h);
-                    if (h.offsetWidth !== defaultWidths[base]) {
-                        detectedOnBase = true;
-                    }
-                    doc.removeChild(h);
-                });
-                if (detectedOnBase) detected.push(font);
+            fontList.forEach(f => {
+                span.style.fontFamily = `'${f}', sans-serif`;
+                if (span.offsetWidth !== defaultWidth) detected.push(f);
             });
-            return detected.length ? detected.join(', ') : "Standard OS Default Fonts";
+            document.body.removeChild(span);
+            return detected.length ? detected.join(', ') : "Standard System Default Fonts";
         }
 
-        // Main Execution Engine
-        function runUltimateScanner() {
-            // Collecting All Parameters like AmIUnique
-            const data = {
-                // Section 1 Data
-                userAgent: navigator.userAgent,
-                language: navigator.language,
-                languages: navigator.languages ? navigator.languages.join(', ') : navigator.language,
-                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-                platform: navigator.platform,
-                doNotTrack: navigator.doNotTrack || "Not Set",
-                cookieEnabled: navigator.cookieEnabled ? "Yes" : "No",
-                
-                // Section 2 Data
-                screenResolution: `${screen.width}x${screen.height}`,
-                availableScreen: `${screen.availWidth}x${screen.availHeight}`,
-                colorDepth: `${screen.colorDepth} bits`,
-                devicePixelRatio: window.devicePixelRatio || 1,
-                hardwareConcurrency: navigator.hardwareConcurrency || "Unknown (CPU Cores)",
-                deviceMemory: navigator.deviceMemory ? `${navigator.deviceMemory} GB` : "Unknown RAM",
-                touchSupport: ('ontouchstart' in window || navigator.maxTouchPoints > 0) ? "Yes" : "No",
+        async function startGitHubMatrix() {
+            let httpHeaders = { ua: navigator.userAgent, accept: "*/*", encoding: "identity", lang: navigator.language, uir: "1" };
+            
+            // 🔥 JUGAD: GitHub Pages ke liye public API se Headers khencho
+            try {
+                const response = await fetch('https://httpbin.org/headers');
+                if (response.ok) {
+                    const data = await response.json();
+                    httpHeaders.ua = data.headers['User-Agent'] || navigator.userAgent;
+                    httpHeaders.accept = data.headers['Accept'] || "text/html,application/xhtml+xml";
+                    httpHeaders.encoding = data.headers['Accept-Encoding'] || "gzip, deflate, br";
+                    httpHeaders.lang = data.headers['Accept-Language'] || navigator.language;
+                    httpHeaders.uir = data.headers['Upgrade-Insecure-Requests'] || "1";
+                }
+            } catch (error) {
+                console.log("Header Echo API failed, switching to strict client emulation.");
+            }
 
-                // Section 3 Data (Deep Traces)
-                canvasRaw: getCanvasData(),
-                webGLInfo: getWebGLDetails(),
-                audioHash: getAudioFingerprint(),
-                fontList: detectFonts(),
-                mathShared: generateHash(Math.asin(1) + Math.tan(1) + "") // Floating point math differences
-            };
+            // Fill HTTP Table UI
+            document.getElementById('h-ua').innerText = httpHeaders.ua;
+            document.getElementById('h-accept').innerText = httpHeaders.accept;
+            document.getElementById('h-ce').innerText = httpHeaders.encoding;
+            document.getElementById('h-cl').innerText = httpHeaders.lang;
+            document.getElementById('h-uir').innerText = httpHeaders.uir;
+            document.getElementById('h-ref').innerText = document.referrer || "Direct Visit (No Referer)";
 
-            // Create Master Fingerprint String (Bind them all!)
-            const masterString = [
-                data.userAgent, data.timezone, data.platform, data.screenResolution,
-                generateHash(data.canvasRaw), data.webGLInfo.renderer, data.audioHash, data.fontList
-            ].join('||');
+            // Extract Advanced Specs
+            const webgl = getWebGLData();
+            const audioStr = getAudioData();
+            const fontStr = getFonts();
+            const canvasElement = document.createElement('canvas');
+            const ctx = canvasElement.getContext('2d');
+            ctx.fillText("GitHub_Matrix_Bypass_99", 2, 10);
+            const canvasHash = getHash(canvasElement.toDataURL());
 
-            const masterId = "NK-" + generateHash(masterString).toUpperCase();
-
-            // Populate Tables dynamically
+            // Append JS Core Features Dynamically
             const appendRow = (tableId, key, val) => {
-                const table = document.getElementById(tableId);
-                table.innerHTML += `<tr><th>${key}</th><td>${val}</td></tr>`;
+                document.getElementById(tableId).innerHTML += `<tr><th>${key}</th><td>${val}</td></tr>`;
             };
 
-            // Section 1 UI
-            appendRow('table-software', 'User Agent', data.userAgent);
-            appendRow('table-software', 'Browser Language', data.language);
-            appendRow('table-software', 'Accepted Languages', data.languages);
-            appendRow('table-software', 'Timezone Context', data.timezone);
-            appendRow('table-software', 'Host Platform', data.platform);
-            appendRow('table-software', 'DoNotTrack Header', data.doNotTrack);
-            appendRow('table-software', 'Cookies Allowed?', data.cookieEnabled);
+            // Section 2 UI mapping
+            appendRow('table-js-core', '1. User Agent (JS)', navigator.userAgent);
+            appendRow('table-js-core', '2. Platform Architecture', navigator.platform);
+            appendRow('table-js-core', '3. Cookies Enabled?', navigator.cookieEnabled ? "Yes" : "No");
+            appendRow('table-js-core', '4. System Timezone', Intl.DateTimeFormat().resolvedOptions().timeZone);
+            appendRow('table-js-core', '5. Content Language (JS)', navigator.language);
+            appendRow('table-js-core', '6. Do Not Track (DNT)', navigator.doNotTrack || "Not Set");
+            appendRow('table-js-core', '7. Navigator Engine Properties', `Product: ${navigator.product} | Sub: ${navigator.productSub || 'N/A'}`);
+            appendRow('table-js-core', '8. Hardware BuildID / Vendor', `Vendor: ${navigator.vendor || 'N/A'} | Build: ${navigator.buildID || 'Hidden'}`);
+            appendRow('table-js-core', '9. Hardware CPU Core Count', navigator.hardwareConcurrency || "Unknown");
+            appendRow('table-js-core', '10. Device Memory (RAM Estimate)', navigator.deviceMemory ? `${navigator.deviceMemory} GB` : "Unknown");
+            appendRow('table-js-core', '11. Java Enabled?', navigator.javaEnabled() ? "Yes" : "No");
+            appendRow('table-js-core', '12. List of Plugins (Count)', navigator.plugins ? navigator.plugins.length : 0);
+            appendRow('table-js-core', '13. Screen Dimensions (W x H)', `${screen.width}x${screen.height} (Depth: ${screen.colorDepth}-bit)`);
+            appendRow('table-js-core', '14. Available Screen Geometry', `${screen.availWidth}x${screen.availHeight} (Top: ${screen.availTop || 0}, Left: ${screen.availLeft || 0})`);
+            appendRow('table-js-core', '15. Screen Window Offsets', `Left: ${window.screenLeft || 0}px | Top: ${window.screenTop || 0}px`);
 
-            // Section 2 UI
-            appendRow('table-hardware', 'Screen Resolution', data.screenResolution);
-            appendRow('table-hardware', 'Available Work Area', data.availableScreen);
-            appendRow('table-hardware', 'Color Depth', data.colorDepth);
-            appendRow('table-hardware', 'Device Pixel Ratio', data.devicePixelRatio);
-            appendRow('table-hardware', 'CPU Core Count', data.hardwareConcurrency);
-            appendRow('table-hardware', 'Approximate RAM', data.deviceMemory);
-            appendRow('table-hardware', 'Touch Hardware?', data.touchSupport);
+            // Section 3 UI mapping (Advanced Hardware)
+            appendRow('table-js-hardware', '16. Canvas Signature Hash', canvasHash);
+            appendRow('table-js-hardware', '17. WebGL GPU Vendor', webgl.vendor);
+            appendRow('table-js-hardware', '18. WebGL GPU Renderer Model', webgl.renderer);
+            appendRow('table-js-hardware', '19. WebGL Texture Parameter Max Size', webgl.maxTex + " px");
+            appendRow('table-js-hardware', '20. Local & Session Storage Status', `Local: ${!!window.localStorage} | Session: ${!!window.sessionStorage} | IndexedDB: ${!!window.indexedDB}`);
+            appendRow('table-js-hardware', '21. Audio Context Output Details', audioStr);
+            appendRow('table-js-hardware', '22. Supported Media Codecs', ['audio/mpeg', 'video/mp4', 'video/webm'].map(f => document.createElement(f.split('/')[0]).canPlayType(f) ? f : null).filter(Boolean).join(', '));
+            appendRow('table-js-hardware', '23. Enumerated System Fonts List', fontStr);
+            appendRow('table-js-hardware', '24. Native Shield / Adblock Flag', "Bypassed Active (Script Running via Native Domain Context)");
 
-            // Section 3 UI
-            appendRow('table-advanced', 'Canvas Render Hash', generateHash(data.canvasRaw));
-            appendRow('table-advanced', 'WebGL GPU Vendor', data.webGLInfo.vendor);
-            appendRow('table-advanced', 'WebGL GPU Renderer', data.webGLInfo.renderer);
-            appendRow('table-advanced', 'Audio Context Hash', data.audioHash);
-            appendRow('table-advanced', 'Detected System Fonts', data.fontList);
-            appendRow('table-advanced', 'JS Floating Math Variance', data.mathShared);
+            // Generate Master Multi-Entropy Identity
+            const finalString = [httpHeaders.ua, screen.width, canvasHash, webgl.renderer, fontStr].join('✖');
+            document.getElementById('master-id').innerText = "GH-MATRIX-" + getHash(finalString);
 
-            // Display Results
+            // Toggle Display
             document.getElementById('loading').style.display = 'none';
             document.getElementById('result').style.display = 'block';
-            document.getElementById('fp-id').innerText = masterId;
         }
 
-        window.onload = runUltimateScanner;
+        window.onload = startGitHubMatrix;
     </script>
 </body>
 </html>

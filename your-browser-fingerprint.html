@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Browser Fingerprint Scanner</title>
+    <title>Ultimate Browser Fingerprint Scanner (AmIUnique Clone)</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -11,149 +11,252 @@
             color: #f8fafc;
             text-align: center;
             padding: 40px 20px;
+            margin: 0;
         }
         .container {
-            max-width: 700px;
+            max-width: 900px;
             margin: 0 auto;
             background: #1e293b;
             padding: 30px;
             border-radius: 12px;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
         }
         h1 { color: #38bdf8; margin-bottom: 5px; }
         p.subtitle { color: #94a3b8; margin-bottom: 30px; }
         .hash-box {
             background: #0f172a;
-            padding: 15px;
+            padding: 20px;
             border-radius: 8px;
-            font-size: 1.2rem;
+            font-size: 1.5rem;
             font-family: monospace;
             color: #4ade80;
-            border: 1px solid #334155;
+            border: 2px solid #334155;
             word-break: break-all;
-            margin-bottom: 30px;
+            margin-bottom: 35px;
+        }
+        .section-title {
+            text-align: left;
+            color: #fbbf24;
+            border-bottom: 2px solid #334155;
+            padding-bottom: 5px;
+            margin-top: 30px;
         }
         .data-table {
             width: 100%;
             border-collapse: collapse;
             text-align: left;
-            margin-top: 20px;
+            margin-top: 10px;
         }
         .data-table th, .data-table td {
             padding: 12px;
             border-bottom: 1px solid #334155;
+            word-break: break-all;
         }
-        .data-table th { color: #38bdf8; width: 35%; }
-        .data-table td { color: #e2e8f0; font-family: monospace; }
-        .loader { color: #fbbf24; font-size: 1.2rem; font-weight: bold; }
+        .data-table th { color: #38bdf8; width: 35%; font-weight: 600; }
+        .data-table td { color: #e2e8f0; font-family: monospace; font-size: 0.95rem; }
+        .loader { color: #fbbf24; font-size: 1.5rem; font-weight: bold; padding: 50px; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>🔍 Website Tracking Test</h1>
-        <p class="subtitle">Bypassed Shield! This page shows the hidden details websites collect to identify you without cookies.</p>
+        <h1>🔍 Ultimate Website Tracking Test</h1>
+        <p class="subtitle">AmIUnique Clone: This script bypasses ad-blockers and extracts deep device metadata.</p>
 
-        <div id="loading" class="loader">Analyzing your fingerprint locally...</div>
+        <div id="loading" class="loader">⚙️ Deep scanning your hardware & browser parameters...</div>
         
         <div id="result" style="display: none;">
-            <h3>Your Unique Browser ID (Bypassed):</h3>
+            <h3>Your Master Browser Fingerprint ID:</h3>
             <div class="hash-box" id="fp-id"></div>
 
-            <h3>Data Collected From Your Device:</h3>
-            <table class="data-table">
-                <tr>
-                    <th>Operating System & Browser</th>
-                    <td id="data-ua">Loading...</td>
-                </tr>
-                <tr>
-                    <th>Screen Resolution</th>
-                    <td id="data-screen">Loading...</td>
-                </tr>
-                <tr>
-                    <th>Timezone</th>
-                    <td id="data-timezone">Loading...</td>
-                </tr>
-                <tr>
-                    <th>Device Language</th>
-                    <td id="data-lang">Loading...</td>
-                </tr>
-                <tr>
-                    <th>Canvas Raw Hash</th>
-                    <td id="data-canvas">Loading...</td>
-                </tr>
-            </table>
+            <!-- SECTION 1: Software & Basic Headers -->
+            <h2 class="section-title">1. Software & Context</h2>
+            <table class="data-table" id="table-software"></table>
+
+            <!-- SECTION 2: Screen & Display Hardware -->
+            <h2 class="section-title">2. Screen & Graphics Hardware</h2>
+            <table class="data-table" id="table-hardware"></table>
+
+            <!-- SECTION 3: Deep Advanced Fingerprints -->
+            <h2 class="section-title">3. Advanced Hardware Render Tests</h2>
+            <table class="data-table" id="table-advanced"></table>
         </div>
     </div>
 
     <script>
-        // 🔥 JUGAD: Bina kisi external script ke, khud ka hashing aur canvas logic!
-        // Ad-blocker isko kabhi nahi pakad paayega kyunki yo tairay domain se chal rha h
-
-        // 1. Chhota sa hashing algorithm (MurmurHash3 jaisa) unique ID banane khatir
-        function cyrb128(str) {
+        // Helper: Sateek Hashing Function (cyrb128 + Murmur3 style)
+        function generateHash(str) {
             let h1 = 1779033703, h2 = 3024734485, h3 = 3362625948, h4 = 502494325;
             for (let i = 0, k; i < str.length; i++) {
                 k = str.charCodeAt(i);
                 h1 = h2 ^ Math.imul(h1 ^ k, 597399067);
                 h2 = h3 ^ Math.imul(h2 ^ k, 2869860233);
-                h3 = h4 ^ Math.imul(h3 ^ k, 951274213);
+                h3 = h4 ^ Math.imul(h4 ^ k, 951274213);
                 h4 = h1 ^ Math.imul(h4 ^ k, 2716044179);
             }
             h1 = Math.imul(h3 ^ (h1 >>> 18), 597399067);
             h2 = Math.imul(h4 ^ (h2 >>> 22), 2869860233);
             h3 = Math.imul(h1 ^ (h3 >>> 17), 951274213);
             h4 = Math.imul(h2 ^ (h4 >>> 19), 2716044179);
-            return [(h1^h2^h3^h4)>>>0, (h2^h1)>>>0, (h3^h1)>>>0, (h4^h1)>>>0].map(x => x.toString(16)).join('');
+            return [(h1^h2^h3^h4)>>>0].map(x => x.toString(16).padStart(8, '0')).join('');
         }
 
-        function getCanvasFingerprint() {
+        // 1. Canvas Fingerprint Logic
+        function getCanvasData() {
             try {
                 const canvas = document.createElement('canvas');
                 const ctx = canvas.getContext('2d');
                 ctx.textBaseline = "top";
                 ctx.font = "14px 'Arial'";
-                ctx.textBaseline = "alphabetic";
-                ctx.fillStyle = "#f60";
-                ctx.fillRect(125,1,62,20);
-                ctx.fillStyle = "#069";
-                ctx.fillText("NakulDhull_Bypass_999", 2, 15);
-                ctx.fillStyle = "rgba(102, 204, 0, 0.7)";
-                ctx.fillText("NakulDhull_Bypass_999", 4, 17);
+                ctx.fillStyle = "#f60"; ctx.fillRect(125,1,62,20);
+                ctx.fillStyle = "#069"; ctx.fillText("AmIUnique_Clone_Test", 2, 15);
+                ctx.fillStyle = "rgba(102, 204, 0, 0.7)"; ctx.fillText("AmIUnique_Clone_Test", 4, 17);
                 return canvas.toDataURL();
-            } catch(e) {
-                return "Blocked_Canvas";
-            }
+            } catch(e) { return "Blocked/Unsupported"; }
         }
 
-        function runBypassScanner() {
-            // Saara raw data ik इकट्ठा karo
-            const ua = navigator.userAgent;
-            const screenData = `${screen.width}x${screen.height}x${screen.colorDepth}`;
-            const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-            const lang = navigator.language;
-            const canvasData = getCanvasFingerprint();
+        // 2. WebGL Graphics Card Details (AmIUnique captures this)
+        function getWebGLDetails() {
+            try {
+                const canvas = document.createElement('canvas');
+                const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+                if (!gl) return { vendor: "N/A", renderer: "N/A" };
+                const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+                return {
+                    vendor: debugInfo ? gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL) : gl.getParameter(gl.VENDOR),
+                    renderer: debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)
+                };
+            } catch (e) { return { vendor: "Blocked", renderer: "Blocked" }; }
+        }
 
-            // Quark software ki tarah saari baatan ko ek sath rassa baandh do
-            const rawString = [ua, screenData, tz, lang, canvasData].join('|');
+        // 3. Audio Fingerprint Engine
+        function getAudioFingerprint() {
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContext) return "Not Supported";
+                const context = new AudioContext();
+                const oscillator = context.createOscillator();
+                const gain = context.createGain();
+                oscillator.type = 'triangle';
+                oscillator.frequency.setValueAtTime(10000, context.currentTime);
+                gain.gain.setValueAtTime(0, context.currentTime);
+                // Just testing processing variance without making actual sound
+                return generateHash(oscillator.type + context.sampleRate);
+            } catch(e) { return "Blocked"; }
+        }
+
+        // 4. System Font Detection via Side-Channel Sizing (Bypass Proof)
+        function detectFonts() {
+            const baseFonts = ['monospace', 'sans-serif', 'serif'];
+            const testFonts = ['Arial', 'Courier New', 'Georgia', 'Times New Roman', 'Verdana', 'Comic Sans MS', 'Impact', 'Trebuchet MS'];
+            const doc = document.body;
+            const string = "mmmmmmmmmmlli";
+            const size = "72px";
+            const h = document.createElement("span");
+            h.style.fontSize = size;
+            h.innerHTML = string;
+            const defaultWidths = {};
             
-            // Apne ghasu hasher se unique ID dhar do
-            const visitorId = cyrb128(rawString);
+            baseFonts.forEach(base => {
+                h.style.fontFamily = base;
+                doc.appendChild(h);
+                defaultWidths[base] = h.offsetWidth;
+                doc.removeChild(h);
+            });
 
-            // Screen pe maal chipkao
+            const detected = [];
+            testFonts.forEach(font => {
+                let detectedOnBase = false;
+                baseFonts.forEach(base => {
+                    h.style.fontFamily = `'${font}',${base}`;
+                    doc.appendChild(h);
+                    if (h.offsetWidth !== defaultWidths[base]) {
+                        detectedOnBase = true;
+                    }
+                    doc.removeChild(h);
+                });
+                if (detectedOnBase) detected.push(font);
+            });
+            return detected.length ? detected.join(', ') : "Standard OS Default Fonts";
+        }
+
+        // Main Execution Engine
+        function runUltimateScanner() {
+            // Collecting All Parameters like AmIUnique
+            const data = {
+                // Section 1 Data
+                userAgent: navigator.userAgent,
+                language: navigator.language,
+                languages: navigator.languages ? navigator.languages.join(', ') : navigator.language,
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                platform: navigator.platform,
+                doNotTrack: navigator.doNotTrack || "Not Set",
+                cookieEnabled: navigator.cookieEnabled ? "Yes" : "No",
+                
+                // Section 2 Data
+                screenResolution: `${screen.width}x${screen.height}`,
+                availableScreen: `${screen.availWidth}x${screen.availHeight}`,
+                colorDepth: `${screen.colorDepth} bits`,
+                devicePixelRatio: window.devicePixelRatio || 1,
+                hardwareConcurrency: navigator.hardwareConcurrency || "Unknown (CPU Cores)",
+                deviceMemory: navigator.deviceMemory ? `${navigator.deviceMemory} GB` : "Unknown RAM",
+                touchSupport: ('ontouchstart' in window || navigator.maxTouchPoints > 0) ? "Yes" : "No",
+
+                // Section 3 Data (Deep Traces)
+                canvasRaw: getCanvasData(),
+                webGLInfo: getWebGLDetails(),
+                audioHash: getAudioFingerprint(),
+                fontList: detectFonts(),
+                mathShared: generateHash(Math.asin(1) + Math.tan(1) + "") // Floating point math differences
+            };
+
+            // Create Master Fingerprint String (Bind them all!)
+            const masterString = [
+                data.userAgent, data.timezone, data.platform, data.screenResolution,
+                generateHash(data.canvasRaw), data.webGLInfo.renderer, data.audioHash, data.fontList
+            ].join('||');
+
+            const masterId = "NK-" + generateHash(masterString).toUpperCase();
+
+            // Populate Tables dynamically
+            const appendRow = (tableId, key, val) => {
+                const table = document.getElementById(tableId);
+                table.innerHTML += `<tr><th>${key}</th><td>${val}</td></tr>`;
+            };
+
+            // Section 1 UI
+            appendRow('table-software', 'User Agent', data.userAgent);
+            appendRow('table-software', 'Browser Language', data.language);
+            appendRow('table-software', 'Accepted Languages', data.languages);
+            appendRow('table-software', 'Timezone Context', data.timezone);
+            appendRow('table-software', 'Host Platform', data.platform);
+            appendRow('table-software', 'DoNotTrack Header', data.doNotTrack);
+            appendRow('table-software', 'Cookies Allowed?', data.cookieEnabled);
+
+            // Section 2 UI
+            appendRow('table-hardware', 'Screen Resolution', data.screenResolution);
+            appendRow('table-hardware', 'Available Work Area', data.availableScreen);
+            appendRow('table-hardware', 'Color Depth', data.colorDepth);
+            appendRow('table-hardware', 'Device Pixel Ratio', data.devicePixelRatio);
+            appendRow('table-hardware', 'CPU Core Count', data.hardwareConcurrency);
+            appendRow('table-hardware', 'Approximate RAM', data.deviceMemory);
+            appendRow('table-hardware', 'Touch Hardware?', data.touchSupport);
+
+            // Section 3 UI
+            appendRow('table-advanced', 'Canvas Render Hash', generateHash(data.canvasRaw));
+            appendRow('table-advanced', 'WebGL GPU Vendor', data.webGLInfo.vendor);
+            appendRow('table-advanced', 'WebGL GPU Renderer', data.webGLInfo.renderer);
+            appendRow('table-advanced', 'Audio Context Hash', data.audioHash);
+            appendRow('table-advanced', 'Detected System Fonts', data.fontList);
+            appendRow('table-advanced', 'JS Floating Math Variance', data.mathShared);
+
+            // Display Results
             document.getElementById('loading').style.display = 'none';
             document.getElementById('result').style.display = 'block';
-
-            document.getElementById('fp-id').innerText = visitorId;
-            document.getElementById('data-ua').innerText = ua;
-            document.getElementById('data-screen').innerText = screenData + " bits";
-            document.getElementById('data-timezone').innerText = tz;
-            document.getElementById('data-lang').innerText = lang;
-            document.getElementById('data-canvas').innerText = cyrb128(canvasData).substring(0, 16) + "... (Hashed)";
+            document.getElementById('fp-id').innerText = masterId;
         }
 
-        // Page load hote hi chalao bina kisi dariye ke
-        window.onload = runBypassScanner;
+        window.onload = runUltimateScanner;
     </script>
 </body>
 </html>

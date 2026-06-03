@@ -3,225 +3,131 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultimate GitHub-Bypass Fingerprint Matrix</title>
+    <title>Ultimate Unstoppable Fingerprint Matrix</title>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #090d16;
-            color: #f1f5f9;
-            text-align: center;
-            padding: 40px 20px;
-            margin: 0;
-        }
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            background: #1e293b;
-            padding: 35px;
-            border-radius: 16px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
-        }
-        h1 { color: #38bdf8; margin-bottom: 5px; font-size: 2.2rem; }
-        p.subtitle { color: #94a3b8; margin-bottom: 35px; font-size: 1.1rem; }
-        .hash-box {
-            background: #020617;
-            padding: 20px;
-            border-radius: 10px;
-            font-size: 1.6rem;
-            font-family: monospace;
-            color: #34d399;
-            border: 2px solid #475569;
-            word-break: break-all;
-            margin-bottom: 40px;
-        }
-        .section-title {
-            text-align: left;
-            color: #f59e0b;
-            border-bottom: 2px solid #475569;
-            padding-bottom: 5px;
-            margin-top: 40px;
-            font-size: 1.4rem;
-        }
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-            margin-top: 10px;
-            background: #111827;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        .data-table th, .data-table td {
-            padding: 14px;
-            border-bottom: 1px solid #374151;
-            word-break: break-all;
-        }
-        .data-table th { color: #38bdf8; width: 35%; font-weight: 600; background: #1f2937; }
-        .data-table td { color: #e5e7eb; font-family: monospace; font-size: 0.95rem; }
-        .loader { color: #f59e0b; font-size: 1.6rem; font-weight: bold; padding: 60px; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #090d16; color: #f1f5f9; text-align: center; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; background: #1e293b; padding: 25px; border-radius: 16px; text-align: left; box-shadow: 0 10px 20px rgba(0,0,0,0.4); }
+        h1 { color: #38bdf8; text-align: center; font-size: 2rem; margin-bottom: 5px; }
+        p.sub { text-align: center; color: #94a3b8; margin-bottom: 30px; }
+        .hash-box { background: #020617; padding: 15px; border-radius: 8px; font-size: 1.4rem; font-family: monospace; color: #34d399; text-align: center; border: 2px solid #475569; word-break: break-all; margin-bottom: 30px; }
+        .section-title { color: #f59e0b; border-bottom: 2px solid #475569; padding-bottom: 5px; margin-top: 30px; font-size: 1.2rem; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; background: #111827; border-radius: 8px; overflow: hidden; }
+        th, td { padding: 12px; border-bottom: 1px solid #374151; word-break: break-all; font-family: monospace; font-size: 0.9rem; }
+        th { color: #38bdf8; width: 35%; background: #1f2937; text-align: left; }
+        td { color: #e5e7eb; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>🔍 Ultimate GitHub Fingerprint Matrix</h1>
-        <p class="subtitle">Bypassed Shield Test: Complete Device Entropy (Instant Loading Fix)</p>
+        <h1>🔍 Ultimate Unstoppable Fingerprint Matrix</h1>
+        <p class="sub">Shield-Proof Sandbox Technology (Instant Load Guaranteed)</p>
 
-        <div id="loading" class="loader">⚙️ Reading Device Hardware & Browser Entropy...</div>
-        
-        <div id="result" style="display: none;">
-            <h3>Your Master Tracking Fingerprint ID:</h3>
-            <div class="hash-box" id="fp-id"></div>
+        <h3>Your Unique Master Tracker ID:</h3>
+        <div class="hash-box" id="fp-id">GENERATING...</div>
 
-            <h2 class="section-title">1. Browser Identity & Simulated HTTP Metadata</h2>
-            <table class="data-table" id="table-software"></table>
+        <h2 class="section-title">1. Simulated HTTP & Core Identity Parameters</h2>
+        <table id="table-identity"></table>
 
-            <h2 class="section-title">2. Screen & Window Geometry</h2>
-            <table class="data-table" id="table-screen"></table>
+        <h2 class="section-title">2. Screen & Window Geometry (Inch-To-Inch Metrics)</h2>
+        <table id="table-screen"></table>
 
-            <h2 class="section-title">3. Storage, Permissions & Settings</h2>
-            <table class="data-table" id="table-storage"></table>
-
-            <h2 class="section-title">4. WebGL GPU Hardware Matrix</h2>
-            <table class="data-table" id="table-webgl"></table>
-
-            <h2 class="section-title">5. Audio Context Engine & System Fonts</h2>
-            <table class="data-table" id="table-audio"></table>
-        </div>
+        <h2 class="section-title">3. Storage, Permissions & Hard Hardware Vectors</h2>
+        <table id="table-hardware"></table>
     </div>
 
     <script>
-        // Strong Local Hashing Tool (Bypasses any server requirements)
-        function getHash(str) {
-            let h = 1779033703 ^ str.length;
+        // Simple and robust local hashing function
+        function safeHash(str) {
+            let h = 0;
             for (let i = 0; i < str.length; i++) {
-                h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
-                h = (h << 13) | (h >>> 19);
+                h = (h << 5) - h + str.charCodeAt(i);
+                h |= 0;
             }
-            return Math.abs(h).toString(16).toUpperCase();
+            return "NKL-" + Math.abs(h).toString(16).toUpperCase();
         }
 
-        // WebGL Detection
-        function getWebGLData() {
+        // Safe extractor that wraps everything in a try-catch to prevent freezes
+        function safeExtract(fn, fallbackValue = "Blocked / Restricted by Browser") {
             try {
-                const canvas = document.createElement('canvas');
-                const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-                if (!gl) return { vendor: "N/A", renderer: "N/A", maxTex: "N/A" };
-                const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
-                return {
-                    vendor: debugInfo ? gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL) : gl.getParameter(gl.VENDOR),
-                    renderer: debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER),
-                    maxTex: gl.getParameter(gl.MAX_TEXTURE_SIZE)
-                };
-            } catch(e) { return { vendor: "Blocked", renderer: "Blocked", maxTex: "Blocked" }; }
+                return fn();
+            } catch (e) {
+                return fallbackValue;
+            }
         }
 
-        // Audio System Specification
-        function getAudioData() {
-            try {
-                const AudioContext = window.AudioContext || window.webkitAudioContext;
-                if (!AudioContext) return "Unsupported";
-                const ctx = new AudioContext();
-                return `${ctx.sampleRate}Hz | Channels: ${ctx.destination.maxChannelCount} | State: ${ctx.state}`;
-            } catch(e) { return "Blocked"; }
-        }
+        window.onload = function() {
+            const tableId = document.getElementById('table-identity');
+            const tableScreen = document.getElementById('table-screen');
+            const tableHardware = document.getElementById('table-hardware');
 
-        // Font Detection via Layout Variance
-        function getFonts() {
-            const fontList = ['Arial', 'Courier New', 'Georgia', 'Times New Roman', 'Verdana', 'Comic Sans MS', 'Impact', 'Segoe UI', 'Helvetica'];
-            const span = document.createElement("span");
-            span.style.fontSize = "72px"; span.innerHTML = "mmmmmmmmmmlli";
-            document.body.appendChild(span);
-            const defaultWidth = span.offsetWidth;
-            const detected = [];
-            fontList.forEach(f => {
-                span.style.fontFamily = `'${f}', sans-serif`;
-                if (span.offsetWidth !== defaultWidth) detected.push(f);
-            });
-            document.body.removeChild(span);
-            return detected.length ? detected.join(', ') : "Standard System Default Fonts";
-        }
-
-        function runInstantMatrix() {
-            // Helper to insert rows
-            const append = (tableId, key, value) => {
-                const table = document.getElementById(tableId);
-                if (table) {
-                    table.innerHTML += `<tr><th>${key}</th><td>${value || 'N/A / Blocked'}</td></tr>`;
-                }
+            const appendRow = (table, key, val) => {
+                table.innerHTML += `<tr><th>${key}</th><td>${val}</td></tr>`;
             };
 
-            // 1. Canvas Generation
-            const canvasElement = document.createElement('canvas');
-            const ctx = canvasElement.getContext('2d');
-            ctx.fillText("GitHub_Matrix_Bypass_Fixed", 2, 10);
-            const canvasHash = getHash(canvasElement.toDataURL());
+            // --- SECTION 1: IDENTITY ---
+            appendRow(tableId, "1. User Agent", safeExtract(() => navigator.userAgent));
+            appendRow(tableId, "2. Platform Architecture", safeExtract(() => navigator.platform));
+            appendRow(tableId, "3. System Timezone", safeExtract(() => Intl.DateTimeFormat().resolvedOptions().timeZone));
+            appendRow(tableId, "4. Content Language", safeExtract(() => navigator.language));
+            appendRow(tableId, "5. Do Not Track (DNT)", safeExtract(() => navigator.doNotTrack || "Not Set"));
+            appendRow(tableId, "6. Simulated Accept Header", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+            appendRow(tableId, "7. Simulated Content Encoding", "gzip, deflate, br, zstd");
+            appendRow(tableId, "8. Upgrade Insecure Requests", "1");
+            appendRow(tableId, "9. Referer Context Trace", safeExtract(() => document.referrer || "Direct Visit (No Referer)"));
+            appendRow(tableId, "10. Navigator Core Specs", safeExtract(() => `Product: ${navigator.product} | Vendor: ${navigator.vendor || 'N/A'}`));
 
-            const webgl = getWebGLData();
-            const audioStr = getAudioData();
-            const fontStr = getFonts();
+            // --- SECTION 2: GEOMETRY ---
+            appendRow(tableScreen, "11. Screen Dimensions", safeExtract(() => `${screen.width}x${screen.height} (${screen.colorDepth}-bit)`));
+            appendRow(tableScreen, "12. Available Screen Space", safeExtract(() => `${screen.availWidth}x${screen.availHeight} (Top: ${screen.availTop || 0}, Left: ${screen.availLeft || 0})`));
+            appendRow(tableScreen, "13. Window UI Offsets", safeExtract(() => `Left: ${window.screenLeft}px | Top: ${window.screenTop}px`));
+            appendRow(tableScreen, "14. Device Pixel Ratio", safeExtract(() => window.devicePixelRatio || 1));
+            appendRow(tableScreen, "15. UI Element: Location Bar", safeExtract(() => window.locationbar.visible ? "Visible" : "Hidden"));
+            appendRow(tableScreen, "16. UI Element: Menu Bar", safeExtract(() => window.menubar.visible ? "Visible" : "Hidden"));
+            appendRow(tableScreen, "17. UI Element: Personal Bar", safeExtract(() => window.personalbar.visible ? "Visible" : "Hidden"));
+            appendRow(tableScreen, "18. UI Element: Status Bar", safeExtract(() => window.statusbar.visible ? "Visible" : "Hidden"));
 
-            // ---- SECTION 1 UI (Software & Simulated Headers) ----
-            append('table-software', '1. User Agent (JS Context)', navigator.userAgent);
-            append('table-software', '2. Simulated Accept Header', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8');
-            append('table-software', '3. Simulated Content Encoding', 'gzip, deflate, br, zstd (Client Preference)');
-            append('table-software', '4. Content Language (Browser Match)', navigator.language);
-            append('table-software', '5. Upgrade Insecure Requests Flag', '1 (Enforced Active)');
-            append('table-software', '6. Referer Context Trace', document.referrer || "Direct Visit (No Referer Trace)");
-            append('table-software', '7. Platform Architecture', navigator.platform);
-            append('table-software', '8. System Timezone Region', Intl.DateTimeFormat().resolvedOptions().timeZone);
-            append('table-software', '9. Do Not Track (DNT) Status', navigator.doNotTrack || "Not Set");
-            append('table-software', '10. Browser Engine (Product)', `${navigator.product} (Sub: ${navigator.productSub || 'N/A'})`);
-            append('table-software', '11. Core Vendor Specifications', `${navigator.vendor || 'N/A'} (Sub: ${navigator.vendorSub || 'N/A'})`);
-            append('table-software', '12. Engine Build Identity', navigator.buildID || "Hidden inside Modern Engines");
+            // --- SECTION 3: HARDWARE & STORAGE (Most targeted by ad-blockers) ---
+            appendRow(tableHardware, "19. Cookies Allowed?", safeExtract(() => navigator.cookieEnabled ? "Yes" : "No"));
+            appendRow(tableHardware, "20. Local & Session Storage", safeExtract(() => `Local: ${!!window.localStorage} | Session: ${!!window.sessionStorage}`));
+            appendRow(tableHardware, "21. IndexedDB Status", safeExtract(() => typeof indexedDB !== 'undefined' ? "Supported" : "Blocked"));
+            
+            // Safe Canvas Signature Extraction
+            const canvasHash = safeExtract(() => {
+                const can = document.createElement('canvas');
+                const ctx = can.getContext('2d');
+                ctx.fillText("Bypass_Test_2026", 2, 10);
+                return safeHash(can.toDataURL());
+            }, "Blocked by Anti-Fingerprinting Shield");
+            appendRow(tableHardware, "22. Canvas Element Signature Hash", canvasHash);
 
-            // ---- SECTION 2 UI (Screen & Geometry) ----
-            append('table-screen', '13. Master Screen Resolution', `${screen.width}x${screen.height}`);
-            append('table-screen', '14. Screen Color Depth', `${screen.colorDepth}-bit`);
-            append('table-screen', '15. Available Screen Width / Height', `${screen.availWidth}x${screen.availHeight}`);
-            append('table-screen', '16. Screen Available Top / Left Offset', `Top: ${screen.availTop || 0}px \| Left: ${screen.availLeft || 0}px`);
-            append('table-screen', '17. Screen Window Real Offsets', `Left: ${window.screenLeft || 0}px \| Top: ${window.screenTop || 0}px`);
-            append('table-screen', '18. Device Pixel Ratio (UI Scale)', window.devicePixelRatio || 1);
-            append('table-screen', '19. Window Location Bar Visible?', window.locationbar.visible ? "Yes" : "No");
-            append('table-screen', '20. Window Menu Bar Visible?', window.menubar.visible ? "Yes" : "No");
-            append('table-screen', '21. Window Personal Bar Visible?', window.personalbar.visible ? "Yes" : "No");
-            append('table-screen', '22. Window Status Bar Visible?', window.statusbar.visible ? "Yes" : "No");
+            // Safe WebGL GPU Extraction
+            const gpuModel = safeExtract(() => {
+                const can = document.createElement('canvas');
+                const gl = can.getContext('webgl') || can.getContext('experimental-webgl');
+                if (!gl) return "Unsupported GPU Engine";
+                const dbg = gl.getExtension('WEBGL_debug_renderer_info');
+                return dbg ? gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER);
+            }, "Blocked by Anti-Fingerprinting Shield");
+            appendRow(tableHardware, "23. WebGL GPU Renderer Model", gpuModel);
 
-            // ---- SECTION 3 UI (Storage & Permissions) ----
-            append('table-storage', '23. Cookies Allowed Status', navigator.cookieEnabled ? "Yes" : "No");
-            append('table-storage', '24. Java Plugin Activation Status', navigator.javaEnabled() ? "Active" : "Disabled/Dead");
-            append('table-storage', '25. Use of Local Storage', typeof localStorage !== 'undefined' ? "Accessible" : "Blocked");
-            append('table-storage', '26. Use of Session Storage', typeof sessionStorage !== 'undefined' ? "Accessible" : "Blocked");
-            append('table-storage', '27. Use of IndexedDB Engine', typeof indexedDB !== 'undefined' ? "Supported" : "Blocked");
-            append('table-storage', '28. Shield/Adblock Flag Diagnostics', "Active Guard (Scripts Isolated via Local Domain Context)");
-            append('table-storage', '29. Notification Permissions State', 'Notification' in window ? Notification.permission : "Unsupported");
+            // Safe Audio Context Extraction
+            const audioSpec = safeExtract(() => {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContext) return "Unsupported Audio System";
+                const ctx = new AudioContext();
+                return `${ctx.sampleRate}Hz | Max Channels: ${ctx.destination.maxChannelCount}`;
+            }, "Blocked by Anti-Fingerprinting Shield");
+            appendRow(tableHardware, "24. Audio Hardware Output Metrics", audioSpec);
 
-            // ---- SECTION 4 UI (WebGL GPU Matrix) ----
-            append('table-webgl', '30. Canvas Render Element Signature', canvasHash);
-            append('table-webgl', '31. WebGL Support Verification', webgl.renderer !== 'N/A' ? "Supported" : "Unsupported");
-            append('table-webgl', '32. WebGL Hardware GPU Vendor', webgl.vendor);
-            append('table-webgl', '33. WebGL GPU Renderer Model Name', webgl.renderer);
-            append('table-webgl', '34. WebGL Max Texture Size Limit', webgl.maxTex + " px");
+            appendRow(tableHardware, "25. CPU Thread Cores Count", safeExtract(() => navigator.hardwareConcurrency || "Hidden"));
+            appendRow(tableHardware, "26. Device Memory (RAM)", safeExtract(() => navigator.deviceMemory ? `${navigator.deviceMemory} GB` : "Hidden"));
+            appendRow(tableHardware, "27. Touch Screen Detected?", safeExtract(() => ('ontouchstart' in window || navigator.maxTouchPoints > 0) ? "Yes" : "No"));
 
-            // ---- SECTION 5 UI (Audio & Hardware Sensors) ----
-            append('table-audio', '35. Hardware CPU Core Threads Count', navigator.hardwareConcurrency || "Hidden/Unknown");
-            append('table-audio', '36. Device Physical Memory (RAM Estimate)', navigator.deviceMemory ? `${navigator.deviceMemory} GB` : "Unknown");
-            append('table-audio', '37. Physical Touch Screen Support?', ('ontouchstart' in window || navigator.maxTouchPoints > 0) ? "Yes" : "No");
-            append('table-audio', '38. Audio Hardware Sample Rate Specs', audioStr);
-            append('table-audio', '39. Enumerated System Fonts List', fontStr);
-
-            // Generate Master Multi-Entropy Identity String
-            const finalBlob = [navigator.userAgent, screen.width, canvasHash, webgl.renderer, fontStr].join('✖');
-            document.getElementById('fp-id').innerText = "GH-MATRIX-" + getHash(finalBlob);
-
-            // Hide Loader and Reveal Instant Tables
-            document.getElementById('loading').style.style.display = 'none'; // Safe hide
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('result').style.display = 'block';
-        }
-
-        // Run instantly without waiting for slow external networks
-        window.onload = runInstantMatrix;
+            // Master Entropy ID Build
+            const entropySeed = [navigator.userAgent, screen.width, canvasHash, gpuModel].join('|');
+            document.getElementById('fp-id').innerText = safeHash(entropySeed);
+        };
     </script>
 </body>
 </html>

@@ -47,6 +47,9 @@
         .data-table td { color: #e2e8f0; font-family: monospace; }
         .loader { color: #fbbf24; font-size: 1.2rem; font-weight: bold; }
     </style>
+
+    <!-- 🔥 JUGAD: dynamic import ki jagah standard script tag thok diya -->
+    <script src="https://openfpcdn.io/fingerprintjs/v4/umd.js"></script>
 </head>
 <body>
 
@@ -54,10 +57,8 @@
         <h1>🔍 Website Tracking Test</h1>
         <p class="subtitle">This page shows the hidden details websites collect to identify you without cookies.</p>
 
-        <!-- Loading message -->
         <div id="loading" class="loader">Please wait. Analyzing your browser fingerprint...</div>
         
-        <!-- Results section (Hidden by default) -->
         <div id="result" style="display: none;">
             <h3>Your Unique Browser ID:</h3>
             <div class="hash-box" id="fp-id"></div>
@@ -88,34 +89,34 @@
         </div>
     </div>
 
-    <!-- Loading FingerprintJS Library -->
     <script>
-        // Load the open-source FingerprintJS library from a global CDN
-        const fpPromise = import('https://openfpcdn.io/fingerprintjs/v4')
-            .then(FingerprintJS => FingerprintJS.load())
+        // Naya aur asan tareeka library chalane ka
+        function initFingerprint() {
+            if (typeof FingerprintJS === 'undefined') {
+                document.getElementById('loading').innerText = "Error: FingerprintJS blocked by your Ad-Blocker/Browser Shield! Turn it off to test.";
+                return;
+            }
 
-        // Get the fingerprint data and update the webpage
-        fpPromise
-            .then(fp => fp.get())
-            .then(result => {
-                // Hide the loading message and show the results
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('result').style.display = 'block';
+            FingerprintJS.load()
+                .then(fp => fp.get())
+                .then(result => {
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('result').style.display = 'block';
 
-                // Display the calculated Unique Visitor ID
-                document.getElementById('fp-id').innerText = result.visitorId;
+                    document.getElementById('fp-id').innerText = result.visitorId;
+                    document.getElementById('data-ua').innerText = navigator.userAgent;
+                    document.getElementById('data-screen').innerText = `${screen.width}x${screen.height} (${screen.colorDepth}-bit)`;
+                    document.getElementById('data-timezone').innerText = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                    document.getElementById('data-lang').innerText = navigator.language;
+                    document.getElementById('data-touch').innerText = ('ontouchstart' in window) ? "Yes (Touch Screen Device)" : "No (Desktop/Laptop)";
+                })
+                .catch(error => {
+                    document.getElementById('loading').innerText = "An error occurred: " + error;
+                });
+        }
 
-                // Fill the table with standard browser information
-                document.getElementById('data-ua').innerText = navigator.userAgent;
-                document.getElementById('data-screen').innerText = `${screen.width}x${screen.height} (${screen.colorDepth}-bit)`;
-                document.getElementById('data-timezone').innerText = Intl.DateTimeFormat().resolvedOptions().timeZone;
-                document.getElementById('data-lang').innerText = navigator.language;
-                document.getElementById('data-touch').innerText = ('ontouchstart' in window) ? "Yes (Touch Screen Device)" : "No (Desktop/Laptop)";
-            })
-            .catch(error => {
-                // Show an error message if something goes wrong
-                document.getElementById('loading').innerText = "An error occurred: " + error;
-            });
+        // Page load hote hi chala do
+        window.onload = initFingerprint;
     </script>
 </body>
 </html>
